@@ -6,4 +6,5 @@
 *.scm#*
 .#*.scm
 
-compiled/
+**/compiled/
+.claude/

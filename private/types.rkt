@@ -10,6 +10,7 @@
          ;; Window flags
          _SDL_WindowFlags
          SDL_WINDOW_RESIZABLE
+         SDL_WINDOW_HIGH_PIXEL_DENSITY
          ;; Pointer types
          _SDL_Window-pointer
          _SDL_Window-pointer/null
@@ -17,6 +18,8 @@
          _SDL_Renderer-pointer/null
          _SDL_Texture-pointer
          _SDL_Texture-pointer/null
+         _SDL_Surface-pointer
+         _SDL_Surface-pointer/null
          ;; Rect structs
          _SDL_FRect
          _SDL_FRect-pointer
@@ -30,6 +33,14 @@
          set-SDL_FRect-y!
          set-SDL_FRect-w!
          set-SDL_FRect-h!
+         ;; Color struct
+         _SDL_Color
+         _SDL_Color-pointer
+         make-SDL_Color
+         SDL_Color-r
+         SDL_Color-g
+         SDL_Color-b
+         SDL_Color-a
          ;; Event constants
          SDL_EVENT_QUIT
          ;; Window events
@@ -44,6 +55,8 @@
          ;; Keyboard events
          SDL_EVENT_KEY_DOWN
          SDL_EVENT_KEY_UP
+         ;; Text input
+         SDL_EVENT_TEXT_INPUT
          ;; Mouse events
          SDL_EVENT_MOUSE_MOTION
          SDL_EVENT_MOUSE_BUTTON_DOWN
@@ -83,12 +96,18 @@
          SDL_MouseButtonEvent-clicks
          SDL_MouseButtonEvent-x
          SDL_MouseButtonEvent-y
+         _SDL_TextInputEvent
+         _SDL_TextInputEvent-pointer
+         SDL_TextInputEvent-type
+         SDL_TextInputEvent-windowID
+         SDL_TextInputEvent-text
          ;; Event union helpers
          SDL_EVENT_SIZE
          sdl-event-type
          event->keyboard
          event->mouse-motion
          event->mouse-button
+         event->text-input
          ;; Key constants
          SDLK_ESCAPE
          SDLK_R
@@ -125,7 +144,8 @@
 ;; ============================================================================
 ;; Window Flags (SDL_WindowFlags) - 64-bit in SDL3
 ;; ============================================================================
-(define SDL_WINDOW_RESIZABLE #x0000000000000020)
+(define SDL_WINDOW_RESIZABLE           #x0000000000000020)
+(define SDL_WINDOW_HIGH_PIXEL_DENSITY  #x0000000000002000)
 
 ;; SDL_WindowFlags is a 64-bit unsigned integer in SDL3 (flags can be combined with bitwise-ior)
 (define _SDL_WindowFlags _uint64)
@@ -136,6 +156,7 @@
 (define-cpointer-type _SDL_Window-pointer)
 (define-cpointer-type _SDL_Renderer-pointer)
 (define-cpointer-type _SDL_Texture-pointer)
+(define-cpointer-type _SDL_Surface-pointer)
 
 ;; ============================================================================
 ;; Rectangle Structs
@@ -147,6 +168,17 @@
    [y _float]
    [w _float]
    [h _float]))
+
+;; ============================================================================
+;; Color Struct
+;; ============================================================================
+
+;; SDL_Color - RGBA color (r, g, b, a each 0-255)
+(define-cstruct _SDL_Color
+  ([r _uint8]
+   [g _uint8]
+   [b _uint8]
+   [a _uint8]))
 
 ;; ============================================================================
 ;; Event Constants
@@ -164,6 +196,8 @@
 ;; Keyboard events
 (define SDL_EVENT_KEY_DOWN #x300)
 (define SDL_EVENT_KEY_UP #x301)
+;; Text input
+(define SDL_EVENT_TEXT_INPUT #x303)
 ;; Mouse events
 (define SDL_EVENT_MOUSE_MOTION #x400)
 (define SDL_EVENT_MOUSE_BUTTON_DOWN #x401)
@@ -242,6 +276,14 @@
    [x _float]
    [y _float]))
 
+;; SDL_TextInputEvent - text input with actual characters (handles shift/caps automatically)
+(define-cstruct _SDL_TextInputEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [windowID _uint32]
+   [text _pointer]))  ; const char* - UTF-8 encoded text
+
 ;; SDL_Event union size (128 bytes in SDL3)
 (define SDL_EVENT_SIZE 128)
 
@@ -258,6 +300,9 @@
 
 (define (event->mouse-button event-ptr)
   (cast event-ptr _pointer _SDL_MouseButtonEvent-pointer))
+
+(define (event->text-input event-ptr)
+  (cast event-ptr _pointer _SDL_TextInputEvent-pointer))
 
 ;; ============================================================================
 ;; Error Handling

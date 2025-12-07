@@ -24,6 +24,7 @@
          SDL-CreateWindow
          SDL-DestroyWindow
          SDL-SetWindowTitle
+         SDL-GetWindowPixelDensity
          ;; Renderer
          SDL-CreateRenderer
          SDL-DestroyRenderer
@@ -34,10 +35,16 @@
          SDL-DestroyTexture
          SDL-RenderTexture
          SDL-GetTextureSize
+         SDL-CreateTextureFromSurface
+         ;; Surface
+         SDL-DestroySurface
          ;; Events
          SDL-PollEvent
          ;; Keyboard
          SDL-GetKeyName
+         ;; Text Input
+         SDL-StartTextInput
+         SDL-StopTextInput
          ;; Timer
          SDL-Delay)
 
@@ -84,6 +91,12 @@
 ;; SDL_DestroyWindow: Destroy a window
 (define-sdl SDL-DestroyWindow (_fun _SDL_Window-pointer -> _void)
   #:c-id SDL_DestroyWindow)
+
+;; SDL_GetWindowPixelDensity: Get the pixel density of a window
+;; window: the window to query
+;; Returns: the pixel density (e.g., 2.0 for Retina displays)
+(define-sdl SDL-GetWindowPixelDensity (_fun _SDL_Window-pointer -> _float)
+  #:c-id SDL_GetWindowPixelDensity)
 
 ;; ============================================================================
 ;; Renderer
@@ -146,6 +159,23 @@
   (_fun _SDL_Texture-pointer _pointer _pointer -> _sdl-bool)
   #:c-id SDL_GetTextureSize)
 
+;; SDL_CreateTextureFromSurface: Create a texture from an existing surface
+;; renderer: the renderer to use
+;; surface: the surface to convert to a texture
+;; Returns: pointer to the texture, or NULL on failure
+(define-sdl SDL-CreateTextureFromSurface
+  (_fun _SDL_Renderer-pointer _SDL_Surface-pointer -> _SDL_Texture-pointer/null)
+  #:c-id SDL_CreateTextureFromSurface)
+
+;; ============================================================================
+;; Surface
+;; ============================================================================
+
+;; SDL_DestroySurface: Free a surface (replaces SDL_FreeSurface from SDL2)
+;; surface: the surface to destroy
+(define-sdl SDL-DestroySurface (_fun _SDL_Surface-pointer -> _void)
+  #:c-id SDL_DestroySurface)
+
 ;; ============================================================================
 ;; Events
 ;; ============================================================================
@@ -165,6 +195,22 @@
 ;; Returns: A human-readable key name string
 (define-sdl SDL-GetKeyName (_fun _SDL_Keycode -> _string)
   #:c-id SDL_GetKeyName)
+
+;; ============================================================================
+;; Text Input
+;; ============================================================================
+
+;; SDL_StartTextInput: Start accepting text input events
+;; window: the window to enable text input for
+;; Returns: true on success, false on failure
+(define-sdl SDL-StartTextInput (_fun _SDL_Window-pointer -> _sdl-bool)
+  #:c-id SDL_StartTextInput)
+
+;; SDL_StopTextInput: Stop accepting text input events
+;; window: the window to disable text input for
+;; Returns: true on success, false on failure
+(define-sdl SDL-StopTextInput (_fun _SDL_Window-pointer -> _sdl-bool)
+  #:c-id SDL_StopTextInput)
 
 ;; ============================================================================
 ;; Window (additional functions)

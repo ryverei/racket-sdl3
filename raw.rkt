@@ -9,10 +9,112 @@
 ;; For Racket-idiomatic wrappers with automatic resource management,
 ;; see the pretty.rkt module.
 
-(require "private/lib.rkt"
+(require ffi/unsafe
+         "private/lib.rkt"
          "private/types.rkt")
 
 (provide (all-from-out "private/lib.rkt")
-         (all-from-out "private/types.rkt"))
+         (all-from-out "private/types.rkt")
+         ;; Initialization
+         SDL-Init
+         SDL-Quit
+         ;; Error handling
+         SDL-GetError
+         ;; Window management
+         SDL-CreateWindow
+         SDL-DestroyWindow
+         ;; Renderer
+         SDL-CreateRenderer
+         SDL-DestroyRenderer
+         SDL-SetRenderDrawColor
+         SDL-RenderClear
+         SDL-RenderPresent
+         ;; Events
+         SDL-PollEvent)
 
-;; SDL3 FFI bindings will be added here
+;; ============================================================================
+;; Initialization
+;; ============================================================================
+
+;; SDL_Init: Initialize the SDL library
+;; flags: SDL_InitFlags bitmask specifying subsystems to initialize
+;; Returns: true on success, false on failure
+(define-sdl SDL-Init (_fun _SDL_InitFlags -> _sdl-bool)
+  #:c-id SDL_Init)
+
+;; SDL_Quit: Clean up all initialized subsystems
+(define-sdl SDL-Quit (_fun -> _void)
+  #:c-id SDL_Quit)
+
+;; ============================================================================
+;; Error Handling
+;; ============================================================================
+
+;; SDL_GetError: Get the last error message
+;; Returns: A string describing the last error
+(define-sdl SDL-GetError (_fun -> _string)
+  #:c-id SDL_GetError)
+
+;; Register SDL_GetError with the types module for check-sdl-bool
+(sdl-get-error-proc SDL-GetError)
+
+;; ============================================================================
+;; Window Management
+;; ============================================================================
+
+;; SDL_CreateWindow: Create a window with the specified title, size, and flags
+;; title: The title of the window (UTF-8)
+;; w: Width of the window in pixels
+;; h: Height of the window in pixels
+;; flags: SDL_WindowFlags bitmask
+;; Returns: Pointer to the window, or NULL on failure
+(define-sdl SDL-CreateWindow
+  (_fun _string _int _int _SDL_WindowFlags -> _SDL_Window-pointer/null)
+  #:c-id SDL_CreateWindow)
+
+;; SDL_DestroyWindow: Destroy a window
+(define-sdl SDL-DestroyWindow (_fun _SDL_Window-pointer -> _void)
+  #:c-id SDL_DestroyWindow)
+
+;; ============================================================================
+;; Renderer
+;; ============================================================================
+
+;; SDL_CreateRenderer: Create a 2D rendering context for a window
+;; window: The window for the renderer
+;; name: The name of the renderer driver, or NULL for default
+;; Returns: Pointer to the renderer, or NULL on failure
+(define-sdl SDL-CreateRenderer
+  (_fun _SDL_Window-pointer _string/utf-8 -> _SDL_Renderer-pointer/null)
+  #:c-id SDL_CreateRenderer)
+
+;; SDL_DestroyRenderer: Destroy a renderer
+(define-sdl SDL-DestroyRenderer (_fun _SDL_Renderer-pointer -> _void)
+  #:c-id SDL_DestroyRenderer)
+
+;; SDL_SetRenderDrawColor: Set the color for drawing operations
+;; r, g, b, a: Color components (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetRenderDrawColor
+  (_fun _SDL_Renderer-pointer _uint8 _uint8 _uint8 _uint8 -> _sdl-bool)
+  #:c-id SDL_SetRenderDrawColor)
+
+;; SDL_RenderClear: Clear the renderer with the current draw color
+;; Returns: true on success, false on failure
+(define-sdl SDL-RenderClear (_fun _SDL_Renderer-pointer -> _sdl-bool)
+  #:c-id SDL_RenderClear)
+
+;; SDL_RenderPresent: Update the screen with any rendering since the last call
+;; Returns: true on success, false on failure
+(define-sdl SDL-RenderPresent (_fun _SDL_Renderer-pointer -> _sdl-bool)
+  #:c-id SDL_RenderPresent)
+
+;; ============================================================================
+;; Events
+;; ============================================================================
+
+;; SDL_PollEvent: Poll for currently pending events
+;; event: Pointer to an SDL_Event structure (at least 128 bytes)
+;; Returns: true if there is a pending event, false otherwise
+(define-sdl SDL-PollEvent (_fun _pointer -> _sdl-bool)
+  #:c-id SDL_PollEvent)

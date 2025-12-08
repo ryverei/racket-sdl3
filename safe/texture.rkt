@@ -17,6 +17,12 @@
  texture-destroy!
  texture-size
 
+ ;; Color/Alpha modulation
+ texture-set-color-mod!
+ texture-get-color-mod
+ texture-set-alpha-mod!
+ texture-get-alpha-mod
+
  ;; Rendering
  render-texture!)
 
@@ -73,6 +79,39 @@
   (unless (SDL-GetTextureSize (texture-ptr tex) w-ptr h-ptr)
     (error 'texture-size "Failed to get texture size: ~a" (SDL-GetError)))
   (values (ptr-ref w-ptr _float) (ptr-ref h-ptr _float)))
+
+;; ============================================================================
+;; Color/Alpha Modulation
+;; ============================================================================
+
+;; Set the color modulation for a texture (tinting)
+;; r, g, b: 0-255 color values multiplied with texture colors
+;; 255,255,255 = no tint (default), 255,0,0 = red tint, etc.
+(define (texture-set-color-mod! tex r g b)
+  (unless (SDL-SetTextureColorMod (texture-ptr tex) r g b)
+    (error 'texture-set-color-mod! "Failed to set color mod: ~a" (SDL-GetError))))
+
+;; Get the current color modulation for a texture
+;; Returns: (values r g b)
+(define (texture-get-color-mod tex)
+  (define-values (success r g b) (SDL-GetTextureColorMod (texture-ptr tex)))
+  (unless success
+    (error 'texture-get-color-mod "Failed to get color mod: ~a" (SDL-GetError)))
+  (values r g b))
+
+;; Set the alpha modulation for a texture (transparency)
+;; alpha: 0-255 (0 = fully transparent, 255 = fully opaque)
+(define (texture-set-alpha-mod! tex alpha)
+  (unless (SDL-SetTextureAlphaMod (texture-ptr tex) alpha)
+    (error 'texture-set-alpha-mod! "Failed to set alpha mod: ~a" (SDL-GetError))))
+
+;; Get the current alpha modulation for a texture
+;; Returns: alpha (0-255)
+(define (texture-get-alpha-mod tex)
+  (define-values (success alpha) (SDL-GetTextureAlphaMod (texture-ptr tex)))
+  (unless success
+    (error 'texture-get-alpha-mod "Failed to get alpha mod: ~a" (SDL-GetError)))
+  alpha)
 
 ;; ============================================================================
 ;; Texture Rendering

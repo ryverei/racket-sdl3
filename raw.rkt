@@ -50,6 +50,11 @@
          SDL-GetRenderDrawBlendMode
          SDL-SetTextureBlendMode
          SDL-GetTextureBlendMode
+         ;; Texture color/alpha modulation
+         SDL-SetTextureColorMod
+         SDL-GetTextureColorMod
+         SDL-SetTextureAlphaMod
+         SDL-GetTextureAlphaMod
          ;; Surface
          SDL-DestroySurface
          ;; Events
@@ -296,6 +301,48 @@
         -> (result : _sdl-bool)
         -> (values result blendMode))
   #:c-id SDL_GetTextureBlendMode)
+
+;; ============================================================================
+;; Texture Color/Alpha Modulation
+;; ============================================================================
+
+;; SDL_SetTextureColorMod: Set an additional color value multiplied into render copy operations
+;; texture: the texture to modify
+;; r, g, b: the color modulation values (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetTextureColorMod
+  (_fun _SDL_Texture-pointer _uint8 _uint8 _uint8 -> _sdl-bool)
+  #:c-id SDL_SetTextureColorMod)
+
+;; SDL_GetTextureColorMod: Get the additional color value multiplied into render copy operations
+;; texture: the texture to query
+;; Returns: (values success? r g b)
+(define-sdl SDL-GetTextureColorMod
+  (_fun _SDL_Texture-pointer
+        (r : (_ptr o _uint8))
+        (g : (_ptr o _uint8))
+        (b : (_ptr o _uint8))
+        -> (result : _sdl-bool)
+        -> (values result r g b))
+  #:c-id SDL_GetTextureColorMod)
+
+;; SDL_SetTextureAlphaMod: Set an additional alpha value multiplied into render copy operations
+;; texture: the texture to modify
+;; alpha: the alpha modulation value (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetTextureAlphaMod
+  (_fun _SDL_Texture-pointer _uint8 -> _sdl-bool)
+  #:c-id SDL_SetTextureAlphaMod)
+
+;; SDL_GetTextureAlphaMod: Get the additional alpha value multiplied into render copy operations
+;; texture: the texture to query
+;; Returns: (values success? alpha)
+(define-sdl SDL-GetTextureAlphaMod
+  (_fun _SDL_Texture-pointer
+        (alpha : (_ptr o _uint8))
+        -> (result : _sdl-bool)
+        -> (values result alpha))
+  #:c-id SDL_GetTextureAlphaMod)
 
 ;; ============================================================================
 ;; Surface

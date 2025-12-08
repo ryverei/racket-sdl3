@@ -28,6 +28,9 @@
 (define last-wheel-x 0.0)
 (define last-wheel-y 0.0)
 
+;; Current modifier state (tracked from key events)
+(define current-mod 0)
+
 ;; Scroll speed multiplier
 (define scroll-speed 30.0)
 
@@ -115,7 +118,44 @@
     (define dx (* (if (> last-wheel-x 0) 1.0 (if (< last-wheel-x 0) -1.0 0.0)) arrow-len))
     (define dy (* (if (> last-wheel-y 0) -1.0 (if (< last-wheel-y 0) 1.0 0.0)) arrow-len))
     (set-draw-color! renderer 100 255 100)
-    (draw-line! renderer center-x center-y (+ center-x dx) (+ center-y dy))))
+    (draw-line! renderer center-x center-y (+ center-x dx) (+ center-y dy)))
+
+  ;; Draw modifier indicators at bottom left
+  (define mod-y (- window-height 30.0))
+  (define mod-size 20.0)
+  (define mod-spacing 25.0)
+
+  ;; Shift indicator
+  (if (mod-shift? current-mod)
+      (set-draw-color! renderer 255 200 100)
+      (set-draw-color! renderer 60 60 60))
+  (fill-rect! renderer 10.0 mod-y mod-size mod-size)
+  (set-draw-color! renderer 100 100 100)
+  (draw-rect! renderer 10.0 mod-y mod-size mod-size)
+
+  ;; Ctrl indicator
+  (if (mod-ctrl? current-mod)
+      (set-draw-color! renderer 100 200 255)
+      (set-draw-color! renderer 60 60 60))
+  (fill-rect! renderer (+ 10.0 mod-spacing) mod-y mod-size mod-size)
+  (set-draw-color! renderer 100 100 100)
+  (draw-rect! renderer (+ 10.0 mod-spacing) mod-y mod-size mod-size)
+
+  ;; Alt indicator
+  (if (mod-alt? current-mod)
+      (set-draw-color! renderer 100 255 150)
+      (set-draw-color! renderer 60 60 60))
+  (fill-rect! renderer (+ 10.0 (* 2 mod-spacing)) mod-y mod-size mod-size)
+  (set-draw-color! renderer 100 100 100)
+  (draw-rect! renderer (+ 10.0 (* 2 mod-spacing)) mod-y mod-size mod-size)
+
+  ;; Gui/Cmd indicator
+  (if (mod-gui? current-mod)
+      (set-draw-color! renderer 255 150 200)
+      (set-draw-color! renderer 60 60 60))
+  (fill-rect! renderer (+ 10.0 (* 3 mod-spacing)) mod-y mod-size mod-size)
+  (set-draw-color! renderer 100 100 100)
+  (draw-rect! renderer (+ 10.0 (* 3 mod-spacing)) mod-y mod-size mod-size))
 
 (define (main)
   (sdl-init!)
@@ -126,11 +166,9 @@
   (printf "Scroll Demo~n")
   (printf "===========~n")
   (printf "Use mouse wheel to scroll the virtual canvas.~n")
+  (printf "Hold Shift + scroll for horizontal scrolling.~n")
   (printf "Canvas size: ~ax~a, Window: ~ax~a~n" canvas-width canvas-height window-width window-height)
   (printf "Press Escape to quit.~n~n")
-
-  ;; Track if shift is held (for horizontal scrolling)
-  (define shift-held? #f)
 
   (let loop ([running? #t])
     (when running?
@@ -144,9 +182,11 @@
             [(or (quit-event) (window-event 'close-requested))
              #f]
 
-            ;; Escape to quit
-            [(key-event 'down key _ _ _)
-             (if (= key SDLK_ESCAPE) #f run?)]
+            ;; Key events - track modifiers and handle escape
+            [(key-event type key _ mod _)
+             ;; Update modifier state from key event
+             (set! current-mod mod)
+             (if (and (eq? type 'down) (= key SDLK_ESCAPE)) #f run?)]
 
             ;; Mouse wheel - main scrolling logic
             [(mouse-wheel-event wx wy direction mx my)
@@ -159,18 +199,24 @@
              (define dx (* wx scroll-speed mult))
              (define dy (* wy scroll-speed mult))
 
-             ;; Horizontal scroll (wx) or shift+vertical for horizontal
+             ;; Check if shift is held for horizontal scrolling
+             (define shift? (mod-shift? current-mod))
+
+             ;; Horizontal scroll from wheel X, or Shift+wheel Y
              (when (not (zero? wx))
                (set! scroll-x (+ scroll-x dx)))
+             (when (and shift? (not (zero? wy)))
+               ;; Shift+vertical scroll = horizontal scroll
+               (set! scroll-x (- scroll-x dy)))
 
-             ;; Vertical scroll
-             (when (not (zero? wy))
+             ;; Vertical scroll (only when shift not held)
+             (when (and (not shift?) (not (zero? wy)))
                ;; Invert Y because positive wheel = scroll up = decrease scroll-y
                (set! scroll-y (- scroll-y dy)))
 
              (clamp-scroll!)
-             (printf "Wheel: dx=~a dy=~a dir=~a pos=(~a,~a) scroll=(~a,~a)~n"
-                     wx wy direction
+             (printf "Wheel: dx=~a dy=~a dir=~a shift=~a pos=(~a,~a) scroll=(~a,~a)~n"
+                     wx wy direction shift?
                      (inexact->exact (round mx)) (inexact->exact (round my))
                      (inexact->exact (round scroll-x)) (inexact->exact (round scroll-y)))
              run?]

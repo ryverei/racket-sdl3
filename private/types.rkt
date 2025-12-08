@@ -146,22 +146,75 @@
          event->mouse-button
          event->text-input
          event->mouse-wheel
-         ;; Key constants
-         SDLK_ESCAPE
-         SDLK_R
-         SDLK_G
-         SDLK_B
-         SDLK_SPACE
-         SDLK_r
-         SDLK_g
-         SDLK_b
+         ;; Key constants - Special keys
+         SDLK_UNKNOWN SDLK_RETURN SDLK_ESCAPE SDLK_BACKSPACE SDLK_TAB SDLK_SPACE
+         ;; Punctuation and symbols
+         SDLK_EXCLAIM SDLK_DBLAPOSTROPHE SDLK_HASH SDLK_DOLLAR SDLK_PERCENT
+         SDLK_AMPERSAND SDLK_APOSTROPHE SDLK_LEFTPAREN SDLK_RIGHTPAREN
+         SDLK_ASTERISK SDLK_PLUS SDLK_COMMA SDLK_MINUS SDLK_PERIOD SDLK_SLASH
+         ;; Number keys
+         SDLK_0 SDLK_1 SDLK_2 SDLK_3 SDLK_4
+         SDLK_5 SDLK_6 SDLK_7 SDLK_8 SDLK_9
+         ;; More punctuation
+         SDLK_COLON SDLK_SEMICOLON SDLK_LESS SDLK_EQUALS SDLK_GREATER
+         SDLK_QUESTION SDLK_AT SDLK_LEFTBRACKET SDLK_BACKSLASH
+         SDLK_RIGHTBRACKET SDLK_CARET SDLK_UNDERSCORE SDLK_GRAVE
+         ;; Letter keys
+         SDLK_A SDLK_B SDLK_C SDLK_D SDLK_E SDLK_F SDLK_G
+         SDLK_H SDLK_I SDLK_J SDLK_K SDLK_L SDLK_M SDLK_N
+         SDLK_O SDLK_P SDLK_Q SDLK_R SDLK_S SDLK_T SDLK_U
+         SDLK_V SDLK_W SDLK_X SDLK_Y SDLK_Z
+         ;; More punctuation (after letters)
+         SDLK_LEFTBRACE SDLK_PIPE SDLK_RIGHTBRACE SDLK_TILDE SDLK_DELETE
+         ;; Lock keys
+         SDLK_CAPSLOCK SDLK_SCROLLLOCK SDLK_NUMLOCKCLEAR
+         ;; Function keys F1-F12
+         SDLK_F1 SDLK_F2 SDLK_F3 SDLK_F4 SDLK_F5 SDLK_F6
+         SDLK_F7 SDLK_F8 SDLK_F9 SDLK_F10 SDLK_F11 SDLK_F12
+         ;; Function keys F13-F24
+         SDLK_F13 SDLK_F14 SDLK_F15 SDLK_F16 SDLK_F17 SDLK_F18
+         SDLK_F19 SDLK_F20 SDLK_F21 SDLK_F22 SDLK_F23 SDLK_F24
+         ;; Print/Pause
+         SDLK_PRINTSCREEN SDLK_PAUSE
+         ;; Navigation keys
+         SDLK_INSERT SDLK_HOME SDLK_PAGEUP SDLK_END SDLK_PAGEDOWN
          ;; Arrow keys
-         SDLK_RIGHT
-         SDLK_LEFT
-         SDLK_DOWN
-         SDLK_UP
+         SDLK_RIGHT SDLK_LEFT SDLK_DOWN SDLK_UP
+         ;; Keypad numbers
+         SDLK_KP_0 SDLK_KP_1 SDLK_KP_2 SDLK_KP_3 SDLK_KP_4
+         SDLK_KP_5 SDLK_KP_6 SDLK_KP_7 SDLK_KP_8 SDLK_KP_9
+         ;; Keypad operators
+         SDLK_KP_DIVIDE SDLK_KP_MULTIPLY SDLK_KP_MINUS SDLK_KP_PLUS
+         SDLK_KP_ENTER SDLK_KP_PERIOD SDLK_KP_EQUALS
+         ;; Application/Menu
+         SDLK_APPLICATION SDLK_MENU
+         ;; Editing keys
+         SDLK_UNDO SDLK_CUT SDLK_COPY SDLK_PASTE SDLK_FIND
+         ;; Media keys
+         SDLK_MUTE SDLK_VOLUMEUP SDLK_VOLUMEDOWN
+         ;; Modifier keycodes
+         SDLK_LCTRL SDLK_LSHIFT SDLK_LALT SDLK_LGUI
+         SDLK_RCTRL SDLK_RSHIFT SDLK_RALT SDLK_RGUI
          ;; Keycode type
          _SDL_Keycode
+         ;; Modifier key masks
+         SDL_KMOD_NONE
+         SDL_KMOD_LSHIFT
+         SDL_KMOD_RSHIFT
+         SDL_KMOD_LCTRL
+         SDL_KMOD_RCTRL
+         SDL_KMOD_LALT
+         SDL_KMOD_RALT
+         SDL_KMOD_LGUI
+         SDL_KMOD_RGUI
+         SDL_KMOD_NUM
+         SDL_KMOD_CAPS
+         SDL_KMOD_MODE
+         SDL_KMOD_SCROLL
+         SDL_KMOD_CTRL
+         SDL_KMOD_SHIFT
+         SDL_KMOD_ALT
+         SDL_KMOD_GUI
          ;; Blend mode
          _SDL_BlendMode
          SDL_BLENDMODE_NONE
@@ -290,24 +343,216 @@
 ;; ============================================================================
 ;; Key Constants (SDL_Keycode values)
 ;; ============================================================================
-;; SDL3 keycodes are mostly ASCII for letter/number keys
-(define SDLK_ESCAPE 27)      ; '\x1B'
-(define SDLK_SPACE 32)
-(define SDLK_R 82)           ; uppercase 'R'
-(define SDLK_G 71)           ; uppercase 'G'
-(define SDLK_B 66)           ; uppercase 'B'
-(define SDLK_r 114)          ; lowercase 'r'
-(define SDLK_g 103)          ; lowercase 'g'
-(define SDLK_b 98)           ; lowercase 'b'
+;; SDL3 keycodes: letters are lowercase ASCII, special keys use scancode mask
 
-;; Arrow keys use scancodes with SDLK_SCANCODE_MASK (0x40000000)
+;; Special keys
+(define SDLK_UNKNOWN   #x00000000)
+(define SDLK_RETURN    #x0000000D)  ; '\r'
+(define SDLK_ESCAPE    #x0000001B)
+(define SDLK_BACKSPACE #x00000008)  ; '\b'
+(define SDLK_TAB       #x00000009)  ; '\t'
+(define SDLK_SPACE     #x00000020)  ; ' '
+
+;; Punctuation and symbols (ASCII order)
+(define SDLK_EXCLAIM      #x00000021)  ; '!'
+(define SDLK_DBLAPOSTROPHE #x00000022) ; '"'
+(define SDLK_HASH         #x00000023)  ; '#'
+(define SDLK_DOLLAR       #x00000024)  ; '$'
+(define SDLK_PERCENT      #x00000025)  ; '%'
+(define SDLK_AMPERSAND    #x00000026)  ; '&'
+(define SDLK_APOSTROPHE   #x00000027)  ; '\''
+(define SDLK_LEFTPAREN    #x00000028)  ; '('
+(define SDLK_RIGHTPAREN   #x00000029)  ; ')'
+(define SDLK_ASTERISK     #x0000002A)  ; '*'
+(define SDLK_PLUS         #x0000002B)  ; '+'
+(define SDLK_COMMA        #x0000002C)  ; ','
+(define SDLK_MINUS        #x0000002D)  ; '-'
+(define SDLK_PERIOD       #x0000002E)  ; '.'
+(define SDLK_SLASH        #x0000002F)  ; '/'
+
+;; Number keys (ASCII '0'-'9')
+(define SDLK_0 #x00000030)
+(define SDLK_1 #x00000031)
+(define SDLK_2 #x00000032)
+(define SDLK_3 #x00000033)
+(define SDLK_4 #x00000034)
+(define SDLK_5 #x00000035)
+(define SDLK_6 #x00000036)
+(define SDLK_7 #x00000037)
+(define SDLK_8 #x00000038)
+(define SDLK_9 #x00000039)
+
+;; More punctuation
+(define SDLK_COLON        #x0000003A)  ; ':'
+(define SDLK_SEMICOLON    #x0000003B)  ; ';'
+(define SDLK_LESS         #x0000003C)  ; '<'
+(define SDLK_EQUALS       #x0000003D)  ; '='
+(define SDLK_GREATER      #x0000003E)  ; '>'
+(define SDLK_QUESTION     #x0000003F)  ; '?'
+(define SDLK_AT           #x00000040)  ; '@'
+(define SDLK_LEFTBRACKET  #x0000005B)  ; '['
+(define SDLK_BACKSLASH    #x0000005C)  ; '\\'
+(define SDLK_RIGHTBRACKET #x0000005D)  ; ']'
+(define SDLK_CARET        #x0000005E)  ; '^'
+(define SDLK_UNDERSCORE   #x0000005F)  ; '_'
+(define SDLK_GRAVE        #x00000060)  ; '`'
+
+;; Letter keys (SDL3: uppercase names, lowercase ASCII values 'a'-'z')
+(define SDLK_A #x00000061)
+(define SDLK_B #x00000062)
+(define SDLK_C #x00000063)
+(define SDLK_D #x00000064)
+(define SDLK_E #x00000065)
+(define SDLK_F #x00000066)
+(define SDLK_G #x00000067)
+(define SDLK_H #x00000068)
+(define SDLK_I #x00000069)
+(define SDLK_J #x0000006A)
+(define SDLK_K #x0000006B)
+(define SDLK_L #x0000006C)
+(define SDLK_M #x0000006D)
+(define SDLK_N #x0000006E)
+(define SDLK_O #x0000006F)
+(define SDLK_P #x00000070)
+(define SDLK_Q #x00000071)
+(define SDLK_R #x00000072)
+(define SDLK_S #x00000073)
+(define SDLK_T #x00000074)
+(define SDLK_U #x00000075)
+(define SDLK_V #x00000076)
+(define SDLK_W #x00000077)
+(define SDLK_X #x00000078)
+(define SDLK_Y #x00000079)
+(define SDLK_Z #x0000007A)
+
+;; More punctuation (after letters in ASCII)
+(define SDLK_LEFTBRACE  #x0000007B)  ; '{'
+(define SDLK_PIPE       #x0000007C)  ; '|'
+(define SDLK_RIGHTBRACE #x0000007D)  ; '}'
+(define SDLK_TILDE      #x0000007E)  ; '~'
+(define SDLK_DELETE     #x0000007F)
+
+;; Lock keys
+(define SDLK_CAPSLOCK   #x40000039)
+(define SDLK_SCROLLLOCK #x40000047)
+(define SDLK_NUMLOCKCLEAR #x40000053)
+
+;; Function keys F1-F12
+(define SDLK_F1  #x4000003A)
+(define SDLK_F2  #x4000003B)
+(define SDLK_F3  #x4000003C)
+(define SDLK_F4  #x4000003D)
+(define SDLK_F5  #x4000003E)
+(define SDLK_F6  #x4000003F)
+(define SDLK_F7  #x40000040)
+(define SDLK_F8  #x40000041)
+(define SDLK_F9  #x40000042)
+(define SDLK_F10 #x40000043)
+(define SDLK_F11 #x40000044)
+(define SDLK_F12 #x40000045)
+
+;; Function keys F13-F24
+(define SDLK_F13 #x40000068)
+(define SDLK_F14 #x40000069)
+(define SDLK_F15 #x4000006A)
+(define SDLK_F16 #x4000006B)
+(define SDLK_F17 #x4000006C)
+(define SDLK_F18 #x4000006D)
+(define SDLK_F19 #x4000006E)
+(define SDLK_F20 #x4000006F)
+(define SDLK_F21 #x40000070)
+(define SDLK_F22 #x40000071)
+(define SDLK_F23 #x40000072)
+(define SDLK_F24 #x40000073)
+
+;; Print/Pause
+(define SDLK_PRINTSCREEN #x40000046)
+(define SDLK_PAUSE       #x40000048)
+
+;; Navigation keys
+(define SDLK_INSERT   #x40000049)
+(define SDLK_HOME     #x4000004A)
+(define SDLK_PAGEUP   #x4000004B)
+(define SDLK_END      #x4000004D)
+(define SDLK_PAGEDOWN #x4000004E)
+
+;; Arrow keys
 (define SDLK_RIGHT #x4000004F)
 (define SDLK_LEFT  #x40000050)
 (define SDLK_DOWN  #x40000051)
 (define SDLK_UP    #x40000052)
 
+;; Keypad numbers
+(define SDLK_KP_0 #x40000062)
+(define SDLK_KP_1 #x40000059)
+(define SDLK_KP_2 #x4000005A)
+(define SDLK_KP_3 #x4000005B)
+(define SDLK_KP_4 #x4000005C)
+(define SDLK_KP_5 #x4000005D)
+(define SDLK_KP_6 #x4000005E)
+(define SDLK_KP_7 #x4000005F)
+(define SDLK_KP_8 #x40000060)
+(define SDLK_KP_9 #x40000061)
+
+;; Keypad operators
+(define SDLK_KP_DIVIDE   #x40000054)
+(define SDLK_KP_MULTIPLY #x40000055)
+(define SDLK_KP_MINUS    #x40000056)
+(define SDLK_KP_PLUS     #x40000057)
+(define SDLK_KP_ENTER    #x40000058)
+(define SDLK_KP_PERIOD   #x40000063)
+(define SDLK_KP_EQUALS   #x40000067)
+
+;; Application/Menu key
+(define SDLK_APPLICATION #x40000065)
+(define SDLK_MENU        #x40000076)
+
+;; Editing keys
+(define SDLK_UNDO  #x4000007A)
+(define SDLK_CUT   #x4000007B)
+(define SDLK_COPY  #x4000007C)
+(define SDLK_PASTE #x4000007D)
+(define SDLK_FIND  #x4000007E)
+
+;; Media keys
+(define SDLK_MUTE       #x4000007F)
+(define SDLK_VOLUMEUP   #x40000080)
+(define SDLK_VOLUMEDOWN #x40000081)
+
+;; Modifier keys (as keycodes, not mod flags)
+(define SDLK_LCTRL  #x400000E0)
+(define SDLK_LSHIFT #x400000E1)
+(define SDLK_LALT   #x400000E2)
+(define SDLK_LGUI   #x400000E3)
+(define SDLK_RCTRL  #x400000E4)
+(define SDLK_RSHIFT #x400000E5)
+(define SDLK_RALT   #x400000E6)
+(define SDLK_RGUI   #x400000E7)
+
 ;; SDL_Keycode type (32-bit)
 (define _SDL_Keycode _uint32)
+
+;; ============================================================================
+;; Modifier Key Masks (SDL_Keymod - uint16)
+;; ============================================================================
+(define SDL_KMOD_NONE   #x0000)
+(define SDL_KMOD_LSHIFT #x0001)
+(define SDL_KMOD_RSHIFT #x0002)
+(define SDL_KMOD_LCTRL  #x0040)
+(define SDL_KMOD_RCTRL  #x0080)
+(define SDL_KMOD_LALT   #x0100)
+(define SDL_KMOD_RALT   #x0200)
+(define SDL_KMOD_LGUI   #x0400)
+(define SDL_KMOD_RGUI   #x0800)
+(define SDL_KMOD_NUM    #x1000)
+(define SDL_KMOD_CAPS   #x2000)
+(define SDL_KMOD_MODE   #x4000)
+(define SDL_KMOD_SCROLL #x8000)
+;; Combined masks
+(define SDL_KMOD_CTRL  (bitwise-ior SDL_KMOD_LCTRL SDL_KMOD_RCTRL))
+(define SDL_KMOD_SHIFT (bitwise-ior SDL_KMOD_LSHIFT SDL_KMOD_RSHIFT))
+(define SDL_KMOD_ALT   (bitwise-ior SDL_KMOD_LALT SDL_KMOD_RALT))
+(define SDL_KMOD_GUI   (bitwise-ior SDL_KMOD_LGUI SDL_KMOD_RGUI))
 
 ;; ============================================================================
 ;; Blend Modes

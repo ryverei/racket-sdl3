@@ -29,15 +29,6 @@
 (define size-step 50)
 (define min-size 200)
 
-;; Key codes
-(define SDLK_f 102)
-(define SDLK_F 70)
-(define SDLK_c 99)
-(define SDLK_C 67)
-(define SDLK_EQUALS 61)    ; = key (also + with shift)
-(define SDLK_PLUS 43)      ; + on numpad
-(define SDLK_MINUS 45)     ; - key
-
 (define (main)
   (sdl-init!)
 
@@ -100,19 +91,19 @@
                 run?]
 
                ;; F - toggle fullscreen
-               [(or (= key SDLK_f) (= key SDLK_F))
+               [(= key SDLK_F)
                 (window-set-fullscreen! window (not fullscreen?))
                 run?]
 
                ;; C - center window (approximate, assumes 1920x1080 display)
-               [(or (= key SDLK_c) (= key SDLK_C))
+               [(= key SDLK_C)
                 (window-set-position! window
                                       (quotient (- 1920 win-w) 2)
                                       (quotient (- 1080 win-h) 2))
                 run?]
 
                ;; R - reset
-               [(or (= key SDLK_r) (= key SDLK_R))
+               [(= key SDLK_R)
                 (when fullscreen?
                   (window-set-fullscreen! window #f))
                 (window-set-size! window initial-width initial-height)

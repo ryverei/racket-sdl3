@@ -47,11 +47,68 @@
  ;; Key utilities
  key-name
 
- ;; Re-export key constants for convenience
- SDLK_ESCAPE SDLK_SPACE
- SDLK_r SDLK_g SDLK_b
- SDLK_R SDLK_G SDLK_B
- SDLK_UP SDLK_DOWN SDLK_LEFT SDLK_RIGHT)
+ ;; Modifier predicates
+ mod-shift?
+ mod-ctrl?
+ mod-alt?
+ mod-gui?
+
+ ;; Re-export key constants - Special keys
+ SDLK_UNKNOWN SDLK_RETURN SDLK_ESCAPE SDLK_BACKSPACE SDLK_TAB SDLK_SPACE
+ ;; Punctuation and symbols
+ SDLK_EXCLAIM SDLK_DBLAPOSTROPHE SDLK_HASH SDLK_DOLLAR SDLK_PERCENT
+ SDLK_AMPERSAND SDLK_APOSTROPHE SDLK_LEFTPAREN SDLK_RIGHTPAREN
+ SDLK_ASTERISK SDLK_PLUS SDLK_COMMA SDLK_MINUS SDLK_PERIOD SDLK_SLASH
+ ;; Number keys
+ SDLK_0 SDLK_1 SDLK_2 SDLK_3 SDLK_4
+ SDLK_5 SDLK_6 SDLK_7 SDLK_8 SDLK_9
+ ;; More punctuation
+ SDLK_COLON SDLK_SEMICOLON SDLK_LESS SDLK_EQUALS SDLK_GREATER
+ SDLK_QUESTION SDLK_AT SDLK_LEFTBRACKET SDLK_BACKSLASH
+ SDLK_RIGHTBRACKET SDLK_CARET SDLK_UNDERSCORE SDLK_GRAVE
+ ;; Letter keys
+ SDLK_A SDLK_B SDLK_C SDLK_D SDLK_E SDLK_F SDLK_G
+ SDLK_H SDLK_I SDLK_J SDLK_K SDLK_L SDLK_M SDLK_N
+ SDLK_O SDLK_P SDLK_Q SDLK_R SDLK_S SDLK_T SDLK_U
+ SDLK_V SDLK_W SDLK_X SDLK_Y SDLK_Z
+ ;; More punctuation (after letters)
+ SDLK_LEFTBRACE SDLK_PIPE SDLK_RIGHTBRACE SDLK_TILDE SDLK_DELETE
+ ;; Lock keys
+ SDLK_CAPSLOCK SDLK_SCROLLLOCK SDLK_NUMLOCKCLEAR
+ ;; Function keys F1-F12
+ SDLK_F1 SDLK_F2 SDLK_F3 SDLK_F4 SDLK_F5 SDLK_F6
+ SDLK_F7 SDLK_F8 SDLK_F9 SDLK_F10 SDLK_F11 SDLK_F12
+ ;; Function keys F13-F24
+ SDLK_F13 SDLK_F14 SDLK_F15 SDLK_F16 SDLK_F17 SDLK_F18
+ SDLK_F19 SDLK_F20 SDLK_F21 SDLK_F22 SDLK_F23 SDLK_F24
+ ;; Print/Pause
+ SDLK_PRINTSCREEN SDLK_PAUSE
+ ;; Navigation keys
+ SDLK_INSERT SDLK_HOME SDLK_PAGEUP SDLK_END SDLK_PAGEDOWN
+ ;; Arrow keys
+ SDLK_RIGHT SDLK_LEFT SDLK_DOWN SDLK_UP
+ ;; Keypad numbers
+ SDLK_KP_0 SDLK_KP_1 SDLK_KP_2 SDLK_KP_3 SDLK_KP_4
+ SDLK_KP_5 SDLK_KP_6 SDLK_KP_7 SDLK_KP_8 SDLK_KP_9
+ ;; Keypad operators
+ SDLK_KP_DIVIDE SDLK_KP_MULTIPLY SDLK_KP_MINUS SDLK_KP_PLUS
+ SDLK_KP_ENTER SDLK_KP_PERIOD SDLK_KP_EQUALS
+ ;; Application/Menu
+ SDLK_APPLICATION SDLK_MENU
+ ;; Editing keys
+ SDLK_UNDO SDLK_CUT SDLK_COPY SDLK_PASTE SDLK_FIND
+ ;; Media keys
+ SDLK_MUTE SDLK_VOLUMEUP SDLK_VOLUMEDOWN
+ ;; Modifier keycodes
+ SDLK_LCTRL SDLK_LSHIFT SDLK_LALT SDLK_LGUI
+ SDLK_RCTRL SDLK_RSHIFT SDLK_RALT SDLK_RGUI
+
+ ;; Re-export modifier constants
+ SDL_KMOD_NONE SDL_KMOD_LSHIFT SDL_KMOD_RSHIFT
+ SDL_KMOD_LCTRL SDL_KMOD_RCTRL SDL_KMOD_LALT SDL_KMOD_RALT
+ SDL_KMOD_LGUI SDL_KMOD_RGUI SDL_KMOD_NUM SDL_KMOD_CAPS
+ SDL_KMOD_MODE SDL_KMOD_SCROLL
+ SDL_KMOD_CTRL SDL_KMOD_SHIFT SDL_KMOD_ALT SDL_KMOD_GUI)
 
 ;; ============================================================================
 ;; Event Structs
@@ -246,3 +303,23 @@
 ;; Get a human-readable name for a keycode
 (define (key-name keycode)
   (SDL-GetKeyName keycode))
+
+;; ============================================================================
+;; Modifier Predicates
+;; ============================================================================
+
+;; Check if any shift key is pressed
+(define (mod-shift? mod)
+  (not (zero? (bitwise-and mod SDL_KMOD_SHIFT))))
+
+;; Check if any ctrl key is pressed
+(define (mod-ctrl? mod)
+  (not (zero? (bitwise-and mod SDL_KMOD_CTRL))))
+
+;; Check if any alt key is pressed
+(define (mod-alt? mod)
+  (not (zero? (bitwise-and mod SDL_KMOD_ALT))))
+
+;; Check if any gui/command key is pressed
+(define (mod-gui? mod)
+  (not (zero? (bitwise-and mod SDL_KMOD_GUI))))

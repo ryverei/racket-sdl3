@@ -55,13 +55,13 @@
              ;; Check for color keys or escape
              (cond
                [(= key SDLK_ESCAPE) #f]
-               [(or (= key SDLK_r) (= key SDLK_R))
+               [(= key SDLK_R)
                 (set-color! 255 0 0)
                 running?]
-               [(or (= key SDLK_g) (= key SDLK_G))
+               [(= key SDLK_G)
                 (set-color! 0 255 0)
                 running?]
-               [(or (= key SDLK_b) (= key SDLK_B))
+               [(= key SDLK_B)
                 (set-color! 0 0 255)
                 running?]
                [else running?])]

@@ -69,13 +69,13 @@
                [(= key SDLK_ESCAPE)
                 (values cr cg cb ca #f)]
                ;; R key - red tint
-               [(or (= key SDLK_r) (= key SDLK_R))
+               [(= key SDLK_R)
                 (values 255 100 100 ca run?)]
                ;; G key - green tint
-               [(or (= key SDLK_g) (= key SDLK_G))
+               [(= key SDLK_G)
                 (values 100 255 100 ca run?)]
                ;; B key - blue tint
-               [(or (= key SDLK_b) (= key SDLK_B))
+               [(= key SDLK_B)
                 (values 100 100 255 ca run?)]
                ;; Space - reset
                [(= key SDLK_SPACE)

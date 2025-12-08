@@ -30,12 +30,6 @@
 ;; Continuous rotation speed (degrees per frame)
 (define rotation-speed 2.0)
 
-;; Key codes
-(define SDLK_h 104)
-(define SDLK_H 72)
-(define SDLK_v 118)
-(define SDLK_V 86)
-
 (define (flip-symbol h? v?)
   (cond
     [(and h? v?) 'both]
@@ -99,16 +93,16 @@
                [(= key SDLK_RIGHT)
                 (values (+ a rotation-step) fh fv cont cx cy mx my run?)]
                ;; H - toggle horizontal flip
-               [(or (= key SDLK_h) (= key SDLK_H))
+               [(= key SDLK_H)
                 (values a (not fh) fv cont cx cy mx my run?)]
                ;; V - toggle vertical flip
-               [(or (= key SDLK_v) (= key SDLK_V))
+               [(= key SDLK_V)
                 (values a fh (not fv) cont cx cy mx my run?)]
                ;; Space - toggle continuous rotation
                [(= key SDLK_SPACE)
                 (values a fh fv (not cont) cx cy mx my run?)]
                ;; R - reset
-               [(or (= key SDLK_r) (= key SDLK_R))
+               [(= key SDLK_R)
                 (values 0.0 #f #f #f default-center-x default-center-y mx my run?)]
                [else
                 (values a fh fv cont cx cy mx my run?)])]

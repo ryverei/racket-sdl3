@@ -14,10 +14,12 @@
          "safe/events.rkt"
          "safe/draw.rkt"
          "safe/texture.rkt"
-         "safe/ttf.rkt")
+         "safe/ttf.rkt"
+         "safe/mouse.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
          (all-from-out "safe/draw.rkt")
          (all-from-out "safe/texture.rkt")
-         (all-from-out "safe/ttf.rkt"))
+         (all-from-out "safe/ttf.rkt")
+         (all-from-out "safe/mouse.rkt"))

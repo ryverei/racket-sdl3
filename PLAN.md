@@ -196,14 +196,18 @@ Key improvements:
 
 ---
 
-## Phase 7: Mouse (`hello-mouse.rkt`) - PENDING
+## Phase 7: Mouse (`hello-mouse.rkt`) - COMPLETED
 
-### New: `safe/mouse.rkt` or additions to `safe/events.rkt`
+### New: `safe/mouse.rkt`
 
 ```racket
-(get-mouse-state)  ; returns (values x y button-mask)
+(get-mouse-state)  ; -> (values x y button-mask)
 (mouse-button-pressed? mask button)
 ```
+
+### Example Update
+
+`hello-mouse.rkt`: rewritten to use `sdl3/safe`, drawing helpers, and new mouse utilities. Trail rendering, button indicators, and cursor color are all driven by `get-mouse-state` and `mouse-button-pressed?`. (Not runnable in headless sandbox; requires a display.)
 
 ---
 
@@ -217,7 +221,7 @@ Key improvements:
 | 4 | **DONE** | `safe/ttf.rkt`, `safe/texture.rkt` (wrap helper) | `hello-text.rkt` |
 | 5 | **DONE** | `safe/draw.rkt` (shapes) | `hello-shapes.rkt` |
 | 6 | **DONE** | `safe/draw.rkt` (`current-ticks`) | `hello-animation.rkt` |
-| 7 | PENDING | `safe/mouse.rkt` | `hello-mouse.rkt` |
+| 7 | **DONE** | `safe/mouse.rkt` | `hello-mouse.rkt` |
 
 ---
 

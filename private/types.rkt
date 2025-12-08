@@ -71,6 +71,10 @@
          SDL_EVENT_MOUSE_MOTION
          SDL_EVENT_MOUSE_BUTTON_DOWN
          SDL_EVENT_MOUSE_BUTTON_UP
+         SDL_EVENT_MOUSE_WHEEL
+         ;; Mouse wheel direction
+         SDL_MOUSEWHEEL_NORMAL
+         SDL_MOUSEWHEEL_FLIPPED
          ;; Mouse button constants
          SDL_BUTTON_LEFT
          SDL_BUTTON_MIDDLE
@@ -124,6 +128,16 @@
          SDL_TextInputEvent-type
          SDL_TextInputEvent-windowID
          SDL_TextInputEvent-text
+         _SDL_MouseWheelEvent
+         _SDL_MouseWheelEvent-pointer
+         SDL_MouseWheelEvent-type
+         SDL_MouseWheelEvent-windowID
+         SDL_MouseWheelEvent-which
+         SDL_MouseWheelEvent-x
+         SDL_MouseWheelEvent-y
+         SDL_MouseWheelEvent-direction
+         SDL_MouseWheelEvent-mouse_x
+         SDL_MouseWheelEvent-mouse_y
          ;; Event union helpers
          SDL_EVENT_SIZE
          sdl-event-type
@@ -131,6 +145,7 @@
          event->mouse-motion
          event->mouse-button
          event->text-input
+         event->mouse-wheel
          ;; Key constants
          SDLK_ESCAPE
          SDLK_R
@@ -246,6 +261,13 @@
 (define SDL_EVENT_MOUSE_MOTION #x400)
 (define SDL_EVENT_MOUSE_BUTTON_DOWN #x401)
 (define SDL_EVENT_MOUSE_BUTTON_UP #x402)
+(define SDL_EVENT_MOUSE_WHEEL #x403)
+
+;; ============================================================================
+;; Mouse Wheel Direction
+;; ============================================================================
+(define SDL_MOUSEWHEEL_NORMAL 0)
+(define SDL_MOUSEWHEEL_FLIPPED 1)
 
 ;; ============================================================================
 ;; Mouse Button Constants
@@ -374,6 +396,19 @@
    [windowID _uint32]
    [text _pointer]))  ; const char* - UTF-8 encoded text
 
+;; SDL_MouseWheelEvent - mouse wheel/scroll
+(define-cstruct _SDL_MouseWheelEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [windowID _uint32]
+   [which _uint32]      ; mouse instance id
+   [x _float]           ; horizontal scroll amount
+   [y _float]           ; vertical scroll amount
+   [direction _sint32]  ; SDL_MouseWheelDirection
+   [mouse_x _float]     ; mouse x position
+   [mouse_y _float]))   ; mouse y position
+
 ;; SDL_Event union size (128 bytes in SDL3)
 (define SDL_EVENT_SIZE 128)
 
@@ -393,6 +428,9 @@
 
 (define (event->text-input event-ptr)
   (cast event-ptr _pointer _SDL_TextInputEvent-pointer))
+
+(define (event->mouse-wheel event-ptr)
+  (cast event-ptr _pointer _SDL_MouseWheelEvent-pointer))
 
 ;; ============================================================================
 ;; Error Handling

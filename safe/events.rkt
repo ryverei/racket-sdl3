@@ -29,6 +29,11 @@
 
  text-input-event text-input-event? text-input-event-text
 
+ mouse-wheel-event mouse-wheel-event?
+ mouse-wheel-event-x mouse-wheel-event-y
+ mouse-wheel-event-direction
+ mouse-wheel-event-mouse-x mouse-wheel-event-mouse-y
+
  unknown-event unknown-event? unknown-event-type
 
  ;; Polling functions
@@ -87,6 +92,12 @@
 ;; Text input (actual characters, handles shift/caps)
 (struct text-input-event sdl-event (text) #:transparent)
 ;; text is a string
+
+;; Mouse wheel/scroll
+(struct mouse-wheel-event sdl-event (x y direction mouse-x mouse-y) #:transparent)
+;; x, y are scroll amounts (floats, positive = right/away from user)
+;; direction is 'normal or 'flipped
+;; mouse-x, mouse-y are cursor position (floats)
 
 ;; Unknown/unhandled event type
 (struct unknown-event sdl-event (type) #:transparent)
@@ -169,6 +180,16 @@
      (define text-ptr (SDL_TextInputEvent-text ti))
      (define text (cast text-ptr _pointer _string/utf-8))
      (text-input-event text)]
+
+    ;; Mouse wheel
+    [(= type SDL_EVENT_MOUSE_WHEEL)
+     (define mw (event->mouse-wheel buf))
+     (define dir (SDL_MouseWheelEvent-direction mw))
+     (mouse-wheel-event (SDL_MouseWheelEvent-x mw)
+                        (SDL_MouseWheelEvent-y mw)
+                        (if (= dir SDL_MOUSEWHEEL_NORMAL) 'normal 'flipped)
+                        (SDL_MouseWheelEvent-mouse_x mw)
+                        (SDL_MouseWheelEvent-mouse_y mw))]
 
     ;; Unknown
     [else

@@ -154,20 +154,31 @@ Key improvements:
 
 ---
 
-## Phase 5: Shapes & Drawing (`hello-shapes.rkt`) - PENDING
+## Phase 5: Shapes & Drawing (`hello-shapes.rkt`) - COMPLETED
 
 ### Additions to `safe/draw.rkt`
 
 ```racket
 (draw-point! renderer x y)
-(draw-points! renderer points)   ; accepts list of (x y) or (cons x y)
+(draw-points! renderer points)   ; points: SDL_FPoint, list/cons, or vector of (x y)
 (draw-line! renderer x1 y1 x2 y2)
 (draw-lines! renderer points)
 (draw-rect! renderer x y w h)
-(draw-rects! renderer rects)     ; accepts list of (x y w h)
+(draw-rects! renderer rects)     ; rects: SDL_FRect, list, or vector of (x y w h)
 (fill-rect! renderer x y w h)
 (fill-rects! renderer rects)
 ```
+
+All helpers accept exact numbers, coerce to floats, and handle list/vector inputs. Batched APIs build temporary SDL_FPoint/SDL_FRect arrays under the hood.
+
+### Example Update
+
+`hello-shapes.rkt`: **Reduced from 171 lines to 116 lines** (55 line reduction)
+
+Key improvements:
+- Uses `sdl3/safe` only; no manual `malloc` or FFI pointer arithmetic
+- Polyline/point batches drawn with `draw-lines!`/`draw-points!` helpers
+- Event loop via `match` on event structs; custodian-managed window/renderer
 
 ---
 
@@ -202,7 +213,7 @@ Mostly benefits from earlier phases.
 | 2 | **DONE** | `safe/events.rkt` (added `key-name`) | `hello-input.rkt` |
 | 3 | **DONE** | `safe/texture.rkt` | `hello-image.rkt` |
 | 4 | **DONE** | `safe/ttf.rkt`, `safe/texture.rkt` (wrap helper) | `hello-text.rkt` |
-| 5 | PENDING | `safe/draw.rkt` (shapes) | `hello-shapes.rkt` |
+| 5 | **DONE** | `safe/draw.rkt` (shapes) | `hello-shapes.rkt` |
 | 6 | PENDING | (uses previous) | `hello-animation.rkt` |
 | 7 | PENDING | `safe/mouse.rkt` | `hello-mouse.rkt` |
 

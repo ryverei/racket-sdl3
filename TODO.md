@@ -283,7 +283,7 @@ This document tracks the implementation status of SDL3, SDL3_image, and SDL3_ttf
 - [ ] `SDL_GetMice`
 - [ ] `SDL_GetMouseNameForID`
 - [ ] `SDL_GetMouseFocus`
-- [ ] `SDL_GetMouseState`
+- [x] `SDL_GetMouseState`
 - [ ] `SDL_GetGlobalMouseState`
 - [ ] `SDL_GetRelativeMouseState`
 - [ ] `SDL_WarpMouseInWindow`
@@ -766,11 +766,11 @@ This document tracks the implementation status of SDL3, SDL3_image, and SDL3_ttf
 - [ ] ... (more cursor types)
 
 ### Mouse Button Constants (P1)
-- [ ] `SDL_BUTTON_LEFT`
-- [ ] `SDL_BUTTON_MIDDLE`
-- [ ] `SDL_BUTTON_RIGHT`
-- [ ] `SDL_BUTTON_X1`
-- [ ] `SDL_BUTTON_X2`
+- [x] `SDL_BUTTON_LEFT`
+- [x] `SDL_BUTTON_MIDDLE`
+- [x] `SDL_BUTTON_RIGHT`
+- [x] `SDL_BUTTON_X1`
+- [x] `SDL_BUTTON_X2`
 
 ### TTF Constants (P1)
 - [ ] `TTF_FontStyleFlags` (`TTF_STYLE_NORMAL`, `TTF_STYLE_BOLD`, `TTF_STYLE_ITALIC`, etc.)

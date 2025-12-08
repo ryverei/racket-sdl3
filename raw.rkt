@@ -54,6 +54,8 @@
          ;; Text Input
          SDL-StartTextInput
          SDL-StopTextInput
+         ;; Mouse
+         SDL-GetMouseState
          ;; Timer
          SDL-GetTicks
          SDL-Delay)
@@ -305,6 +307,18 @@
 ;; Returns: true on success, false on failure
 (define-sdl SDL-SetWindowTitle (_fun _SDL_Window-pointer _string -> _sdl-bool)
   #:c-id SDL_SetWindowTitle)
+
+;; ============================================================================
+;; Mouse
+;; ============================================================================
+
+;; SDL_GetMouseState: Get the current state of the mouse
+;; x: pointer to receive x position (can be NULL)
+;; y: pointer to receive y position (can be NULL)
+;; Returns: SDL_MouseButtonFlags bitmask of button states
+(define-sdl SDL-GetMouseState
+  (_fun _pointer _pointer -> _uint32)
+  #:c-id SDL_GetMouseState)
 
 ;; ============================================================================
 ;; Timer

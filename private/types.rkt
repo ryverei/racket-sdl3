@@ -70,6 +70,17 @@
          SDL_EVENT_MOUSE_MOTION
          SDL_EVENT_MOUSE_BUTTON_DOWN
          SDL_EVENT_MOUSE_BUTTON_UP
+         ;; Mouse button constants
+         SDL_BUTTON_LEFT
+         SDL_BUTTON_MIDDLE
+         SDL_BUTTON_RIGHT
+         SDL_BUTTON_X1
+         SDL_BUTTON_X2
+         SDL_BUTTON_LMASK
+         SDL_BUTTON_MMASK
+         SDL_BUTTON_RMASK
+         SDL_BUTTON_X1MASK
+         SDL_BUTTON_X2MASK
          ;; Event structs
          _SDL_CommonEvent
          _SDL_CommonEvent-pointer
@@ -216,6 +227,24 @@
 (define SDL_EVENT_MOUSE_MOTION #x400)
 (define SDL_EVENT_MOUSE_BUTTON_DOWN #x401)
 (define SDL_EVENT_MOUSE_BUTTON_UP #x402)
+
+;; ============================================================================
+;; Mouse Button Constants
+;; ============================================================================
+;; Mouse button indices
+(define SDL_BUTTON_LEFT 1)
+(define SDL_BUTTON_MIDDLE 2)
+(define SDL_BUTTON_RIGHT 3)
+(define SDL_BUTTON_X1 4)
+(define SDL_BUTTON_X2 5)
+
+;; Mouse button masks for SDL_GetMouseState return value
+(define (SDL_BUTTON_MASK x) (arithmetic-shift 1 (- x 1)))
+(define SDL_BUTTON_LMASK (SDL_BUTTON_MASK SDL_BUTTON_LEFT))    ; 1
+(define SDL_BUTTON_MMASK (SDL_BUTTON_MASK SDL_BUTTON_MIDDLE))  ; 2
+(define SDL_BUTTON_RMASK (SDL_BUTTON_MASK SDL_BUTTON_RIGHT))   ; 4
+(define SDL_BUTTON_X1MASK (SDL_BUTTON_MASK SDL_BUTTON_X1))     ; 8
+(define SDL_BUTTON_X2MASK (SDL_BUTTON_MASK SDL_BUTTON_X2))     ; 16
 
 ;; ============================================================================
 ;; Key Constants (SDL_Keycode values)

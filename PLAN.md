@@ -109,16 +109,27 @@ Key improvements:
 
 ---
 
-## Phase 3: Image Loading (`hello-image.rkt`) - PENDING
+## Phase 3: Image Loading (`hello-image.rkt`) - COMPLETED
 
 ### New File: `safe/texture.rkt`
 
 ```racket
 (load-texture renderer path #:custodian)
 (texture-size texture)  ; returns (values width height)
-(render-texture! renderer texture x y #:src #:width #:height)
-(destroy-texture! texture)
+(render-texture! renderer texture x y #:width #:height #:src-x #:src-y #:src-w #:src-h)
+(texture-destroy! texture)
 ```
+
+### Example Update
+
+`hello-image.rkt`: **Reduced from 145 lines to 84 lines** (42% reduction)
+
+Key improvements:
+- No `ffi/unsafe` require or `sdl3/image` - just `sdl3/safe`
+- No manual `malloc` for texture size
+- No `dynamic-wind` cleanup
+- No manual `SDL_FRect` creation and mutation
+- Simple `render-texture!` call instead of manual rect management
 
 ---
 
@@ -181,7 +192,7 @@ Mostly benefits from earlier phases.
 |-------|--------|-------|---------|
 | 1 | **DONE** | `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe.rkt` | `hello-window.rkt` |
 | 2 | **DONE** | `safe/events.rkt` (added `key-name`) | `hello-input.rkt` |
-| 3 | PENDING | `safe/texture.rkt` | `hello-image.rkt` |
+| 3 | **DONE** | `safe/texture.rkt` | `hello-image.rkt` |
 | 4 | PENDING | `safe/ttf.rkt` | `hello-text.rkt` |
 | 5 | PENDING | `safe/draw.rkt` (shapes) | `hello-shapes.rkt` |
 | 6 | PENDING | (uses previous) | `hello-animation.rkt` |

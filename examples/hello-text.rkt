@@ -1,243 +1,115 @@
 #lang racket/base
 
-;; SDL3 TTF example - Text rendering with keyboard input
-;; - Shows static text "Hello from SDL3_ttf!"
-;; - Type characters to display them dynamically
-;; - Backspace to delete last character
-;; - Shows FPS counter
-;; - Press Escape to quit
+;; SDL3_ttf example using the idiomatic safe interface
+;; - Static greeting, live typed text, and FPS counter
+;; - Escape quits, backspace deletes
 
-(require ffi/unsafe
+(require racket/match
          racket/format
-         sdl3
-         sdl3/ttf)
+         sdl3/safe)
 
-(define WINDOW_WIDTH 800)
-(define WINDOW_HEIGHT 600)
-(define FONT_PATH "/System/Library/Fonts/Supplemental/Arial.ttf")
-(define BASE_FONT_SIZE 24.0)
+(define window-width 800)
+(define window-height 600)
+(define font-path "/System/Library/Fonts/Supplemental/Arial.ttf")
+(define base-font-size 24.0)
+(define backspace-key 8)
 
-;; Current typed text (mutable)
-(define typed-text "")
-
-;; Add character to typed text
-(define (add-char! ch)
-  (set! typed-text (string-append typed-text (string ch))))
-
-;; Remove last character
-(define (backspace!)
-  (when (> (string-length typed-text) 0)
-    (set! typed-text (substring typed-text 0 (- (string-length typed-text) 1)))))
-
-;; Create a texture from text using TTF
-;; Returns #f on failure, texture pointer on success
-(define (render-text-to-texture renderer font text color)
-  (if (string=? text "")
-      #f  ; Don't render empty string
-      (let ()
-        ;; Render text to surface (length 0 = null-terminated)
-        (define surface (TTF-RenderText-Blended font text 0 color))
-        (when (not surface)
-          (printf "Warning: TTF_RenderText_Blended failed: ~a~n" (SDL-GetError))
-          (set! surface #f))
-
-        (if surface
-            (let ()
-              ;; Convert surface to texture
-              (define texture (SDL-CreateTextureFromSurface renderer surface))
-
-              ;; Free the surface (we have the texture now)
-              (SDL-DestroySurface surface)
-
-              (when (not texture)
-                (printf "Warning: SDL_CreateTextureFromSurface failed: ~a~n" (SDL-GetError)))
-
-              texture)
-            #f))))
-
-;; Get texture size (SDL3 uses floats)
-(define (get-texture-size texture)
-  (define w-ptr (malloc _float 'atomic-interior))
-  (define h-ptr (malloc _float 'atomic-interior))
-  (SDL-GetTextureSize texture w-ptr h-ptr)
-  (values (ptr-ref w-ptr _float) (ptr-ref h-ptr _float)))
-
-;; Render texture at position
-(define (render-texture-at renderer texture x y)
-  (when texture
-    (define-values (w h) (get-texture-size texture))
-    (define dest-rect (make-SDL_FRect x y w h))
-    (SDL-RenderTexture renderer texture #f dest-rect)))
-
-;; Handle key down event - only check for special keys
-(define (handle-key-down event-ptr)
-  (define kb (event->keyboard event-ptr))
-  (define keycode (SDL_KeyboardEvent-key kb))
-
-  (cond
-    ;; Escape - quit
-    [(= keycode SDLK_ESCAPE) #t]
-
-    ;; Backspace - remove last character
-    [(= keycode 8)  ; Backspace
-     (backspace!)
-     #f]
-
-    ;; Other keys - ignore (printable characters come from text input events)
-    [else #f]))
-
-;; Handle text input event - get the actual typed character
-(define (handle-text-input event-ptr)
-  (define text-event (event->text-input event-ptr))
-  (define text-ptr (SDL_TextInputEvent-text text-event))
-  ;; The text field is already a pointer to a C string, so we cast it directly
-  (define text (cast text-ptr _pointer _string/utf-8))
-  ;; Add each character from the text (usually just one)
-  (for ([ch (in-string text)])
-    (add-char! ch)))
+(define (trim-last s)
+  (if (zero? (string-length s))
+      s
+      (substring s 0 (sub1 (string-length s)))))
 
 (define (main)
-  ;; Initialize SDL video subsystem
-  (unless (SDL-Init SDL_INIT_VIDEO)
-    (error 'main "Failed to initialize SDL: ~a" (SDL-GetError)))
+  (sdl-init!)
 
-  ;; Initialize SDL_ttf
-  (unless (TTF-Init)
-    (error 'main "Failed to initialize SDL_ttf: ~a" (SDL-GetError)))
+  ;; Create window and renderer (managed by custodian)
+  (define-values (window renderer)
+    (make-window+renderer "SDL3 TTF - Type to see text"
+                          window-width window-height
+                          #:window-flags SDL_WINDOW_HIGH_PIXEL_DENSITY))
 
-  (printf "SDL_ttf initialized successfully~n")
+  ;; Scale font for high-DPI displays
+  (define pixel-density (window-pixel-density window))
+  (define font-size (* base-font-size pixel-density))
+  (define font (open-font font-path font-size))
 
-  (define window #f)
-  (define renderer #f)
-  (define font #f)
+  ;; Enable text input events
+  (SDL-StartTextInput window)
 
-  (dynamic-wind
-    void
-    (lambda ()
-      ;; Create window with high DPI support
-      (set! window (SDL-CreateWindow "SDL3 TTF - Type to see text"
-                                     WINDOW_WIDTH
-                                     WINDOW_HEIGHT
-                                     SDL_WINDOW_HIGH_PIXEL_DENSITY))
-      (unless window
-        (error 'main "Failed to create window: ~a" (SDL-GetError)))
+  (define static-color '(255 255 255 255))
+  (define typed-color '(0 255 0 255))
+  (define fps-color '(255 255 0 255))
 
-      ;; Create renderer
-      (set! renderer (SDL-CreateRenderer window #f))
-      (unless renderer
-        (error 'main "Failed to create renderer: ~a" (SDL-GetError)))
+  ;; Render once and reuse
+  (define static-texture
+    (render-text font "Hello from SDL3_ttf!"
+                 static-color
+                 #:renderer renderer))
 
-      ;; Get pixel density for font scaling (e.g., 2.0 on Retina)
-      (define pixel-density (SDL-GetWindowPixelDensity window))
-      (define font-size (* BASE_FONT_SIZE pixel-density))
-      (printf "Pixel density: ~a, font size: ~a~n" pixel-density font-size)
+  (let loop ([typed-text ""] [fps-text "FPS: --"]
+             [frame-count 0]
+             [last-time (current-inexact-milliseconds)]
+             [running? #t])
+    (when running?
+      ;; Process events
+      (define-values (new-text still-running?)
+        (for/fold ([curr-text typed-text] [run? #t])
+                  ([ev (in-events)]
+                   #:break (not run?))
+          (match ev
+            [(or (quit-event) (window-event 'close-requested))
+             (values curr-text #f)]
 
-      ;; Load font at scaled size
-      (set! font (TTF-OpenFont FONT_PATH font-size))
-      (unless font
-        (error 'main "Failed to load font ~a: ~a" FONT_PATH (SDL-GetError)))
+            [(key-event 'down key _ _ _)
+             (cond
+               [(= key SDLK_ESCAPE) (values curr-text #f)]
+               [(= key backspace-key) (values (trim-last curr-text) run?)]
+               [else (values curr-text run?)])]
 
-      (printf "Font loaded successfully: ~a at ~a pt~n" FONT_PATH font-size)
+            [(text-input-event txt)
+             (values (string-append curr-text txt) run?)]
 
-      ;; Enable text input for the window
-      (SDL-StartTextInput window)
+            [_ (values curr-text run?)])))
 
-      ;; Create color structs
-      (define white (make-SDL_Color 255 255 255 255))
-      (define green (make-SDL_Color 0 255 0 255))
-      (define yellow (make-SDL_Color 255 255 0 255))
+      ;; Update FPS counter (~2x per second)
+      (define next-frame-count (add1 frame-count))
+      (define current-time (current-inexact-milliseconds))
+      (define elapsed (- current-time last-time))
 
-      ;; Create static text texture
-      (define static-text "Hello from SDL3_ttf!")
-      (define static-texture #f)
+      (define-values (next-fps-text next-frame next-last-time)
+        (if (>= elapsed 500.0)
+            (let ([fps (/ (* next-frame-count 1000.0) elapsed)])
+              (values (format "FPS: ~a" (~r fps #:precision 1))
+                      0
+                      current-time))
+            (values fps-text next-frame-count last-time)))
 
-      ;; Event buffer
-      (define event (malloc SDL_EVENT_SIZE 'atomic-interior))
-      (define running? #t)
+      (when still-running?
+        ;; Clear background
+        (set-draw-color! renderer 0 0 0)
+        (render-clear! renderer)
 
-      ;; FPS tracking
-      (define frame-count 0)
-      (define last-time (current-inexact-milliseconds))
-      (define fps-text "FPS: --")
+        ;; Static greeting
+        (when static-texture
+          (render-texture! renderer static-texture 20 20))
 
-      ;; Main loop
-      (let loop ()
-        (when running?
-          ;; Poll all pending events
-          (let event-loop ()
-            (when (SDL-PollEvent event)
-              (define type (sdl-event-type event))
-              (cond
-                [(= type SDL_EVENT_QUIT)
-                 (set! running? #f)]
-                [(= type SDL_EVENT_WINDOW_CLOSE_REQUESTED)
-                 (set! running? #f)]
-                [(= type SDL_EVENT_KEY_DOWN)
-                 (when (handle-key-down event)
-                   (set! running? #f))]
-                [(= type SDL_EVENT_TEXT_INPUT)
-                 (handle-text-input event)]
-                [else (void)])
-              (event-loop)))
+        ;; Live typed text
+        (draw-text! renderer font new-text 20 80 typed-color)
 
-          ;; Render if still running
-          (when running?
-            ;; Set background to black
-            (SDL-SetRenderDrawColor renderer 0 0 0 255)
-            (SDL-RenderClear renderer)
+        ;; FPS counter
+        (draw-text! renderer font next-fps-text 20 (- window-height 60) fps-color)
 
-            ;; Render static text (create texture on first frame)
-            (unless static-texture
-              (set! static-texture (render-text-to-texture renderer font static-text white)))
-            (render-texture-at renderer static-texture 20.0 20.0)
+        (render-present! renderer)
+        (delay! 16)
 
-            ;; Render typed text (recreate each frame when text changes)
-            (define typed-texture (render-text-to-texture renderer font typed-text green))
-            (when typed-texture
-              (render-texture-at renderer typed-texture 20.0 80.0)
-              (SDL-DestroyTexture typed-texture))
+        (loop new-text next-fps-text next-frame next-last-time still-running?))))
 
-            ;; Calculate FPS
-            (set! frame-count (+ frame-count 1))
-            (define current-time (current-inexact-milliseconds))
-            (define elapsed (- current-time last-time))
+  (SDL-StopTextInput window)
 
-            (when (>= elapsed 500.0)  ; Update FPS every 500ms
-              (define fps (/ (* frame-count 1000.0) elapsed))
-              (set! fps-text (format "FPS: ~a" (~r fps #:precision 1)))
-              (set! frame-count 0)
-              (set! last-time current-time))
+  (when static-texture
+    (texture-destroy! static-texture))
 
-            ;; Render FPS
-            (define fps-texture (render-text-to-texture renderer font fps-text yellow))
-            (when fps-texture
-              (render-texture-at renderer fps-texture 20.0 (- WINDOW_HEIGHT 60.0))
-              (SDL-DestroyTexture fps-texture))
+  (close-font! font))
 
-            ;; Present the rendered frame
-            (SDL-RenderPresent renderer)
-
-            ;; Small delay (~60fps)
-            (SDL-Delay 16)
-
-            (loop))))
-
-      ;; Cleanup textures
-      (when static-texture
-        (SDL-DestroyTexture static-texture)))
-
-    ;; Cleanup
-    (lambda ()
-      (when window
-        (SDL-StopTextInput window))
-      (when font
-        (TTF-CloseFont font))
-      (when renderer
-        (SDL-DestroyRenderer renderer))
-      (when window
-        (SDL-DestroyWindow window))
-      (TTF-Quit)
-      (SDL-Quit))))
-
-;; Run the main function
+;; Run
 (main)

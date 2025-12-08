@@ -13,9 +13,11 @@
 (require "safe/window.rkt"
          "safe/events.rkt"
          "safe/draw.rkt"
-         "safe/texture.rkt")
+         "safe/texture.rkt"
+         "safe/ttf.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
          (all-from-out "safe/draw.rkt")
-         (all-from-out "safe/texture.rkt"))
+         (all-from-out "safe/texture.rkt")
+         (all-from-out "safe/ttf.rkt"))

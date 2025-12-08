@@ -11,6 +11,7 @@
 (provide
  ;; Texture management
  load-texture
+ texture-from-pointer
  texture?
  texture-ptr
  texture-destroy!
@@ -35,6 +36,13 @@
   (define ptr (IMG-LoadTexture (renderer-ptr rend) path))
   (unless ptr
     (error 'load-texture "Failed to load texture ~a: ~a" path (SDL-GetError)))
+
+  (texture-from-pointer ptr #:custodian cust))
+
+(define (texture-from-pointer ptr
+                              #:custodian [cust (current-custodian)])
+  (unless ptr
+    (error 'texture-from-pointer "Texture pointer is null: ~a" (SDL-GetError)))
 
   (define tex (texture ptr #f))
 

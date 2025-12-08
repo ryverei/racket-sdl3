@@ -133,16 +133,24 @@ Key improvements:
 
 ---
 
-## Phase 4: Text Rendering (`hello-text.rkt`) - PENDING
+## Phase 4: Text Rendering (`hello-text.rkt`) - COMPLETED
 
-### New File: `safe/ttf.rkt`
+### New Files & APIs
 
-```racket
-(open-font path size #:custodian)
-(close-font! font)
-(draw-text! renderer font text x y color)
-(render-text font text color #:renderer #:mode)
-```
+- `safe/ttf.rkt` - custodian-managed fonts (`open-font`, `close-font!`) and helpers:
+  - `render-text` -> custodian-managed texture (or `#f` for empty strings) with `#:renderer` and `#:mode` (`'blended` or `'solid`)
+  - `draw-text!` convenience that renders and destroys in one call
+- `safe/texture.rkt` - added `texture-from-pointer` for wrapping textures created from surfaces
+
+### Example Update
+
+`hello-text.rkt`: Reduced from ~233 lines to 121 lines (112 line reduction)
+
+Key improvements:
+- Uses `sdl3/safe` only; no manual malloc, event buffers, or dynamic-wind cleanup
+- Fonts/text rendering via `open-font`, `render-text`, and `draw-text!` helpers (textures auto-cleaned)
+- Event handling with `match` on structs (`text-input-event`, `key-event`), simple state loop
+- High-DPI font scaling retained via `window-pixel-density`
 
 ---
 
@@ -193,7 +201,7 @@ Mostly benefits from earlier phases.
 | 1 | **DONE** | `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe.rkt` | `hello-window.rkt` |
 | 2 | **DONE** | `safe/events.rkt` (added `key-name`) | `hello-input.rkt` |
 | 3 | **DONE** | `safe/texture.rkt` | `hello-image.rkt` |
-| 4 | PENDING | `safe/ttf.rkt` | `hello-text.rkt` |
+| 4 | **DONE** | `safe/ttf.rkt`, `safe/texture.rkt` (wrap helper) | `hello-text.rkt` |
 | 5 | PENDING | `safe/draw.rkt` (shapes) | `hello-shapes.rkt` |
 | 6 | PENDING | (uses previous) | `hello-animation.rkt` |
 | 7 | PENDING | `safe/mouse.rkt` | `hello-mouse.rkt` |

@@ -1,161 +1,173 @@
-# Implementation Plan: Texture & Rendering Improvements
+# Implementation Plan: Better Event Handling & Input
 
 This document outlines the next set of features to add to the SDL3 Racket bindings.
 
 ## Goals
 
-Enhance texture rendering and add blend modes to enable sprite-based games with rotation, scaling, transparency, and color effects.
+Improve event handling with blocking wait functions and enhance input support with mouse wheel events, relative mouse mode, and expanded keyboard constants for modifier keys.
 
 ---
 
-## Phase 1: Blend Modes
+## Phase 1: Blocking Event Functions
 
-Add blend mode support for transparency and compositing effects.
+Add `SDL_WaitEvent` and `SDL_WaitEventTimeout` for CPU-efficient event handling in applications that don't need continuous rendering.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+SDL-WaitEvent         ; event-ptr -> bool
+SDL-WaitEventTimeout  ; event-ptr timeout-ms -> bool
+```
+
+### Safe Wrapper (`safe/events.rkt`)
+
+```racket
+(wait-event)           ; -> event (blocks indefinitely)
+(wait-event-timeout ms) ; -> event or #f (blocks up to ms milliseconds)
+```
+
+### Example: `12-wait-events.rkt`
+
+Demonstrate blocking event handling:
+- Simple application that only redraws when events occur
+- Show CPU usage difference vs polling loop
+- Display event type and timestamp on each event
+- Use wait-event-timeout with 1000ms to show periodic "idle" updates
+
+---
+
+## Phase 2: Mouse Wheel Events
+
+Add mouse wheel/scroll event support.
 
 ### Types (`private/types.rkt`)
 
 ```racket
-_SDL_BlendMode  ; uint32
+;; Event constant
+SDL_EVENT_MOUSE_WHEEL  ; #x403
 
-;; Constants
-SDL_BLENDMODE_NONE               ; no blending
-SDL_BLENDMODE_BLEND              ; alpha blending
-SDL_BLENDMODE_BLEND_PREMULTIPLIED
-SDL_BLENDMODE_ADD                ; additive blending
-SDL_BLENDMODE_ADD_PREMULTIPLIED
-SDL_BLENDMODE_MOD                ; color modulate
-SDL_BLENDMODE_MUL                ; color multiply
+;; Wheel direction enum
+_SDL_MouseWheelDirection
+SDL_MOUSEWHEEL_NORMAL   ; 0
+SDL_MOUSEWHEEL_FLIPPED  ; 1
+
+;; Event struct
+_SDL_MouseWheelEvent
+  - type        : uint32
+  - reserved    : uint32
+  - timestamp   : uint64
+  - windowID    : uint32
+  - which       : uint32
+  - x           : float   ; horizontal scroll amount
+  - y           : float   ; vertical scroll amount
+  - direction   : int32   ; SDL_MouseWheelDirection
+  - mouse_x     : float   ; mouse x position
+  - mouse_y     : float   ; mouse y position
 ```
 
-### Raw Bindings (`raw.rkt`)
+### Safe Wrapper (`safe/events.rkt`)
 
 ```racket
-SDL-SetRenderDrawBlendMode  ; renderer blend-mode -> bool
-SDL-GetRenderDrawBlendMode  ; renderer -> (values bool blend-mode)
-SDL-SetTextureBlendMode     ; texture blend-mode -> bool
-SDL-GetTextureBlendMode     ; texture -> (values bool blend-mode)
+;; New event struct
+(struct mouse-wheel-event sdl-event (x y direction mouse-x mouse-y) #:transparent)
+;; x, y are scroll amounts (positive = right/away from user)
+;; direction is 'normal or 'flipped
+;; mouse-x, mouse-y are cursor position
 ```
 
-### Safe Wrapper (`safe/draw.rkt`)
+### Example: `13-scroll.rkt`
 
-```racket
-(set-blend-mode! renderer mode)  ; mode: 'none, 'blend, 'add, 'mod, 'mul
-```
-
-### Example: `08-blend.rkt`
-
-Demonstrate blend modes with overlapping semi-transparent shapes:
-- Draw colored rectangles with alpha < 255
-- Toggle between blend modes with number keys (1-5)
-- Show additive blending for "glow" effects
-- Display current blend mode name
+Demonstrate mouse wheel support:
+- Display a large virtual canvas (colored grid or pattern)
+- Scroll wheel moves viewport up/down
+- Shift+scroll or horizontal scroll moves left/right
+- Show current scroll position and wheel delta on screen
 
 ---
 
-## Phase 2: Texture Color & Alpha Modulation
+## Phase 3: Keyboard Modifier Constants
 
-Enable tinting and fading of textures.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-SDL-SetTextureColorMod   ; texture r g b -> bool
-SDL-GetTextureColorMod   ; texture -> (values bool r g b)
-SDL-SetTextureAlphaMod   ; texture alpha -> bool
-SDL-GetTextureAlphaMod   ; texture -> (values bool alpha)
-```
-
-### Safe Wrapper (`safe/texture.rkt`)
-
-```racket
-(texture-set-color-mod! texture r g b)
-(texture-set-alpha-mod! texture alpha)
-```
-
-### Example: `09-tint.rkt`
-
-Demonstrate color and alpha modulation:
-- Load a sprite/image
-- R/G/B keys tint the sprite red/green/blue
-- Up/Down arrows adjust alpha (fade in/out)
-- Space resets to normal
-- Show current tint values on screen
-
----
-
-## Phase 3: Rotated Texture Rendering
-
-Enable sprite rotation and flipping.
+Add modifier key constants for detecting Shift, Ctrl, Alt, etc.
 
 ### Types (`private/types.rkt`)
 
 ```racket
-_SDL_FlipMode  ; enum
+;; Modifier key masks (SDL_Keymod - uint16)
+SDL_KMOD_NONE    ; #x0000
+SDL_KMOD_LSHIFT  ; #x0001
+SDL_KMOD_RSHIFT  ; #x0002
+SDL_KMOD_LCTRL   ; #x0040
+SDL_KMOD_RCTRL   ; #x0080
+SDL_KMOD_LALT    ; #x0100
+SDL_KMOD_RALT    ; #x0200
+SDL_KMOD_LGUI    ; #x0400  (Command on Mac, Windows key on PC)
+SDL_KMOD_RGUI    ; #x0800
+SDL_KMOD_NUM     ; #x1000  (Num Lock)
+SDL_KMOD_CAPS    ; #x2000  (Caps Lock)
+SDL_KMOD_MODE    ; #x4000  (AltGr)
+SDL_KMOD_SCROLL  ; #x8000  (Scroll Lock)
 
-SDL_FLIP_NONE
-SDL_FLIP_HORIZONTAL
-SDL_FLIP_VERTICAL
+;; Combined masks
+SDL_KMOD_CTRL    ; (LCTRL | RCTRL)
+SDL_KMOD_SHIFT   ; (LSHIFT | RSHIFT)
+SDL_KMOD_ALT     ; (LALT | RALT)
+SDL_KMOD_GUI     ; (LGUI | RGUI)
 ```
 
-### Raw Bindings (`raw.rkt`)
+### Safe Wrapper (`safe/events.rkt`)
 
 ```racket
-SDL-RenderTextureRotated  ; renderer texture srcrect dstrect angle center flip -> bool
+;; Helper predicates for checking modifiers
+(mod-shift? mod)  ; -> bool (any shift key)
+(mod-ctrl? mod)   ; -> bool (any ctrl key)
+(mod-alt? mod)    ; -> bool (any alt key)
+(mod-gui? mod)    ; -> bool (any gui/command key)
 ```
 
-### Safe Wrapper (`safe/texture.rkt`)
+### Example: Update `13-scroll.rkt`
 
-```racket
-(render-texture! renderer texture x y
-                 #:angle 45.0           ; rotation in degrees
-                 #:center (cx . cy)     ; rotation center (default: texture center)
-                 #:flip 'horizontal)    ; 'none, 'horizontal, 'vertical, 'both
-```
-
-### Example: `10-rotate.rkt`
-
-Demonstrate rotation and flipping:
-- Load a sprite (something asymmetric so rotation is visible)
-- Left/Right arrows rotate the sprite
-- H key flips horizontally, V key flips vertically
-- Mouse position sets rotation center
-- Continuous rotation option (spacebar toggles)
+- Use modifier detection to enable Shift+scroll for horizontal scrolling
+- Display active modifiers on screen
 
 ---
 
-## Phase 4: Window Size & Position
+## Phase 4: Common Keycode Constants
 
-Add window query and manipulation functions.
+Expand the available keycode constants for common keys.
 
-### Raw Bindings (`raw.rkt`)
-
-```racket
-SDL-GetWindowSize      ; window -> (values bool w h)
-SDL-SetWindowSize      ; window w h -> bool
-SDL-GetWindowPosition  ; window -> (values bool x y)
-SDL-SetWindowPosition  ; window x y -> bool
-SDL-GetWindowFlags     ; window -> flags
-SDL-SetWindowFullscreen ; window fullscreen? -> bool
-```
-
-### Safe Wrapper (`safe/window.rkt`)
+### Types (`private/types.rkt`)
 
 ```racket
-(window-size window)           ; -> (values w h)
-(window-set-size! window w h)
-(window-position window)       ; -> (values x y)
-(window-set-position! window x y)
-(window-fullscreen? window)
-(window-set-fullscreen! window fullscreen?)
+;; Number keys (top row)
+SDLK_0 through SDLK_9  ; ASCII values 48-57
+
+;; Letter keys (add remaining)
+SDLK_a through SDLK_z  ; ASCII values 97-122
+SDLK_A through SDLK_Z  ; ASCII values 65-90
+
+;; Function keys
+SDLK_F1 through SDLK_F12  ; #x4000003A through #x40000045
+
+;; Common control keys
+SDLK_RETURN      ; #x0D (Enter)
+SDLK_BACKSPACE   ; #x08
+SDLK_TAB         ; #x09
+SDLK_DELETE      ; #x4000004C
+SDLK_INSERT      ; #x40000049
+SDLK_HOME        ; #x4000004A
+SDLK_END         ; #x4000004D
+SDLK_PAGEUP      ; #x4000004B
+SDLK_PAGEDOWN    ; #x4000004E
 ```
 
-### Example: `11-window-controls.rkt`
+### Example: `14-keyboard.rkt`
 
-Demonstrate window manipulation:
-- Arrow keys move the window
-- +/- keys resize the window
-- F key toggles fullscreen
-- Display current size and position on screen
+Comprehensive keyboard demo:
+- Display a virtual keyboard layout on screen
+- Highlight keys as they're pressed
+- Show keycode, scancode, and key name for last pressed key
+- Show active modifier keys
+- Different colors for modifier combinations (Ctrl+key, Shift+key, etc.)
 
 ---
 
@@ -163,15 +175,17 @@ Demonstrate window manipulation:
 
 | Phase | Files | Example |
 |-------|-------|---------|
-| 1 | `private/types.rkt`, `raw.rkt`, `safe/draw.rkt` | `08-blend.rkt` |
-| 2 | `raw.rkt`, `safe/texture.rkt` | `09-tint.rkt` |
-| 3 | `private/types.rkt`, `raw.rkt`, `safe/texture.rkt` | `10-rotate.rkt` |
-| 4 | `raw.rkt`, `safe/window.rkt` | `11-window-controls.rkt` |
+| 1 | `raw.rkt`, `safe/events.rkt` | `12-wait-events.rkt` |
+| 2 | `private/types.rkt`, `safe/events.rkt` | `13-scroll.rkt` |
+| 3 | `private/types.rkt`, `safe/events.rkt` | update `13-scroll.rkt` |
+| 4 | `private/types.rkt` | `14-keyboard.rkt` |
 
 ---
 
 ## Notes
 
-- Each phase is independent and testable via its example
-- Phases 1-3 build on each other for sprite rendering
-- Phase 4 is orthogonal and can be done in any order
+- Phases 1-2 add new functionality; Phases 3-4 expand existing patterns
+- Blocking events (Phase 1) are useful for GUI apps, editors, tools
+- Mouse wheel (Phase 2) is essential for scrollable content
+- Modifier keys (Phase 3) enable keyboard shortcuts (Ctrl+S, etc.)
+- Extended keycodes (Phase 4) support full keyboard interaction

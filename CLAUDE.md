@@ -10,8 +10,8 @@
 /opt/homebrew/bin/raco make <file.rkt>
 
 # Run examples
-/opt/homebrew/bin/racket examples/hello-window.rkt
-/opt/homebrew/bin/racket examples/hello-input.rkt
+/opt/homebrew/bin/racket examples/01-window.rkt
+/opt/homebrew/bin/racket examples/02-input.rkt
 
 # Clear compiled cache (needed after changing types.rkt or raw.rkt)
 rm -rf compiled private/compiled examples/compiled
@@ -37,6 +37,24 @@ rm -rf compiled private/compiled examples/compiled
 1. Add types/constants to `private/types.rkt` with `provide`
 2. Add function binding to `raw.rkt` using `define-sdl`
 3. Clear compiled cache before testing
+
+## SDL3 Reference Headers
+
+When adding new bindings, refer to the SDL3 headers installed via Homebrew:
+
+```
+/opt/homebrew/include/SDL3/        # Core SDL3 headers
+/opt/homebrew/include/SDL3_image/  # SDL3_image headers
+/opt/homebrew/include/SDL3_ttf/    # SDL3_ttf headers
+```
+
+Key headers:
+- `SDL3/SDL_video.h` - Window functions
+- `SDL3/SDL_render.h` - Renderer and texture functions
+- `SDL3/SDL_events.h` - Event types and structs
+- `SDL3/SDL_keyboard.h` - Keyboard functions and keycodes
+- `SDL3/SDL_mouse.h` - Mouse functions
+- `SDL3/SDL_blendmode.h` - Blend mode constants
 
 ## SDL3 Notes
 

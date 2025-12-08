@@ -4,6 +4,15 @@ This document tracks the implementation status of SDL3, SDL3_image, and SDL3_ttf
 
 ## Currently Implemented
 
+### Idiomatic Wrapper (`safe.rkt` and `safe/`)
+A complete idiomatic Racket layer on top of the raw bindings, providing:
+- Custodian-managed resources (automatic cleanup)
+- Racket structs for events (with `match` support)
+- Simpler APIs (fewer pointer manipulations)
+- Drawing helpers, texture management, font/text rendering, mouse state
+
+Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rkt`, `safe/ttf.rkt`, `safe/mouse.rkt`
+
 ### SDL3 Core (`raw.rkt`)
 - [x] `SDL_Init`
 - [x] `SDL_Quit`
@@ -782,13 +791,13 @@ This document tracks the implementation status of SDL3, SDL3_image, and SDL3_ttf
 
 ## Implementation Statistics
 
-**Currently Implemented:** ~40 functions
+**Currently Implemented:** ~50 functions
 **Estimated Total Available:** 500+ functions
 
 ### Coverage by Library
 | Library | Implemented | Estimated Total | Coverage |
 |---------|-------------|-----------------|----------|
-| SDL3 Core | 22 | ~350 | ~6% |
+| SDL3 Core | 32 | ~350 | ~9% |
 | SDL3_image | 2 | ~60 | ~3% |
 | SDL3_ttf | 16 | ~120 | ~13% |
 
@@ -796,13 +805,12 @@ This document tracks the implementation status of SDL3, SDL3_image, and SDL3_ttf
 
 ## Next Steps (Suggested Order)
 
-1. **P0 - Essential Drawing:** `SDL_RenderLine`, `SDL_RenderRect`, `SDL_RenderFillRect`, `SDL_RenderPoint`
-2. **P0 - Mouse State:** `SDL_GetMouseState`, `SDL_GetRelativeMouseState`
-3. **P0 - Blocking Events:** `SDL_WaitEvent`, `SDL_WaitEventTimeout`
-4. **P0 - Window Queries:** `SDL_GetWindowSize`, `SDL_GetWindowPosition`, `SDL_GetWindowFlags`
-5. **P0 - Integer Rect:** `SDL_Rect`, `SDL_Point` types
-6. **P1 - Image Loading:** `IMG_Load` (surface), `IMG_SavePNG`
-7. **P1 - Texture Ops:** `SDL_CreateTexture`, `SDL_SetTextureColorMod`, `SDL_SetTextureAlphaMod`
-8. **P1 - Blend Modes:** `SDL_BlendMode` type and constants
-9. **P1 - More Keys:** Expand keycode and scancode constants
-10. **P2 - Timer:** `SDL_GetTicks`, `SDL_GetPerformanceCounter`
+1. **P0 - Blocking Events:** `SDL_WaitEvent`, `SDL_WaitEventTimeout`
+2. **P0 - Window Queries:** `SDL_GetWindowSize`, `SDL_GetWindowPosition`, `SDL_GetWindowFlags`
+3. **P0 - Integer Rect:** `SDL_Rect`, `SDL_Point` types
+4. **P1 - Image Loading:** `IMG_Load` (surface), `IMG_SavePNG`
+5. **P1 - Texture Ops:** `SDL_CreateTexture`, `SDL_SetTextureColorMod`, `SDL_SetTextureAlphaMod`
+6. **P1 - Blend Modes:** `SDL_BlendMode` type and constants
+7. **P1 - More Keys:** Expand keycode and scancode constants
+8. **P1 - Mouse:** `SDL_GetRelativeMouseState`, cursor functions
+9. **P2 - Timer:** `SDL_GetPerformanceCounter`, `SDL_GetPerformanceFrequency`

@@ -10,6 +10,12 @@
  ;; Color
  set-draw-color!
 
+ ;; Blend modes
+ set-blend-mode!
+ get-blend-mode
+ blend-mode->symbol
+ symbol->blend-mode
+
  ;; Basic rendering
  render-clear!
  render-present!
@@ -34,6 +40,52 @@
 
 (define (set-draw-color! rend r g b [a 255])
   (SDL-SetRenderDrawColor (renderer-ptr rend) r g b a))
+
+;; ============================================================================
+;; Blend Modes
+;; ============================================================================
+
+;; Convert a blend mode symbol to SDL constant
+(define (symbol->blend-mode sym)
+  (case sym
+    [(none) SDL_BLENDMODE_NONE]
+    [(blend alpha) SDL_BLENDMODE_BLEND]
+    [(blend-premultiplied) SDL_BLENDMODE_BLEND_PREMULTIPLIED]
+    [(add additive) SDL_BLENDMODE_ADD]
+    [(add-premultiplied) SDL_BLENDMODE_ADD_PREMULTIPLIED]
+    [(mod modulate) SDL_BLENDMODE_MOD]
+    [(mul multiply) SDL_BLENDMODE_MUL]
+    [else (error 'symbol->blend-mode
+                 "unknown blend mode: ~a (expected one of: none, blend, add, mod, mul)"
+                 sym)]))
+
+;; Convert an SDL blend mode constant to a symbol
+(define (blend-mode->symbol mode)
+  (cond
+    [(= mode SDL_BLENDMODE_NONE) 'none]
+    [(= mode SDL_BLENDMODE_BLEND) 'blend]
+    [(= mode SDL_BLENDMODE_BLEND_PREMULTIPLIED) 'blend-premultiplied]
+    [(= mode SDL_BLENDMODE_ADD) 'add]
+    [(= mode SDL_BLENDMODE_ADD_PREMULTIPLIED) 'add-premultiplied]
+    [(= mode SDL_BLENDMODE_MOD) 'mod]
+    [(= mode SDL_BLENDMODE_MUL) 'mul]
+    [else 'unknown]))
+
+;; Set the blend mode for the renderer
+;; mode can be a symbol ('none, 'blend, 'add, 'mod, 'mul) or an SDL constant
+(define (set-blend-mode! rend mode)
+  (define blend-mode
+    (if (symbol? mode)
+        (symbol->blend-mode mode)
+        mode))
+  (SDL-SetRenderDrawBlendMode (renderer-ptr rend) blend-mode))
+
+;; Get the current blend mode for the renderer (returns a symbol)
+(define (get-blend-mode rend)
+  (define-values (success mode) (SDL-GetRenderDrawBlendMode (renderer-ptr rend)))
+  (if success
+      (blend-mode->symbol mode)
+      (error 'get-blend-mode "failed to get blend mode")))
 
 ;; ============================================================================
 ;; Basic Rendering

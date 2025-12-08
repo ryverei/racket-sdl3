@@ -45,6 +45,11 @@
          SDL-RenderRects
          SDL-RenderFillRect
          SDL-RenderFillRects
+         ;; Blend modes
+         SDL-SetRenderDrawBlendMode
+         SDL-GetRenderDrawBlendMode
+         SDL-SetTextureBlendMode
+         SDL-GetTextureBlendMode
          ;; Surface
          SDL-DestroySurface
          ;; Events
@@ -251,6 +256,46 @@
 (define-sdl SDL-RenderFillRects
   (_fun _SDL_Renderer-pointer _pointer _int -> _sdl-bool)
   #:c-id SDL_RenderFillRects)
+
+;; ============================================================================
+;; Blend Modes
+;; ============================================================================
+
+;; SDL_SetRenderDrawBlendMode: Set the blend mode used for drawing operations
+;; renderer: the renderer
+;; blendMode: the blend mode to use
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetRenderDrawBlendMode
+  (_fun _SDL_Renderer-pointer _SDL_BlendMode -> _sdl-bool)
+  #:c-id SDL_SetRenderDrawBlendMode)
+
+;; SDL_GetRenderDrawBlendMode: Get the current blend mode for the renderer
+;; renderer: the renderer to query
+;; blendMode: pointer to receive the current blend mode
+;; Returns: true on success, false on failure
+(define-sdl SDL-GetRenderDrawBlendMode
+  (_fun _SDL_Renderer-pointer (blendMode : (_ptr o _SDL_BlendMode))
+        -> (result : _sdl-bool)
+        -> (values result blendMode))
+  #:c-id SDL_GetRenderDrawBlendMode)
+
+;; SDL_SetTextureBlendMode: Set the blend mode for a texture
+;; texture: the texture to modify
+;; blendMode: the blend mode to use
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetTextureBlendMode
+  (_fun _SDL_Texture-pointer _SDL_BlendMode -> _sdl-bool)
+  #:c-id SDL_SetTextureBlendMode)
+
+;; SDL_GetTextureBlendMode: Get the blend mode for a texture
+;; texture: the texture to query
+;; blendMode: pointer to receive the current blend mode
+;; Returns: true on success, false on failure
+(define-sdl SDL-GetTextureBlendMode
+  (_fun _SDL_Texture-pointer (blendMode : (_ptr o _SDL_BlendMode))
+        -> (result : _sdl-bool)
+        -> (values result blendMode))
+  #:c-id SDL_GetTextureBlendMode)
 
 ;; ============================================================================
 ;; Surface

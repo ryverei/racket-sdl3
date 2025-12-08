@@ -146,6 +146,16 @@
          SDLK_UP
          ;; Keycode type
          _SDL_Keycode
+         ;; Blend mode
+         _SDL_BlendMode
+         SDL_BLENDMODE_NONE
+         SDL_BLENDMODE_BLEND
+         SDL_BLENDMODE_BLEND_PREMULTIPLIED
+         SDL_BLENDMODE_ADD
+         SDL_BLENDMODE_ADD_PREMULTIPLIED
+         SDL_BLENDMODE_MOD
+         SDL_BLENDMODE_MUL
+         SDL_BLENDMODE_INVALID
          ;; Error handling forward reference
          sdl-get-error-proc)
 
@@ -269,6 +279,23 @@
 
 ;; SDL_Keycode type (32-bit)
 (define _SDL_Keycode _uint32)
+
+;; ============================================================================
+;; Blend Modes
+;; ============================================================================
+
+;; SDL_BlendMode type (32-bit unsigned)
+(define _SDL_BlendMode _uint32)
+
+;; Blend mode constants
+(define SDL_BLENDMODE_NONE                #x00000000)  ; no blending
+(define SDL_BLENDMODE_BLEND               #x00000001)  ; alpha blending
+(define SDL_BLENDMODE_BLEND_PREMULTIPLIED #x00000010)  ; pre-multiplied alpha
+(define SDL_BLENDMODE_ADD                 #x00000002)  ; additive blending
+(define SDL_BLENDMODE_ADD_PREMULTIPLIED   #x00000020)  ; pre-multiplied additive
+(define SDL_BLENDMODE_MOD                 #x00000004)  ; color modulate
+(define SDL_BLENDMODE_MUL                 #x00000008)  ; color multiply
+(define SDL_BLENDMODE_INVALID             #x7FFFFFFF)
 
 ;; ============================================================================
 ;; Event Structs

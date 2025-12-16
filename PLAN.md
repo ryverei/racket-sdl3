@@ -1,191 +1,266 @@
-# Implementation Plan: Better Event Handling & Input
+# Implementation Plan: Textures, Geometry & Input
 
 This document outlines the next set of features to add to the SDL3 Racket bindings.
 
 ## Goals
 
-Improve event handling with blocking wait functions and enhance input support with mouse wheel events, relative mouse mode, and expanded keyboard constants for modifier keys.
+Enable render-to-texture workflows, add integer geometry types, expand image I/O, and improve mouse control for game-style input.
 
 ---
 
-## Phase 1: Blocking Event Functions
+## Phase 1: Render Targets & Texture Creation
 
-Add `SDL_WaitEvent` and `SDL_WaitEventTimeout` for CPU-efficient event handling in applications that don't need continuous rendering.
+Add ability to create blank textures and render to them for off-screen drawing.
+
+### Types (`private/types.rkt`)
+
+```racket
+;; Texture access modes
+_SDL_TextureAccess
+SDL_TEXTUREACCESS_STATIC     ; 0 - changes rarely, not lockable
+SDL_TEXTUREACCESS_STREAMING  ; 1 - changes frequently, lockable
+SDL_TEXTUREACCESS_TARGET     ; 2 - can be used as render target
+
+;; Scale modes for texture filtering
+_SDL_ScaleMode
+SDL_SCALEMODE_NEAREST  ; 0 - nearest pixel sampling (pixelated)
+SDL_SCALEMODE_LINEAR   ; 1 - linear filtering (smooth)
+```
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-SDL-WaitEvent         ; event-ptr -> bool
-SDL-WaitEventTimeout  ; event-ptr timeout-ms -> bool
+SDL-CreateTexture          ; renderer format access w h -> texture
+SDL-SetRenderTarget        ; renderer texture -> bool
+SDL-GetRenderTarget        ; renderer -> texture or #f
+SDL-SetTextureScaleMode    ; texture scalemode -> bool
+SDL-GetTextureScaleMode    ; texture -> (values bool scalemode)
 ```
 
-### Safe Wrapper (`safe/events.rkt`)
+### Safe Wrapper (`safe/texture.rkt`)
 
 ```racket
-(wait-event)           ; -> event (blocks indefinitely)
-(wait-event-timeout ms) ; -> event or #f (blocks up to ms milliseconds)
+(create-texture renderer width height
+                #:access 'target    ; 'static, 'streaming, or 'target
+                #:scale 'nearest)   ; 'nearest or 'linear
+(with-render-target renderer texture body ...)  ; render to texture, restore after
 ```
 
-### Example: `12-wait-events.rkt`
+### Example: `15-render-target.rkt`
 
-Demonstrate blocking event handling:
-- Simple application that only redraws when events occur
-- Show CPU usage difference vs polling loop
-- Display event type and timestamp on each event
-- Use wait-event-timeout with 1000ms to show periodic "idle" updates
+- Create an off-screen texture
+- Draw a pattern to the texture once
+- Render the texture multiple times with different positions/scales
+- Show FPS benefit of caching complex drawing
 
 ---
 
-## Phase 2: Mouse Wheel Events
+## Phase 2: Integer Rectangles & Points
 
-Add mouse wheel/scroll event support.
+Add integer-based geometry types for pixel-perfect positioning.
 
 ### Types (`private/types.rkt`)
 
 ```racket
-;; Event constant
-SDL_EVENT_MOUSE_WHEEL  ; #x403
+;; Integer point
+_SDL_Point
+  - x : int
+  - y : int
 
-;; Wheel direction enum
-_SDL_MouseWheelDirection
-SDL_MOUSEWHEEL_NORMAL   ; 0
-SDL_MOUSEWHEEL_FLIPPED  ; 1
-
-;; Event struct
-_SDL_MouseWheelEvent
-  - type        : uint32
-  - reserved    : uint32
-  - timestamp   : uint64
-  - windowID    : uint32
-  - which       : uint32
-  - x           : float   ; horizontal scroll amount
-  - y           : float   ; vertical scroll amount
-  - direction   : int32   ; SDL_MouseWheelDirection
-  - mouse_x     : float   ; mouse x position
-  - mouse_y     : float   ; mouse y position
+;; Integer rectangle
+_SDL_Rect
+  - x : int
+  - y : int
+  - w : int
+  - h : int
 ```
 
-### Safe Wrapper (`safe/events.rkt`)
+### Optional: Rectangle Utilities
 
 ```racket
-;; New event struct
-(struct mouse-wheel-event sdl-event (x y direction mouse-x mouse-y) #:transparent)
-;; x, y are scroll amounts (positive = right/away from user)
-;; direction is 'normal or 'flipped
-;; mouse-x, mouse-y are cursor position
+SDL-HasRectIntersection    ; rect-a rect-b -> bool
+SDL-GetRectIntersection    ; rect-a rect-b result -> bool
 ```
 
-### Example: `13-scroll.rkt`
+### Example: Update existing examples
 
-Demonstrate mouse wheel support:
-- Display a large virtual canvas (colored grid or pattern)
-- Scroll wheel moves viewport up/down
-- Shift+scroll or horizontal scroll moves left/right
-- Show current scroll position and wheel delta on screen
+- Use integer rects for tile-based positioning where appropriate
 
 ---
 
-## Phase 3: Keyboard Modifier Constants
+## Phase 3: Image I/O
 
-Add modifier key constants for detecting Shift, Ctrl, Alt, etc.
+Complete image loading and add saving capabilities.
+
+### Raw Bindings (`image.rkt`)
+
+```racket
+IMG-Load      ; filename -> surface (load to surface, not texture)
+IMG-SavePNG   ; surface filename -> bool
+IMG-SaveJPG   ; surface filename quality -> bool
+```
+
+### Safe Wrapper (`safe/texture.rkt`)
+
+```racket
+(load-surface filename)           ; -> surface
+(save-surface-png surface path)   ; -> bool
+(save-surface-jpg surface path quality)  ; quality 0-100
+```
+
+### Example: `16-screenshot.rkt`
+
+- Render a scene
+- Press S to save screenshot as PNG
+- Show confirmation message
+
+---
+
+## Phase 4: Relative Mouse & Cursor Control
+
+Enable first-person style mouse input and cursor customization.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+SDL-GetRelativeMouseState      ; -> (values buttons dx dy)
+SDL-SetWindowRelativeMouseMode ; window bool -> bool
+SDL-GetWindowRelativeMouseMode ; window -> bool
+SDL-ShowCursor                 ; -> bool
+SDL-HideCursor                 ; -> bool
+SDL-CursorVisible              ; -> bool
+SDL-CreateSystemCursor         ; cursor-id -> cursor
+SDL-SetCursor                  ; cursor -> bool
+SDL-DestroyCursor              ; cursor -> void
+```
 
 ### Types (`private/types.rkt`)
 
 ```racket
-;; Modifier key masks (SDL_Keymod - uint16)
-SDL_KMOD_NONE    ; #x0000
-SDL_KMOD_LSHIFT  ; #x0001
-SDL_KMOD_RSHIFT  ; #x0002
-SDL_KMOD_LCTRL   ; #x0040
-SDL_KMOD_RCTRL   ; #x0080
-SDL_KMOD_LALT    ; #x0100
-SDL_KMOD_RALT    ; #x0200
-SDL_KMOD_LGUI    ; #x0400  (Command on Mac, Windows key on PC)
-SDL_KMOD_RGUI    ; #x0800
-SDL_KMOD_NUM     ; #x1000  (Num Lock)
-SDL_KMOD_CAPS    ; #x2000  (Caps Lock)
-SDL_KMOD_MODE    ; #x4000  (AltGr)
-SDL_KMOD_SCROLL  ; #x8000  (Scroll Lock)
-
-;; Combined masks
-SDL_KMOD_CTRL    ; (LCTRL | RCTRL)
-SDL_KMOD_SHIFT   ; (LSHIFT | RSHIFT)
-SDL_KMOD_ALT     ; (LALT | RALT)
-SDL_KMOD_GUI     ; (LGUI | RGUI)
+;; System cursor types
+_SDL_SystemCursor
+SDL_SYSTEM_CURSOR_DEFAULT
+SDL_SYSTEM_CURSOR_TEXT
+SDL_SYSTEM_CURSOR_WAIT
+SDL_SYSTEM_CURSOR_CROSSHAIR
+SDL_SYSTEM_CURSOR_POINTER
+SDL_SYSTEM_CURSOR_MOVE
+; ... etc
 ```
 
-### Safe Wrapper (`safe/events.rkt`)
+### Safe Wrapper (`safe/mouse.rkt`)
 
 ```racket
-;; Helper predicates for checking modifiers
-(mod-shift? mod)  ; -> bool (any shift key)
-(mod-ctrl? mod)   ; -> bool (any ctrl key)
-(mod-alt? mod)    ; -> bool (any alt key)
-(mod-gui? mod)    ; -> bool (any gui/command key)
+(get-relative-mouse-state)        ; -> (values buttons dx dy)
+(set-relative-mouse-mode! window on?)
+(relative-mouse-mode? window)
+(show-cursor!)
+(hide-cursor!)
+(cursor-visible?)
+(with-system-cursor cursor-type body ...)
 ```
 
-### Example: Update `13-scroll.rkt`
+### Example: `17-mouselook.rkt`
 
-- Use modifier detection to enable Shift+scroll for horizontal scrolling
-- Display active modifiers on screen
+- Simple 3D-style camera controlled by mouse
+- Click to capture mouse (relative mode)
+- Escape to release
+- Show dx/dy values and accumulated rotation
 
 ---
 
-## Phase 4: Common Keycode Constants
+## Phase 5: Clipboard
 
-Expand the available keycode constants for common keys.
+Add system clipboard support for text.
 
-### Types (`private/types.rkt`)
+### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Number keys (top row)
-SDLK_0 through SDLK_9  ; ASCII values 48-57
-
-;; Letter keys (add remaining)
-SDLK_a through SDLK_z  ; ASCII values 97-122
-SDLK_A through SDLK_Z  ; ASCII values 65-90
-
-;; Function keys
-SDLK_F1 through SDLK_F12  ; #x4000003A through #x40000045
-
-;; Common control keys
-SDLK_RETURN      ; #x0D (Enter)
-SDLK_BACKSPACE   ; #x08
-SDLK_TAB         ; #x09
-SDLK_DELETE      ; #x4000004C
-SDLK_INSERT      ; #x40000049
-SDLK_HOME        ; #x4000004A
-SDLK_END         ; #x4000004D
-SDLK_PAGEUP      ; #x4000004B
-SDLK_PAGEDOWN    ; #x4000004E
+SDL-SetClipboardText   ; text -> bool
+SDL-GetClipboardText   ; -> string
+SDL-HasClipboardText   ; -> bool
 ```
 
-### Example: `14-keyboard.rkt`
+### Safe Wrapper
 
-Comprehensive keyboard demo:
-- Display a virtual keyboard layout on screen
-- Highlight keys as they're pressed
-- Show keycode, scancode, and key name for last pressed key
-- Show active modifier keys
-- Different colors for modifier combinations (Ctrl+key, Shift+key, etc.)
+```racket
+(clipboard-text)          ; -> string or #f
+(set-clipboard-text! str) ; -> bool
+(clipboard-has-text?)     ; -> bool
+```
+
+### Example: Update `14-keyboard.rkt` or text input example
+
+- Ctrl+C to copy displayed text
+- Ctrl+V to paste from clipboard
+
+---
+
+## Phase 6: High-Precision Timer
+
+Add performance counters for accurate timing.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+SDL-GetPerformanceCounter    ; -> uint64
+SDL-GetPerformanceFrequency  ; -> uint64
+SDL-DelayPrecise             ; nanoseconds -> void
+```
+
+### Safe Wrapper
+
+```racket
+(current-time-ns)  ; -> nanoseconds as exact integer
+(with-timing body ...)  ; -> (values result elapsed-ns)
+```
+
+---
+
+## Phase 7: Audio Foundation
+
+Basic audio playback (larger undertaking).
+
+### Core Functions
+
+```racket
+SDL-OpenAudioDevice
+SDL-CloseAudioDevice
+SDL-LoadWAV
+SDL-CreateAudioStream
+SDL-PutAudioStreamData
+SDL-BindAudioStream
+SDL-DestroyAudioStream
+```
+
+### Safe Wrapper
+
+```racket
+(with-audio-device body ...)
+(load-wav path)
+(play-sound wav)
+```
 
 ---
 
 ## Implementation Order
 
-| Phase | Files | Example |
-|-------|-------|---------|
-| 1 | `raw.rkt`, `safe/events.rkt` | `12-wait-events.rkt` |
-| 2 | `private/types.rkt`, `safe/events.rkt` | `13-scroll.rkt` |
-| 3 | `private/types.rkt`, `safe/events.rkt` | update `13-scroll.rkt` |
-| 4 | `private/types.rkt` | `14-keyboard.rkt` |
+| Phase | Priority | Files | Deliverable |
+|-------|----------|-------|-------------|
+| 1 | High | `types.rkt`, `raw.rkt`, `safe/texture.rkt` | Render targets |
+| 2 | High | `types.rkt` | Integer geometry |
+| 3 | Medium | `image.rkt`, `safe/texture.rkt` | Screenshot save |
+| 4 | Medium | `raw.rkt`, `types.rkt`, `safe/mouse.rkt` | FPS mouse |
+| 5 | Low | `raw.rkt` | Copy/paste |
+| 6 | Low | `raw.rkt` | Precise timing |
+| 7 | Low | New `audio.rkt`, `safe/audio.rkt` | Sound |
 
 ---
 
 ## Notes
 
-- Phases 1-2 add new functionality; Phases 3-4 expand existing patterns
-- Blocking events (Phase 1) are useful for GUI apps, editors, tools
-- Mouse wheel (Phase 2) is essential for scrollable content
-- Modifier keys (Phase 3) enable keyboard shortcuts (Ctrl+S, etc.)
-- Extended keycodes (Phase 4) support full keyboard interaction
+- Phases 1-2 unlock new rendering patterns (caching, tiles)
+- Phase 3 enables user content export
+- Phase 4 unlocks FPS-style games
+- Phases 5-6 are small quality-of-life additions
+- Phase 7 is substantial but important for games

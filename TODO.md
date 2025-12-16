@@ -47,9 +47,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_GetTextureAlphaMod`
 - [x] `SDL_DestroySurface`
 - [x] `SDL_PollEvent`
+- [x] `SDL_WaitEvent`
+- [x] `SDL_WaitEventTimeout`
 - [x] `SDL_GetKeyName`
 - [x] `SDL_StartTextInput`
 - [x] `SDL_StopTextInput`
+- [x] `SDL_GetMouseState`
+- [x] `SDL_GetTicks`
 - [x] `SDL_Delay`
 
 ### SDL3_image (`image.rkt`)
@@ -81,8 +85,9 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] Pointer types: `_SDL_Window-pointer`, `_SDL_Renderer-pointer`, `_SDL_Texture-pointer`, `_SDL_Surface-pointer`
 - [x] `_SDL_FPoint` struct, `_SDL_FRect` struct
 - [x] `_SDL_Color` struct
-- [x] Event constants: `SDL_EVENT_QUIT`, window events, keyboard events, mouse events, text input
-- [x] Event structs: `_SDL_CommonEvent`, `_SDL_KeyboardEvent`, `_SDL_MouseMotionEvent`, `_SDL_MouseButtonEvent`, `_SDL_TextInputEvent`
+- [x] Event constants: `SDL_EVENT_QUIT`, window events, keyboard events, mouse events (incl. `SDL_EVENT_MOUSE_WHEEL`), text input
+- [x] Event structs: `_SDL_CommonEvent`, `_SDL_KeyboardEvent`, `_SDL_MouseMotionEvent`, `_SDL_MouseButtonEvent`, `_SDL_TextInputEvent`, `_SDL_MouseWheelEvent`
+- [x] Keyboard modifier constants: `SDL_KMOD_NONE`, `SDL_KMOD_LSHIFT`, `SDL_KMOD_RSHIFT`, `SDL_KMOD_CTRL`, `SDL_KMOD_ALT`, etc.
 - [x] Key constants: `SDLK_ESCAPE`, `SDLK_SPACE`, arrow keys, R/G/B keys
 - [x] `_SDL_Keycode`
 - [x] `_SDL_BlendMode` and all blend mode constants
@@ -262,8 +267,8 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_WriteSurfacePixel`
 
 ### Events (P0)
-- [ ] `SDL_WaitEvent`
-- [ ] `SDL_WaitEventTimeout`
+- [x] `SDL_WaitEvent`
+- [x] `SDL_WaitEventTimeout`
 - [ ] `SDL_PushEvent`
 - [ ] `SDL_PumpEvents`
 - [ ] `SDL_PeepEvents`
@@ -700,7 +705,7 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_WINDOW_NOT_FOCUSABLE`
 
 ### Event Types (P1)
-- [ ] `SDL_EVENT_MOUSE_WHEEL`
+- [x] `SDL_EVENT_MOUSE_WHEEL`
 - [ ] `SDL_EVENT_JOYSTICK_AXIS_MOTION`
 - [ ] `SDL_EVENT_JOYSTICK_BUTTON_DOWN`
 - [ ] `SDL_EVENT_JOYSTICK_BUTTON_UP`
@@ -722,7 +727,7 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] ... (many more)
 
 ### Event Structs (P1)
-- [ ] `SDL_MouseWheelEvent`
+- [x] `SDL_MouseWheelEvent`
 - [ ] `SDL_JoyAxisEvent`
 - [ ] `SDL_JoyButtonEvent`
 - [ ] `SDL_JoyHatEvent`
@@ -739,8 +744,8 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 
 ### Key Constants (P1)
 - [ ] Full scancode enum (`SDL_SCANCODE_*`) - ~200+ constants
-- [ ] Full keycode enum (`SDLK_*`) - ~200+ constants
-- [ ] Modifier key constants (`SDL_KMOD_NONE`, `SDL_KMOD_LSHIFT`, `SDL_KMOD_RSHIFT`, etc.)
+- [x] Core keycode constants (`SDLK_*`) - letters, numbers, F-keys, arrows, modifiers, etc.
+- [x] Modifier key constants (`SDL_KMOD_NONE`, `SDL_KMOD_LSHIFT`, `SDL_KMOD_RSHIFT`, `SDL_KMOD_CTRL`, `SDL_KMOD_ALT`, `SDL_KMOD_GUI`, etc.)
 
 ### Rect Structs (P0)
 - [ ] `SDL_Rect` (integer version)
@@ -808,13 +813,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 
 ## Implementation Statistics
 
-**Currently Implemented:** ~65 functions
+**Currently Implemented:** ~70 functions
 **Estimated Total Available:** 500+ functions
 
 ### Coverage by Library
 | Library | Implemented | Estimated Total | Coverage |
 |---------|-------------|-----------------|----------|
-| SDL3 Core | 47 | ~350 | ~13% |
+| SDL3 Core | 50 | ~350 | ~14% |
 | SDL3_image | 2 | ~60 | ~3% |
 | SDL3_ttf | 16 | ~120 | ~13% |
 
@@ -822,11 +827,10 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 
 ## Next Steps (Suggested Order)
 
-1. **P0 - Blocking Events:** `SDL_WaitEvent`, `SDL_WaitEventTimeout`
-2. **P0 - Integer Rect:** `SDL_Rect`, `SDL_Point` types
-3. **P1 - Image Loading:** `IMG_Load` (surface), `IMG_SavePNG`
-4. **P1 - Texture Creation:** `SDL_CreateTexture`, `SDL_SetTextureScaleMode`
-5. **P1 - More Keys:** Expand keycode and scancode constants
-6. **P1 - Mouse:** `SDL_GetRelativeMouseState`, cursor functions
-7. **P2 - Timer:** `SDL_GetPerformanceCounter`, `SDL_GetPerformanceFrequency`
-8. **P2 - Clipboard:** `SDL_SetClipboardText`, `SDL_GetClipboardText`
+1. **P0 - Integer Rect:** `SDL_Rect`, `SDL_Point` types
+2. **P1 - Image Loading:** `IMG_Load` (surface), `IMG_SavePNG`
+3. **P1 - Texture Creation:** `SDL_CreateTexture`, `SDL_SetTextureScaleMode`
+4. **P1 - Scancodes:** Add full scancode enum (`SDL_SCANCODE_*`)
+5. **P1 - Mouse:** `SDL_GetRelativeMouseState`, cursor functions
+6. **P2 - Timer:** `SDL_GetPerformanceCounter`, `SDL_GetPerformanceFrequency`
+7. **P2 - Clipboard:** `SDL_SetClipboardText`, `SDL_GetClipboardText`

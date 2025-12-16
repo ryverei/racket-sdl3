@@ -102,7 +102,13 @@
          SDL-CursorVisible
          ;; Timer
          SDL-GetTicks
-         SDL-Delay)
+         SDL-Delay
+         ;; Clipboard
+         SDL-SetClipboardText
+         SDL-GetClipboardText
+         SDL-HasClipboardText
+         ;; Memory
+         SDL-free)
 
 ;; ============================================================================
 ;; Initialization
@@ -720,3 +726,37 @@
 ;; ms: The number of milliseconds to delay
 (define-sdl SDL-Delay (_fun _uint32 -> _void)
   #:c-id SDL_Delay)
+
+;; ============================================================================
+;; Clipboard
+;; ============================================================================
+
+;; SDL_SetClipboardText: Put UTF-8 text into the clipboard
+;; text: the text to store in the clipboard
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetClipboardText
+  (_fun _string/utf-8 -> _sdl-bool)
+  #:c-id SDL_SetClipboardText)
+
+;; SDL_GetClipboardText: Get UTF-8 text from the clipboard
+;; Returns: pointer to clipboard text (must be freed with SDL_free)
+;; Note: Returns empty string if clipboard is empty or on error
+(define-sdl SDL-GetClipboardText
+  (_fun -> _pointer)
+  #:c-id SDL_GetClipboardText)
+
+;; SDL_HasClipboardText: Query whether the clipboard has text
+;; Returns: true if the clipboard has text, false otherwise
+(define-sdl SDL-HasClipboardText
+  (_fun -> _bool)
+  #:c-id SDL_HasClipboardText)
+
+;; ============================================================================
+;; Memory Management
+;; ============================================================================
+
+;; SDL_free: Free memory allocated by SDL functions
+;; Use this to free pointers returned by SDL_GetClipboardText, etc.
+(define-sdl SDL-free
+  (_fun _pointer -> _void)
+  #:c-id SDL_free)

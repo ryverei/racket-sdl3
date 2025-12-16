@@ -3,6 +3,7 @@
 ;; SDL3_ttf example using the idiomatic safe interface
 ;; - Static greeting, live typed text, and FPS counter
 ;; - Escape quits, backspace deletes
+;; - Cmd/Ctrl+C copies text, Cmd/Ctrl+V pastes from clipboard
 
 (require racket/match
          racket/format
@@ -60,10 +61,25 @@
             [(or (quit-event) (window-event 'close-requested))
              (values curr-text #f)]
 
-            [(key-event 'down key _ _ _)
+            [(key-event 'down key _ mod _)
+             (define cmd-or-ctrl? (or (mod-gui? mod) (mod-ctrl? mod)))
              (cond
                [(= key SDLK_ESCAPE) (values curr-text #f)]
                [(= key backspace-key) (values (trim-last curr-text) run?)]
+               ;; Cmd/Ctrl+C: copy current text
+               [(and cmd-or-ctrl? (= key SDLK_C))
+                (when (> (string-length curr-text) 0)
+                  (set-clipboard-text! curr-text)
+                  (printf "Copied: ~a~n" curr-text))
+                (values curr-text run?)]
+               ;; Cmd/Ctrl+V: paste from clipboard
+               [(and cmd-or-ctrl? (= key SDLK_V))
+                (define pasted (clipboard-text))
+                (if pasted
+                    (begin
+                      (printf "Pasted: ~a~n" pasted)
+                      (values (string-append curr-text pasted) run?))
+                    (values curr-text run?))]
                [else (values curr-text run?)])]
 
             [(text-input-event txt)

@@ -1,226 +1,373 @@
-# Implementation Plan: Audio Support
+# Implementation Plan: Remaining P0 Features
 
-This document outlines the plan for adding audio support to the SDL3 Racket bindings.
+This document outlines the plan for completing all remaining P0 (essential) features for the SDL3 Racket bindings.
 
 ## Goals
 
-Enable audio playback for games and applications, including loading WAV files, streaming audio, and basic device management.
+Complete the foundational SDL3 bindings needed for basic games and applications by implementing all remaining P0-priority functions for window management, rendering, and drawing.
 
 ---
 
-## Phase 1: Audio Types & Constants
+## Phase 1: Window Management Functions
 
-Add necessary types and constants for audio support.
+Essential window control functions that most applications need.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+;; Window creation convenience
+SDL-CreateWindowAndRenderer  ; title w h flags win-ptr-ptr ren-ptr-ptr -> bool
+
+;; Window properties
+SDL-GetWindowTitle           ; window -> string
+SDL-SetWindowIcon            ; window surface -> bool
+SDL-GetWindowID              ; window -> uint32
+SDL-GetWindowFromID          ; id -> window
+
+;; Window visibility
+SDL-ShowWindow               ; window -> bool
+SDL-HideWindow               ; window -> bool
+SDL-RaiseWindow              ; window -> bool
+
+;; Window state
+SDL-MaximizeWindow           ; window -> bool
+SDL-MinimizeWindow           ; window -> bool
+SDL-RestoreWindow            ; window -> bool
+
+;; Window constraints
+SDL-SetWindowMinimumSize     ; window w h -> bool
+SDL-SetWindowMaximumSize     ; window w h -> bool
+SDL-GetWindowMinimumSize     ; window w-ptr h-ptr -> bool
+SDL-GetWindowMaximumSize     ; window w-ptr h-ptr -> bool
+
+;; Window decoration
+SDL-SetWindowBordered        ; window bordered -> bool
+SDL-SetWindowResizable       ; window resizable -> bool
+
+;; Window effects
+SDL-SetWindowOpacity         ; window opacity -> bool
+SDL-GetWindowOpacity         ; window -> float
+SDL-FlashWindow              ; window operation -> bool
+
+;; Surface rendering (alternative to hardware renderer)
+SDL-GetWindowSurface         ; window -> surface
+SDL-UpdateWindowSurface      ; window -> bool
+```
 
 ### Types (`private/types.rkt`)
 
 ```racket
-;; Audio device ID (uint32)
-_SDL_AudioDeviceID
-
-;; Audio format enum (SDL_AudioFormat)
-_SDL_AudioFormat
-SDL_AUDIO_S16      ; signed 16-bit samples
-SDL_AUDIO_S32      ; signed 32-bit samples
-SDL_AUDIO_F32      ; 32-bit floating point samples
-
-;; Audio spec struct
-_SDL_AudioSpec
-  - format : SDL_AudioFormat
-  - channels : int
-  - freq : int
-
-;; Pointer types
-_SDL_AudioStream-pointer
-```
-
-### Init Flags
-
-```racket
-SDL_INIT_AUDIO  ; 0x00000010 - add to existing init flags
+;; Flash operation enum
+_SDL_FlashOperation
+SDL_FLASH_CANCEL             ; 0
+SDL_FLASH_BRIEFLY            ; 1
+SDL_FLASH_UNTIL_FOCUSED      ; 2
 ```
 
 ---
 
-## Phase 2: Audio Device Management
+## Phase 2: Renderer Query Functions
 
-Basic device enumeration and control.
+Functions to query renderer capabilities and state.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Drivers
-SDL-GetNumAudioDrivers    ; -> int
-SDL-GetAudioDriver        ; index -> string
-SDL-GetCurrentAudioDriver ; -> string
+;; Driver enumeration
+SDL-GetNumRenderDrivers      ; -> int
+SDL-GetRenderDriver          ; index -> string
 
-;; Device enumeration
-SDL-GetAudioPlaybackDevices  ; count-ptr -> device-id-array
-SDL-GetAudioRecordingDevices ; count-ptr -> device-id-array
-SDL-GetAudioDeviceName       ; devid -> string
+;; Renderer queries
+SDL-GetRenderer              ; window -> renderer
+SDL-GetRenderWindow          ; renderer -> window
+SDL-GetRendererName          ; renderer -> string
 
-;; Device control
-SDL-OpenAudioDevice        ; devid spec-ptr -> device-id (0 = default device)
-SDL-CloseAudioDevice       ; devid -> void
-SDL-PauseAudioDevice       ; devid -> bool
-SDL-ResumeAudioDevice      ; devid -> bool
-SDL-AudioDevicePaused      ; devid -> bool
+;; Output size
+SDL-GetRenderOutputSize          ; renderer w-ptr h-ptr -> bool
+SDL-GetCurrentRenderOutputSize   ; renderer w-ptr h-ptr -> bool
+
+;; Draw color getters
+SDL-GetRenderDrawColor       ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
+SDL-SetRenderDrawColorFloat  ; renderer r g b a -> bool
+SDL-GetRenderDrawColorFloat  ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
+
+;; VSync control
+SDL-SetRenderVSync           ; renderer vsync -> bool
+SDL-GetRenderVSync           ; renderer vsync-ptr -> bool
 ```
 
 ---
 
-## Phase 3: Audio Streams
+## Phase 3: Viewport and Clipping
 
-SDL3's primary audio API uses audio streams for all playback.
+Control what portion of the renderer is visible and where drawing occurs.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Stream lifecycle
-SDL-CreateAudioStream      ; src-spec dst-spec -> stream
-SDL-DestroyAudioStream     ; stream -> void
+;; Viewport (visible area)
+SDL-SetRenderViewport        ; renderer rect -> bool
+SDL-GetRenderViewport        ; renderer rect-ptr -> bool
 
-;; Stream properties
-SDL-GetAudioStreamFormat   ; stream src-spec-ptr dst-spec-ptr -> bool
-SDL-SetAudioStreamFormat   ; stream src-spec dst-spec -> bool
+;; Clip rectangle (drawing constraint)
+SDL-SetRenderClipRect        ; renderer rect -> bool
+SDL-GetRenderClipRect        ; renderer rect-ptr -> bool
+SDL-RenderClipEnabled        ; renderer -> bool
 
-;; Data operations
-SDL-PutAudioStreamData     ; stream data len -> bool
-SDL-GetAudioStreamData     ; stream buf len -> int (bytes read)
-SDL-GetAudioStreamAvailable ; stream -> int (bytes available)
-SDL-FlushAudioStream       ; stream -> bool
-SDL-ClearAudioStream       ; stream -> bool
-
-;; Binding streams to devices
-SDL-BindAudioStream        ; devid stream -> bool
-SDL-UnbindAudioStream      ; stream -> void
+;; Render scale (for resolution independence)
+SDL-SetRenderScale           ; renderer scale-x scale-y -> bool
+SDL-GetRenderScale           ; renderer scale-x-ptr scale-y-ptr -> bool
 ```
 
 ---
 
-## Phase 4: WAV Loading & Convenience Functions
+## Phase 4: Advanced Texture Rendering
 
-Load WAV files and provide simpler APIs.
+Additional texture rendering modes for special effects and UI.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-SDL-LoadWAV                 ; path spec-ptr buf-ptr len-ptr -> bool
-SDL-OpenAudioDeviceStream   ; devid spec callback userdata -> stream (convenience)
-```
+;; Affine transform rendering (arbitrary 2D transforms)
+SDL-RenderTextureAffine      ; renderer texture src-rect origin right down -> bool
 
-### Safe Wrapper (`safe/audio.rkt`)
+;; Tiled rendering (for backgrounds, patterns)
+SDL-RenderTextureTiled       ; renderer texture src-rect scale dst-rect -> bool
 
-```racket
-;; Device management
-(open-audio-device)                  ; open default playback device
-(open-audio-device #:device id)      ; open specific device
-(close-audio-device! dev)
-(pause-audio-device! dev)
-(resume-audio-device! dev)
-(audio-device-paused? dev)
-
-;; WAV loading
-(load-wav path)                      ; -> (values spec audio-data)
-
-;; Stream management
-(create-audio-stream src-spec dst-spec)
-(destroy-audio-stream! stream)
-(put-audio-stream-data! stream data)
-(bind-audio-stream! device stream)
-(unbind-audio-stream! stream)
-
-;; High-level convenience
-(play-wav device path)               ; load and play WAV file
+;; 9-grid rendering (for scalable UI elements like buttons, panels)
+SDL-RenderTexture9Grid       ; renderer texture src-rect
+                             ; left-width right-width top-height bottom-height
+                             ; scale dst-rect -> bool
 ```
 
 ---
 
-## Phase 5: Example
+## Phase 5: Geometry Rendering
 
-### Example: `18-audio.rkt`
+Hardware-accelerated arbitrary geometry for particle effects, custom shapes, etc.
 
-Demonstrate basic audio playback:
-
-- Initialize SDL with audio
-- Open default audio device
-- Load a WAV file
-- Create an audio stream and bind to device
-- Play sound on keypress
-- Clean shutdown
+### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Pseudocode structure
-(define (main)
-  (SDL-Init (bitwise-ior SDL_INIT_VIDEO SDL_INIT_AUDIO))
+;; Vertex struct
+_SDL_Vertex
+  - position : SDL_FPoint
+  - color : SDL_FColor
+  - tex_coord : SDL_FPoint
 
-  ;; Open audio
-  (define dev (open-audio-device))
-  (define-values (spec data) (load-wav "sound.wav"))
+;; FColor struct (float colors for vertices)
+_SDL_FColor
+  - r : float
+  - g : float
+  - b : float
+  - a : float
 
-  ;; Create stream matching WAV format
-  (define stream (create-audio-stream spec spec))
-  (bind-audio-stream! dev stream)
-
-  ;; Main loop
-  (let loop ()
-    (match (poll-event)
-      [(key-down-event #:key 'space)
-       (put-audio-stream-data! stream data)
-       (loop)]
-      [(quit-event) 'done]
-      [_ (loop)]))
-
-  ;; Cleanup
-  (unbind-audio-stream! stream)
-  (destroy-audio-stream! stream)
-  (close-audio-device! dev)
-  (SDL-Quit))
+;; Geometry rendering
+SDL-RenderGeometry           ; renderer texture vertices num-verts
+                             ; indices num-indices -> bool
+SDL-RenderGeometryRaw        ; (lower-level, pointer-based)
 ```
+
+### Types (`private/types.rkt`)
+
+```racket
+_SDL_FColor                  ; float r, g, b, a
+_SDL_Vertex                  ; position, color, tex_coord
+```
+
+---
+
+## Phase 6: Debug Text Rendering
+
+Built-in debug text for quick prototyping (no TTF needed).
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+SDL-RenderDebugText          ; renderer x y text -> bool
+SDL-RenderDebugTextFormat    ; renderer x y fmt ... -> bool (variadic - may skip)
+```
+
+Note: `SDL_RenderDebugTextFormat` uses C variadic arguments which are complex in FFI. We may implement only `SDL_RenderDebugText` and handle formatting on the Racket side.
+
+---
+
+## Phase 7: Safe Wrapper Updates
+
+Update `safe/window.rkt` and `safe/draw.rkt` with idiomatic wrappers.
+
+### Window (`safe/window.rkt`)
+
+```racket
+;; Window control
+(show-window! window)
+(hide-window! window)
+(raise-window! window)
+(maximize-window! window)
+(minimize-window! window)
+(restore-window! window)
+
+;; Window properties
+(window-title window)
+(set-window-icon! window surface)
+(window-id window)
+(window-from-id id)
+
+;; Size constraints
+(set-window-minimum-size! window w h)
+(set-window-maximum-size! window w h)
+(window-minimum-size window)  ; -> (values w h)
+(window-maximum-size window)  ; -> (values w h)
+
+;; Decoration
+(set-window-bordered! window bordered?)
+(set-window-resizable! window resizable?)
+
+;; Effects
+(window-opacity window)
+(set-window-opacity! window opacity)
+(flash-window! window [operation])
+```
+
+### Renderer (`safe/draw.rkt`)
+
+```racket
+;; Viewport/clipping
+(set-render-viewport! renderer rect)
+(render-viewport renderer)
+(set-render-clip-rect! renderer rect)
+(render-clip-rect renderer)
+(render-clip-enabled? renderer)
+
+;; Scale
+(set-render-scale! renderer sx sy)
+(render-scale renderer)  ; -> (values sx sy)
+
+;; VSync
+(set-render-vsync! renderer vsync)
+(render-vsync renderer)
+```
+
+---
+
+## Phase 8: Example Updates
+
+Update examples to demonstrate new features.
+
+### New Example: `19-window-control.rkt`
+
+Demonstrate window management:
+- Show/hide window
+- Minimize/maximize/restore
+- Flash window
+- Opacity changes
+- Size constraints
+
+### New Example: `20-viewport-clipping.rkt`
+
+Demonstrate viewport and clipping:
+- Split-screen effect with viewports
+- Clipping for UI regions
+- Render scale for resolution independence
+
+### New Example: `21-geometry.rkt`
+
+Demonstrate geometry rendering:
+- Colored triangles
+- Textured geometry
+- Simple particle system
 
 ---
 
 ## Implementation Order
 
-| Step | Files | Deliverable |
-|------|-------|-------------|
-| 1 | `private/types.rkt` | Audio types, constants, SDL_INIT_AUDIO |
-| 2 | `raw.rkt` | Audio device functions |
-| 3 | `raw.rkt` | Audio stream functions |
-| 4 | `raw.rkt` | WAV loading |
-| 5 | `safe/audio.rkt` | Idiomatic wrapper |
-| 6 | `examples/18-audio.rkt` | Working example |
+| Step | Phase | Files | Deliverable |
+|------|-------|-------|-------------|
+| 1 | Phase 1 | `private/types.rkt`, `raw.rkt` | Window management functions |
+| 2 | Phase 2 | `raw.rkt` | Renderer query functions |
+| 3 | Phase 3 | `raw.rkt` | Viewport and clipping |
+| 4 | Phase 4 | `raw.rkt` | Advanced texture rendering |
+| 5 | Phase 5 | `private/types.rkt`, `raw.rkt` | Geometry rendering |
+| 6 | Phase 6 | `raw.rkt` | Debug text |
+| 7 | Phase 7 | `safe/window.rkt`, `safe/draw.rkt` | Safe wrappers |
+| 8 | Phase 8 | `examples/` | Example programs |
 
 ---
 
-## Key SDL3 Audio Concepts
+## Key SDL3 Concepts
 
-1. **Audio Streams**: SDL3 uses streams as the primary abstraction. You push data into a stream, and SDL handles format conversion and buffering.
+### Viewports vs Clip Rects
 
-2. **Device IDs**: `SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK` (0) opens the default playback device.
+- **Viewport**: Defines the output rectangle where rendering appears. Changing the viewport affects coordinate mapping.
+- **Clip Rect**: Restricts drawing to a rectangle without changing coordinates. Drawing outside the clip rect is discarded.
 
-3. **Audio Spec**: Describes format (S16, F32, etc.), channels (1=mono, 2=stereo), and sample rate (44100, 48000, etc.).
+### Render Scale
 
-4. **Push Model**: You `SDL_PutAudioStreamData` to queue audio. SDL pulls from the stream as needed.
+Render scale allows resolution-independent rendering. Set scale to 2.0 and all coordinates are doubled, useful for:
+- HiDPI displays
+- Pixel art games
+- Dynamic resolution scaling
 
-5. **Binding**: Streams must be bound to a device to play. One device can have multiple streams (mixing).
+### 9-Grid Rendering
+
+The 9-grid (or 9-slice) technique divides a texture into 9 regions:
+- 4 corners (fixed size)
+- 4 edges (stretch in one direction)
+- 1 center (stretches both directions)
+
+This allows UI elements like buttons and panels to scale without distorting corners.
+
+### Geometry Rendering
+
+`SDL_RenderGeometry` draws arbitrary triangles with per-vertex:
+- Position (x, y)
+- Color (r, g, b, a as floats)
+- Texture coordinates (u, v)
+
+Useful for particle systems, custom shapes, and 2D mesh deformation.
 
 ---
 
-## Notes
+## Testing Notes
 
-- SDL3's audio API is significantly different from SDL2
-- No need for callback-based audio - push model is simpler
-- SDL3 handles mixing of multiple streams automatically
-- Format conversion is automatic when specs differ
-- Need to clear compiled cache after modifying types.rkt
+After each phase:
+1. Clear compiled cache: `rm -rf compiled private/compiled`
+2. Compile: `raco make raw.rkt` (or relevant files)
+3. Test in REPL or with example programs
+4. Verify no regressions in existing examples
 
 ---
 
-## Future Enhancements (not in initial scope)
+## Dependencies Between Phases
 
-- Audio recording (microphone input)
-- Real-time audio generation
-- Volume/gain control per stream
-- Audio effects
-- Music streaming for long files
+```
+Phase 1 (Window) ─────┐
+                      │
+Phase 2 (Renderer) ───┼──► Phase 7 (Safe Wrappers) ──► Phase 8 (Examples)
+                      │
+Phase 3 (Viewport) ───┤
+                      │
+Phase 4 (Texture) ────┤
+                      │
+Phase 5 (Geometry) ───┤
+                      │
+Phase 6 (Debug) ──────┘
+```
+
+Phases 1-6 can be implemented in parallel, but Phase 7 depends on all of them, and Phase 8 depends on Phase 7.
+
+---
+
+## Estimated Function Count
+
+| Phase | New Functions | Running Total |
+|-------|---------------|---------------|
+| Phase 1 | 22 | 22 |
+| Phase 2 | 11 | 33 |
+| Phase 3 | 7 | 40 |
+| Phase 4 | 3 | 43 |
+| Phase 5 | 2 | 45 |
+| Phase 6 | 1 | 46 |
+| **Total** | **46** | - |
+
+After completing this plan, the P0 coverage will be essentially complete.

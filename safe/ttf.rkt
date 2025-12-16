@@ -7,7 +7,9 @@
          "../raw.rkt"
          "../ttf.rkt"
          "texture.rkt"
-         "window.rkt")
+         "window.rkt"
+         "draw.rkt"
+         "syntax.rkt")
 
 (provide
  ;; Font management
@@ -15,6 +17,7 @@
  close-font!
  font?
  font-ptr
+ font-destroy!
 
  ;; Rendering
  render-text
@@ -24,12 +27,16 @@
 ;; Font wrapper struct
 ;; ==========================================================================
 
-(struct font (ptr [destroyed? #:mutable])
-  #:property prop:cpointer (λ (f) (font-ptr f)))
+(define-sdl-resource font TTF-CloseFont)
 
 ;; ==========================================================================
 ;; Initialization
 ;; ==========================================================================
+
+;; NOTE: TTF initialization uses module-level mutable state.
+;; SDL_ttf (like SDL itself) is not thread-safe and should only be
+;; called from the main thread. If you need to use fonts from multiple
+;; threads, render all text on the main thread.
 
 (define ttf-initialized? #f)
 (define ttf-shutdown-registered? #f)
@@ -64,51 +71,10 @@
   (define ptr (TTF-OpenFont path (exact->inexact size)))
   (unless ptr
     (error 'open-font "Failed to load font ~a: ~a" path (SDL-GetError)))
+  (wrap-font ptr #:custodian cust))
 
-  (define f (font ptr #f))
-
-  ;; Register destructor with custodian
-  (register-custodian-shutdown
-   f
-   (λ (ft)
-     (unless (font-destroyed? ft)
-       (TTF-CloseFont (font-ptr ft))
-       (set-font-destroyed?! ft #t)))
-   cust
-   #:at-exit? #t)
-
-  f)
-
-(define (close-font! f)
-  (unless (font-destroyed? f)
-    (TTF-CloseFont (font-ptr f))
-    (set-font-destroyed?! f #t)))
-
-;; ==========================================================================
-;; Color Helpers
-;; ==========================================================================
-
-(define (color-struct? v)
-  (with-handlers ([exn:fail? (λ (_) #f)])
-    (SDL_Color-r v) ; will raise if not an SDL_Color cstruct
-    #t))
-
-(define (color->SDL_Color color)
-  (cond
-    [(color-struct? color) color]
-    [(and (list? color) (>= (length color) 3))
-     (make-SDL_Color (list-ref color 0)
-                     (list-ref color 1)
-                     (list-ref color 2)
-                     (if (>= (length color) 4) (list-ref color 3) 255))]
-    [(and (vector? color) (>= (vector-length color) 3))
-     (make-SDL_Color (vector-ref color 0)
-                     (vector-ref color 1)
-                     (vector-ref color 2)
-                     (if (>= (vector-length color) 4) (vector-ref color 3) 255))]
-    [else
-     (error 'render-text
-            "color must be an SDL_Color, list, or vector of 3 or 4 integers")]))
+;; Alias for consistency with other modules
+(define close-font! font-destroy!)
 
 ;; ==========================================================================
 ;; Rendering

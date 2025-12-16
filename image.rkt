@@ -10,7 +10,8 @@
 
 (require ffi/unsafe
          ffi/unsafe/define
-         "private/types.rkt")
+         "private/types.rkt"
+         "private/syntax.rkt")
 
 (provide ;; Functions
          IMG-LoadTexture
@@ -23,29 +24,7 @@
 ;; Library Loading
 ;; ============================================================================
 
-;; Platform-specific library paths for SDL3_image
-(define sdl3-image-lib-paths
-  (case (system-type 'os)
-    [(macosx)
-     ;; Try Homebrew paths on macOS (both ARM and Intel)
-     '("/opt/homebrew/lib/libSDL3_image"    ; ARM Homebrew
-       "/usr/local/lib/libSDL3_image"       ; Intel Homebrew
-       "libSDL3_image")]                    ; System path
-    [(unix)
-     '("/usr/local/lib/libSDL3_image"
-       "/usr/lib/libSDL3_image"
-       "libSDL3_image")]
-    [(windows)
-     '("SDL3_image")]
-    [else '("libSDL3_image")]))
-
-;; Try to load SDL3_image from the first available path
-(define sdl3-image-lib
-  (let loop ([paths sdl3-image-lib-paths])
-    (if (null? paths)
-        (ffi-lib "libSDL3_image" '("0" #f))  ; Last resort
-        (with-handlers ([exn:fail? (λ (e) (loop (cdr paths)))])
-          (ffi-lib (car paths) '("0" #f))))))
+(define sdl3-image-lib (load-sdl-library "SDL3_image"))
 
 (define-ffi-definer define-img sdl3-image-lib
   #:make-c-id convention:hyphen->underscore

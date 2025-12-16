@@ -4,7 +4,8 @@
 
 (require ffi/unsafe
          ffi/unsafe/custodian
-         "../raw.rkt")
+         "../raw.rkt"
+         "syntax.rkt")
 
 (provide
  ;; Initialization
@@ -38,15 +39,11 @@
  (all-from-out "../raw.rkt"))
 
 ;; ============================================================================
-;; Window wrapper struct
+;; Resource wrapper structs
 ;; ============================================================================
 
-;; We wrap the raw pointer so we can track whether it's been destroyed
-(struct window (ptr [destroyed? #:mutable])
-  #:property prop:cpointer (λ (w) (window-ptr w)))
-
-(struct renderer (ptr [destroyed? #:mutable])
-  #:property prop:cpointer (λ (r) (renderer-ptr r)))
+(define-sdl-resource window SDL-DestroyWindow)
+(define-sdl-resource renderer SDL-DestroyRenderer)
 
 ;; ============================================================================
 ;; Initialization
@@ -69,25 +66,7 @@
   (define ptr (SDL-CreateWindow title width height flags))
   (unless ptr
     (error 'make-window "Failed to create window: ~a" (SDL-GetError)))
-
-  (define win (window ptr #f))
-
-  ;; Register destructor with custodian
-  (register-custodian-shutdown
-   win
-   (λ (w)
-     (unless (window-destroyed? w)
-       (SDL-DestroyWindow (window-ptr w))
-       (set-window-destroyed?! w #t)))
-   cust
-   #:at-exit? #t)
-
-  win)
-
-(define (window-destroy! win)
-  (unless (window-destroyed? win)
-    (SDL-DestroyWindow (window-ptr win))
-    (set-window-destroyed?! win #t)))
+  (wrap-window ptr #:custodian cust))
 
 (define (window-set-title! win title)
   (SDL-SetWindowTitle (window-ptr win) title))
@@ -141,25 +120,7 @@
   (define ptr (SDL-CreateRenderer (window-ptr win) name))
   (unless ptr
     (error 'make-renderer "Failed to create renderer: ~a" (SDL-GetError)))
-
-  (define rend (renderer ptr #f))
-
-  ;; Register destructor with custodian
-  (register-custodian-shutdown
-   rend
-   (λ (r)
-     (unless (renderer-destroyed? r)
-       (SDL-DestroyRenderer (renderer-ptr r))
-       (set-renderer-destroyed?! r #t)))
-   cust
-   #:at-exit? #t)
-
-  rend)
-
-(define (renderer-destroy! rend)
-  (unless (renderer-destroyed? rend)
-    (SDL-DestroyRenderer (renderer-ptr rend))
-    (set-renderer-destroyed?! rend #t)))
+  (wrap-renderer ptr #:custodian cust))
 
 ;; ============================================================================
 ;; Convenience Functions

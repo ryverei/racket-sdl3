@@ -4,11 +4,13 @@
 
 (require ffi/unsafe
          "../raw.rkt"
-         "window.rkt")
+         "window.rkt"
+         "syntax.rkt")
 
 (provide
  ;; Color
  set-draw-color!
+ color->SDL_Color
 
  ;; Blend modes
  set-blend-mode!
@@ -37,35 +39,43 @@
 (define (set-draw-color! rend r g b [a 255])
   (SDL-SetRenderDrawColor (renderer-ptr rend) r g b a))
 
+;; Check if a value is an SDL_Color struct
+(define (color-struct? v)
+  (with-handlers ([exn:fail? (λ (_) #f)])
+    (SDL_Color-r v)
+    #t))
+
+;; Convert various color representations to SDL_Color
+;; Accepts: SDL_Color struct, list (r g b) or (r g b a), vector #(r g b) or #(r g b a)
+(define (color->SDL_Color color)
+  (cond
+    [(color-struct? color) color]
+    [(and (list? color) (>= (length color) 3))
+     (make-SDL_Color (list-ref color 0)
+                     (list-ref color 1)
+                     (list-ref color 2)
+                     (if (>= (length color) 4) (list-ref color 3) 255))]
+    [(and (vector? color) (>= (vector-length color) 3))
+     (make-SDL_Color (vector-ref color 0)
+                     (vector-ref color 1)
+                     (vector-ref color 2)
+                     (if (>= (vector-length color) 4) (vector-ref color 3) 255))]
+    [else
+     (error 'color->SDL_Color
+            "color must be an SDL_Color, list, or vector of 3 or 4 integers")]))
+
 ;; ============================================================================
 ;; Blend Modes
 ;; ============================================================================
 
-;; Convert a blend mode symbol to SDL constant
-(define (symbol->blend-mode sym)
-  (case sym
-    [(none) SDL_BLENDMODE_NONE]
-    [(blend alpha) SDL_BLENDMODE_BLEND]
-    [(blend-premultiplied) SDL_BLENDMODE_BLEND_PREMULTIPLIED]
-    [(add additive) SDL_BLENDMODE_ADD]
-    [(add-premultiplied) SDL_BLENDMODE_ADD_PREMULTIPLIED]
-    [(mod modulate) SDL_BLENDMODE_MOD]
-    [(mul multiply) SDL_BLENDMODE_MUL]
-    [else (error 'symbol->blend-mode
-                 "unknown blend mode: ~a (expected one of: none, blend, add, mod, mul)"
-                 sym)]))
-
-;; Convert an SDL blend mode constant to a symbol
-(define (blend-mode->symbol mode)
-  (cond
-    [(= mode SDL_BLENDMODE_NONE) 'none]
-    [(= mode SDL_BLENDMODE_BLEND) 'blend]
-    [(= mode SDL_BLENDMODE_BLEND_PREMULTIPLIED) 'blend-premultiplied]
-    [(= mode SDL_BLENDMODE_ADD) 'add]
-    [(= mode SDL_BLENDMODE_ADD_PREMULTIPLIED) 'add-premultiplied]
-    [(= mode SDL_BLENDMODE_MOD) 'mod]
-    [(= mode SDL_BLENDMODE_MUL) 'mul]
-    [else 'unknown]))
+(define-enum-conversion blend-mode
+  ([none] SDL_BLENDMODE_NONE)
+  ([blend alpha] SDL_BLENDMODE_BLEND)
+  ([blend-premultiplied] SDL_BLENDMODE_BLEND_PREMULTIPLIED)
+  ([add additive] SDL_BLENDMODE_ADD)
+  ([add-premultiplied] SDL_BLENDMODE_ADD_PREMULTIPLIED)
+  ([mod modulate] SDL_BLENDMODE_MOD)
+  ([mul multiply] SDL_BLENDMODE_MUL))
 
 ;; Set the blend mode for the renderer
 ;; mode can be a symbol ('none, 'blend, 'add, 'mod, 'mul) or an SDL constant

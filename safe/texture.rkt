@@ -7,7 +7,8 @@
          "../raw.rkt"
          "../image.rkt"
          "window.rkt"
-         "draw.rkt")
+         "draw.rkt"
+         "syntax.rkt")
 
 (provide
  ;; Texture management
@@ -64,8 +65,7 @@
 ;; Texture wrapper struct
 ;; ============================================================================
 
-(struct texture (ptr [destroyed? #:mutable])
-  #:property prop:cpointer (λ (t) (texture-ptr t)))
+(define-sdl-resource texture SDL-DestroyTexture)
 
 ;; ============================================================================
 ;; Texture Loading
@@ -83,67 +83,24 @@
                               #:custodian [cust (current-custodian)])
   (unless ptr
     (error 'texture-from-pointer "Texture pointer is null: ~a" (SDL-GetError)))
-
-  (define tex (texture ptr #f))
-
-  ;; Register destructor with custodian
-  (register-custodian-shutdown
-   tex
-   (λ (t)
-     (unless (texture-destroyed? t)
-       (SDL-DestroyTexture (texture-ptr t))
-       (set-texture-destroyed?! t #t)))
-   cust
-   #:at-exit? #t)
-
-  tex)
-
-(define (texture-destroy! tex)
-  (unless (texture-destroyed? tex)
-    (SDL-DestroyTexture (texture-ptr tex))
-    (set-texture-destroyed?! tex #t)))
+  (wrap-texture ptr #:custodian cust))
 
 ;; ============================================================================
 ;; Texture Access Mode Conversion
 ;; ============================================================================
 
-;; Convert a texture access mode symbol to SDL constant
-(define (symbol->texture-access sym)
-  (case sym
-    [(static) SDL_TEXTUREACCESS_STATIC]
-    [(streaming) SDL_TEXTUREACCESS_STREAMING]
-    [(target) SDL_TEXTUREACCESS_TARGET]
-    [else (error 'symbol->texture-access
-                 "unknown texture access: ~a (expected: static, streaming, target)"
-                 sym)]))
-
-;; Convert an SDL texture access constant to a symbol
-(define (texture-access->symbol access)
-  (cond
-    [(= access SDL_TEXTUREACCESS_STATIC) 'static]
-    [(= access SDL_TEXTUREACCESS_STREAMING) 'streaming]
-    [(= access SDL_TEXTUREACCESS_TARGET) 'target]
-    [else 'unknown]))
+(define-enum-conversion texture-access
+  ([static] SDL_TEXTUREACCESS_STATIC)
+  ([streaming] SDL_TEXTUREACCESS_STREAMING)
+  ([target] SDL_TEXTUREACCESS_TARGET))
 
 ;; ============================================================================
 ;; Scale Mode Conversion
 ;; ============================================================================
 
-;; Convert a scale mode symbol to SDL constant
-(define (symbol->scale-mode sym)
-  (case sym
-    [(nearest) SDL_SCALEMODE_NEAREST]
-    [(linear) SDL_SCALEMODE_LINEAR]
-    [else (error 'symbol->scale-mode
-                 "unknown scale mode: ~a (expected: nearest, linear)"
-                 sym)]))
-
-;; Convert an SDL scale mode constant to a symbol
-(define (scale-mode->symbol mode)
-  (cond
-    [(= mode SDL_SCALEMODE_NEAREST) 'nearest]
-    [(= mode SDL_SCALEMODE_LINEAR) 'linear]
-    [else 'unknown]))
+(define-enum-conversion scale-mode
+  ([nearest] SDL_SCALEMODE_NEAREST)
+  ([linear] SDL_SCALEMODE_LINEAR))
 
 ;; ============================================================================
 ;; Texture Creation

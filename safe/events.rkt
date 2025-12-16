@@ -44,6 +44,9 @@
  wait-event
  wait-event-timeout
 
+ ;; Event loop helpers
+ should-quit?
+
  ;; Key utilities
  key-name
 
@@ -323,3 +326,19 @@
 ;; Check if any gui/command key is pressed
 (define (mod-gui? mod)
   (not (zero? (bitwise-and mod SDL_KMOD_GUI))))
+
+;; ============================================================================
+;; Event Loop Helpers
+;; ============================================================================
+
+;; Check if an event indicates the application should quit
+;; Returns #t for:
+;;   - quit-event (SDL_QUIT)
+;;   - window close-requested
+;;   - Escape key pressed
+(define (should-quit? ev)
+  (match ev
+    [(quit-event) #t]
+    [(window-event 'close-requested) #t]
+    [(key-event 'down (== SDLK_ESCAPE) _ _ _) #t]
+    [_ #f]))

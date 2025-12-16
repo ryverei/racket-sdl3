@@ -8,7 +8,8 @@
 (require ffi/unsafe
          ffi/unsafe/define
          "private/lib.rkt"
-         "private/types.rkt")
+         "private/types.rkt"
+         "private/syntax.rkt")
 
 (provide (all-defined-out))
 
@@ -16,29 +17,7 @@
 ;; Library Loading
 ;; ============================================================================
 
-;; Platform-specific library paths for SDL3_ttf
-(define sdl3-ttf-lib-paths
-  (case (system-type 'os)
-    [(macosx)
-     ;; Try Homebrew paths on macOS (both ARM and Intel)
-     '("/opt/homebrew/lib/libSDL3_ttf"    ; ARM Homebrew
-       "/usr/local/lib/libSDL3_ttf"       ; Intel Homebrew
-       "libSDL3_ttf")]                    ; System path
-    [(unix)
-     '("/usr/local/lib/libSDL3_ttf"
-       "/usr/lib/libSDL3_ttf"
-       "libSDL3_ttf")]
-    [(windows)
-     '("SDL3_ttf")]
-    [else '("libSDL3_ttf")]))
-
-;; Try to load SDL3_ttf from the first available path
-(define sdl3-ttf-lib
-  (let loop ([paths sdl3-ttf-lib-paths])
-    (if (null? paths)
-        (ffi-lib "libSDL3_ttf" '("0" #f))  ; Last resort
-        (with-handlers ([exn:fail? (λ (e) (loop (cdr paths)))])
-          (ffi-lib (car paths) '("0" #f))))))
+(define sdl3-ttf-lib (load-sdl-library "SDL3_ttf"))
 
 (define-ffi-definer define-ttf sdl3-ttf-lib
   #:make-c-id convention:hyphen->underscore

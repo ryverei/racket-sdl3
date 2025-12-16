@@ -29,7 +29,7 @@
   ;; Initialize SDL video subsystem
   (sdl-init!)
 
-  ;; Create window and renderer (automatically cleaned up on exit)
+  ;; Create window and renderer
   (define-values (window renderer)
     (make-window+renderer initial-title window-width window-height
                           #:window-flags SDL_WINDOW_RESIZABLE))
@@ -83,7 +83,12 @@
         (render-clear! renderer)
         (render-present! renderer)
         (delay! 16)
-        (loop still-running?)))))
+        (loop still-running?))))
 
-;; Run the main function
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the main function when executed directly
+(module+ main
+  (main))

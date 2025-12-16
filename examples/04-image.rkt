@@ -16,13 +16,13 @@
   ;; Initialize SDL video subsystem
   (sdl-init!)
 
-  ;; Create window and renderer (automatically cleaned up on exit)
+  ;; Create window and renderer
   (define-values (window renderer)
     (make-window+renderer "SDL3 Image - Arrow keys to move"
                           window-width window-height
                           #:window-flags SDL_WINDOW_RESIZABLE))
 
-  ;; Load texture (automatically cleaned up on exit)
+  ;; Load texture
   (define image-path "examples/assets/test.png")
   (define tex (load-texture renderer image-path))
 
@@ -78,7 +78,13 @@
         ;; Small delay (~60fps)
         (delay! 16)
 
-        (loop new-x new-y still-running?)))))
+        (loop new-x new-y still-running?))))
 
-;; Run
-(main)
+  ;; Clean up (important for REPL usage)
+  (texture-destroy! tex)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run when executed directly
+(module+ main
+  (main))

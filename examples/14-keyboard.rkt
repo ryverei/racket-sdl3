@@ -217,7 +217,12 @@
         (delay! 16)
         (loop still-running?))))
 
-  (printf "~nDone.~n"))
+  (printf "~nDone.~n")
 
-;; Run
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run when executed directly
+(module+ main
+  (main))

@@ -121,7 +121,12 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop next-x next-y next-vx next-vy ball-radius now still-running?)))))
+        (loop next-x next-y next-vx next-vy ball-radius now still-running?))))
 
-;; Run the example
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the example when executed directly
+(module+ main
+  (main))

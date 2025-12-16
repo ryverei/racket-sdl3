@@ -128,7 +128,13 @@
 
         (loop new-r new-g new-b new-alpha still-running?))))
 
-  (close-font! font))
+  (close-font! font)
+  (texture-destroy! tex)
 
-;; Run the example
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the example when executed directly
+(module+ main
+  (main))

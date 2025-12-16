@@ -126,7 +126,12 @@
 
         (loop new-mode still-running?))))
 
-  (close-font! font))
+  (close-font! font)
 
-;; Run the example
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the example when executed directly
+(module+ main
+  (main))

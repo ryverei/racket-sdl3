@@ -166,7 +166,13 @@
         (loop updated-angle new-flip-h? new-flip-v? new-continuous?
               new-center-x new-center-y new-mouse-x new-mouse-y still-running?))))
 
-  (close-font! font))
+  (close-font! font)
+  (texture-destroy! tex)
 
-;; Run the example
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the example when executed directly
+(module+ main
+  (main))

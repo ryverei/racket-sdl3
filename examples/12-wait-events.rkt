@@ -119,7 +119,12 @@
         (loop still-running?))))
 
   (printf "~nExiting. Processed ~a events with ~a idle timeouts.~n"
-          event-count idle-count))
+          event-count idle-count)
 
-;; Run
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run when executed directly
+(module+ main
+  (main))

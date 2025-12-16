@@ -105,7 +105,12 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?)))))
+        (loop still-running?))))
 
-;; Run the example
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run the example when executed directly
+(module+ main
+  (main))

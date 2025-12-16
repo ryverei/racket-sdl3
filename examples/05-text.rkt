@@ -109,7 +109,12 @@
   (when static-texture
     (texture-destroy! static-texture))
 
-  (close-font! font))
+  (close-font! font)
 
-;; Run
-(main)
+  ;; Clean up (important for REPL usage)
+  (renderer-destroy! renderer)
+  (window-destroy! window))
+
+;; Run when executed directly
+(module+ main
+  (main))

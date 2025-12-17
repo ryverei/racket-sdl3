@@ -125,7 +125,7 @@ Note: `safe/display.rkt` and `safe/dialog.rkt` did not require syntax.rkt, so no
 
 ---
 
-## Phase 2: Split raw.rkt into raw/*.rkt
+## Phase 2: Split raw.rkt into raw/*.rkt ✓ COMPLETED
 
 The largest mechanical change. Split the monolithic raw.rkt by SDL subsystem.
 
@@ -135,41 +135,49 @@ Based on the current raw.rkt sections:
 
 | New Module | Contents |
 |------------|----------|
-| `raw/init.rkt` | SDL-Init, SDL-Quit, SDL-WasInit, SDL-GetError, SDL-ClearError, version functions |
+| `raw/init.rkt` | SDL-Init, SDL-Quit, SDL-GetError, SDL-free |
 | `raw/window.rkt` | SDL-CreateWindow, SDL-DestroyWindow, SDL-GetWindowSize, SDL-SetWindowTitle, etc. |
 | `raw/render.rkt` | SDL-CreateRenderer, SDL-DestroyRenderer, SDL-RenderClear, SDL-RenderPresent, SDL-SetRenderDrawColor, drawing primitives |
 | `raw/texture.rkt` | SDL-CreateTexture, SDL-DestroyTexture, SDL-CreateTextureFromSurface, SDL-RenderTexture, etc. |
-| `raw/surface.rkt` | SDL-CreateSurface, SDL-DestroySurface, SDL-BlitSurface, etc. |
-| `raw/events.rkt` | SDL-PollEvent, SDL-WaitEvent, SDL-PushEvent, event type constants |
-| `raw/keyboard.rkt` | SDL-GetKeyboardState, SDL-GetModState, scancode/keycode functions |
-| `raw/mouse.rkt` | SDL-GetMouseState, SDL-WarpMouseInWindow, SDL-SetCursor, etc. |
+| `raw/surface.rkt` | SDL-DestroySurface |
+| `raw/events.rkt` | SDL-PollEvent, SDL-WaitEvent, SDL-WaitEventTimeout, SDL-PumpEvents |
+| `raw/keyboard.rkt` | SDL-GetKeyboardState, SDL-GetModState, scancode/keycode functions, text input |
+| `raw/mouse.rkt` | SDL-GetMouseState, SDL-WarpMouseInWindow, SDL-SetCursor, cursor functions |
 | `raw/audio.rkt` | SDL-OpenAudioDevice, SDL-CloseAudioDevice, audio stream functions |
 | `raw/display.rkt` | SDL-GetDisplays, SDL-GetDisplayBounds, display mode functions |
-| `raw/clipboard.rkt` | SDL-GetClipboardText, SDL-SetClipboardText, etc. |
+| `raw/clipboard.rkt` | SDL-GetClipboardText, SDL-SetClipboardText, SDL-HasClipboardText |
 | `raw/dialog.rkt` | SDL-ShowOpenFileDialog, SDL-ShowSaveFileDialog, SDL-ShowMessageBox |
 | `raw/timer.rkt` | SDL-GetTicks, SDL-Delay, performance counter functions |
-| `raw/hints.rkt` | SDL-SetHint, SDL-GetHint |
 
 ### Steps
 
-1. Create `raw/` directory
-2. Create each `raw/*.rkt` module:
+1. ✓ Create `raw/` directory
+2. ✓ Create each `raw/*.rkt` module:
    - Copy relevant functions from current `raw.rkt`
    - Add appropriate requires (private/lib.rkt, private/types.rkt)
    - Add provides for all functions
-3. Create new `raw.rkt` that re-exports all `raw/*.rkt` modules
-4. Update `safe/*.rkt` files to require from `raw.rkt` (or specific raw modules)
-5. Delete old raw.rkt content (it becomes the aggregator)
-6. Test: `raco make raw.rkt && raco make safe.rkt`
+3. ✓ Create new `raw.rkt` that re-exports all `raw/*.rkt` modules
+4. ✓ safe/*.rkt files already require from `raw.rkt` (no changes needed)
+5. ✓ Old raw.rkt content replaced with the aggregator
+6. ✓ Test: `raco make raw.rkt && raco make safe.rkt`
 
-### Dependencies Between raw/ Modules
+### Files Created
+- `raw/init.rkt`
+- `raw/window.rkt`
+- `raw/render.rkt`
+- `raw/texture.rkt`
+- `raw/surface.rkt`
+- `raw/events.rkt`
+- `raw/keyboard.rkt`
+- `raw/mouse.rkt`
+- `raw/display.rkt`
+- `raw/timer.rkt`
+- `raw/clipboard.rkt`
+- `raw/audio.rkt`
+- `raw/dialog.rkt`
+- `raw.rkt` (aggregator, replaces old monolithic file)
 
-Most raw modules are independent, but some share dependencies:
-- All require `private/lib.rkt` and `private/types.rkt`
-- `raw/render.rkt` may need window pointer types
-- `raw/texture.rkt` needs renderer and surface pointer types
-
-These dependencies are on types, not functions, so modules remain independent.
+Note: `raw/hints.rkt` not created as no hint functions were in the original raw.rkt.
 
 ---
 

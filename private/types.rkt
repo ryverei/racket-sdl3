@@ -386,6 +386,21 @@
          _SDL_AudioStream-pointer/null
          ;; Window ID type
          _SDL_WindowID
+         ;; Display ID type
+         _SDL_DisplayID
+         ;; Display mode struct
+         _SDL_DisplayMode
+         _SDL_DisplayMode-pointer
+         _SDL_DisplayMode-pointer/null
+         make-SDL_DisplayMode
+         SDL_DisplayMode-displayID
+         SDL_DisplayMode-format
+         SDL_DisplayMode-w
+         SDL_DisplayMode-h
+         SDL_DisplayMode-pixel_density
+         SDL_DisplayMode-refresh_rate
+         SDL_DisplayMode-refresh_rate_numerator
+         SDL_DisplayMode-refresh_rate_denominator
          ;; Flash operation enum
          _SDL_FlashOperation
          SDL_FLASH_CANCEL
@@ -1147,6 +1162,30 @@
 
 ;; SDL_WindowID - unique identifier for a window (uint32)
 (define _SDL_WindowID _uint32)
+
+;; ============================================================================
+;; Display ID
+;; ============================================================================
+
+;; SDL_DisplayID - unique identifier for a display (uint32)
+(define _SDL_DisplayID _uint32)
+
+;; ============================================================================
+;; Display Mode Struct
+;; ============================================================================
+
+;; SDL_DisplayMode - describes a display mode
+;; Note: The 'internal' pointer field is private/opaque, included for ABI compatibility
+(define-cstruct _SDL_DisplayMode
+  ([displayID _SDL_DisplayID]              ; the display this mode is associated with
+   [format _SDL_PixelFormat]               ; pixel format
+   [w _int]                                ; width
+   [h _int]                                ; height
+   [pixel_density _float]                  ; scale converting size to pixels
+   [refresh_rate _float]                   ; refresh rate (or 0.0 for unspecified)
+   [refresh_rate_numerator _int]           ; precise refresh rate numerator
+   [refresh_rate_denominator _int]         ; precise refresh rate denominator
+   [internal _pointer]))                   ; private data (opaque)
 
 ;; ============================================================================
 ;; Flash Operation

@@ -19,7 +19,8 @@
          "safe/keyboard.rkt"
          "safe/clipboard.rkt"
          "safe/timer.rkt"
-         "safe/audio.rkt")
+         "safe/audio.rkt"
+         "safe/display.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
@@ -30,4 +31,5 @@
          (all-from-out "safe/keyboard.rkt")
          (all-from-out "safe/clipboard.rkt")
          (all-from-out "safe/timer.rkt")
-         (all-from-out "safe/audio.rkt"))
+         (all-from-out "safe/audio.rkt")
+         (all-from-out "safe/display.rkt"))

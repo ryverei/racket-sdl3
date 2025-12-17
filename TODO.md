@@ -11,7 +11,7 @@ A complete idiomatic Racket layer on top of the raw bindings, providing:
 - Simpler APIs (fewer pointer manipulations)
 - Drawing helpers, texture management, font/text rendering, mouse state
 
-Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rkt`, `safe/ttf.rkt`, `safe/mouse.rkt`, `safe/clipboard.rkt`, `safe/timer.rkt`, `safe/audio.rkt`
+Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rkt`, `safe/ttf.rkt`, `safe/mouse.rkt`, `safe/clipboard.rkt`, `safe/timer.rkt`, `safe/audio.rkt`, `safe/keyboard.rkt`, `safe/display.rkt`, `safe/dialog.rkt`
 
 ### SDL3 Core (`raw.rkt`)
 - [x] `SDL_Init`
@@ -130,6 +130,35 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_RenderTexture9Grid`
 - [x] `SDL_RenderGeometry`
 - [x] `SDL_RenderDebugText`
+- [x] `SDL_GetKeyboardState`
+- [x] `SDL_GetModState`
+- [x] `SDL_ResetKeyboard`
+- [x] `SDL_GetKeyFromScancode`
+- [x] `SDL_GetScancodeFromKey`
+- [x] `SDL_GetScancodeName`
+- [x] `SDL_GetScancodeFromName`
+- [x] `SDL_GetKeyFromName`
+- [x] `SDL_GetGlobalMouseState`
+- [x] `SDL_WarpMouseInWindow`
+- [x] `SDL_WarpMouseGlobal`
+- [x] `SDL_CaptureMouse`
+- [x] `SDL_GetDisplays`
+- [x] `SDL_GetPrimaryDisplay`
+- [x] `SDL_GetDisplayName`
+- [x] `SDL_GetDisplayBounds`
+- [x] `SDL_GetDisplayUsableBounds`
+- [x] `SDL_GetCurrentDisplayMode`
+- [x] `SDL_GetDesktopDisplayMode`
+- [x] `SDL_GetFullscreenDisplayModes`
+- [x] `SDL_GetDisplayForWindow`
+- [x] `SDL_GetDisplayContentScale`
+- [x] `SDL_GetWindowDisplayScale`
+- [x] `SDL_ShowSimpleMessageBox`
+- [x] `SDL_ShowMessageBox`
+- [x] `SDL_ShowOpenFileDialog`
+- [x] `SDL_ShowSaveFileDialog`
+- [x] `SDL_ShowOpenFolderDialog`
+- [x] `SDL_PumpEvents`
 
 ### SDL3_image (`image.rkt`)
 - [x] `IMG_Version`
@@ -232,17 +261,17 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_FlashWindow`
 
 ### Display Management (P1)
-- [ ] `SDL_GetDisplays`
-- [ ] `SDL_GetPrimaryDisplay`
-- [ ] `SDL_GetDisplayName`
-- [ ] `SDL_GetDisplayBounds`
-- [ ] `SDL_GetDisplayUsableBounds`
-- [ ] `SDL_GetCurrentDisplayMode`
-- [ ] `SDL_GetDesktopDisplayMode`
-- [ ] `SDL_GetFullscreenDisplayModes`
-- [ ] `SDL_GetDisplayForWindow`
-- [ ] `SDL_GetDisplayContentScale`
-- [ ] `SDL_GetWindowDisplayScale`
+- [x] `SDL_GetDisplays`
+- [x] `SDL_GetPrimaryDisplay`
+- [x] `SDL_GetDisplayName`
+- [x] `SDL_GetDisplayBounds`
+- [x] `SDL_GetDisplayUsableBounds`
+- [x] `SDL_GetCurrentDisplayMode`
+- [x] `SDL_GetDesktopDisplayMode`
+- [x] `SDL_GetFullscreenDisplayModes`
+- [x] `SDL_GetDisplayForWindow`
+- [x] `SDL_GetDisplayContentScale`
+- [x] `SDL_GetWindowDisplayScale`
 
 ### Renderer (P0)
 - [x] `SDL_GetNumRenderDrivers`
@@ -356,7 +385,7 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_WaitEvent`
 - [x] `SDL_WaitEventTimeout`
 - [ ] `SDL_PushEvent`
-- [ ] `SDL_PumpEvents`
+- [x] `SDL_PumpEvents`
 - [ ] `SDL_PeepEvents`
 - [ ] `SDL_HasEvent`
 - [ ] `SDL_HasEvents`
@@ -377,16 +406,16 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_GetKeyboards`
 - [ ] `SDL_GetKeyboardNameForID`
 - [ ] `SDL_GetKeyboardFocus`
-- [ ] `SDL_GetKeyboardState`
-- [ ] `SDL_ResetKeyboard`
-- [ ] `SDL_GetModState`
+- [x] `SDL_GetKeyboardState`
+- [x] `SDL_ResetKeyboard`
+- [x] `SDL_GetModState`
 - [ ] `SDL_SetModState`
-- [ ] `SDL_GetKeyFromScancode`
-- [ ] `SDL_GetScancodeFromKey`
+- [x] `SDL_GetKeyFromScancode`
+- [x] `SDL_GetScancodeFromKey`
 - [ ] `SDL_SetScancodeName`
-- [ ] `SDL_GetScancodeName`
-- [ ] `SDL_GetScancodeFromName`
-- [ ] `SDL_GetKeyFromName`
+- [x] `SDL_GetScancodeName`
+- [x] `SDL_GetScancodeFromName`
+- [x] `SDL_GetKeyFromName`
 - [ ] `SDL_StartTextInputWithProperties`
 - [ ] `SDL_TextInputActive`
 - [ ] `SDL_ClearComposition`
@@ -401,13 +430,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_GetMouseNameForID`
 - [ ] `SDL_GetMouseFocus`
 - [x] `SDL_GetMouseState`
-- [ ] `SDL_GetGlobalMouseState`
+- [x] `SDL_GetGlobalMouseState`
 - [x] `SDL_GetRelativeMouseState`
-- [ ] `SDL_WarpMouseInWindow`
-- [ ] `SDL_WarpMouseGlobal`
+- [x] `SDL_WarpMouseInWindow`
+- [x] `SDL_WarpMouseGlobal`
 - [x] `SDL_SetWindowRelativeMouseMode`
 - [x] `SDL_GetWindowRelativeMouseMode`
-- [ ] `SDL_CaptureMouse`
+- [x] `SDL_CaptureMouse`
 - [ ] `SDL_CreateCursor`
 - [ ] `SDL_CreateColorCursor`
 - [x] `SDL_CreateSystemCursor`
@@ -534,13 +563,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_Vulkan_GetPresentationSupport`
 
 ### File Dialog (P2)
-- [ ] `SDL_ShowOpenFileDialog`
-- [ ] `SDL_ShowSaveFileDialog`
-- [ ] `SDL_ShowOpenFolderDialog`
+- [x] `SDL_ShowOpenFileDialog`
+- [x] `SDL_ShowSaveFileDialog`
+- [x] `SDL_ShowOpenFolderDialog`
 
 ### Message Box (P1)
-- [ ] `SDL_ShowSimpleMessageBox`
-- [ ] `SDL_ShowMessageBox`
+- [x] `SDL_ShowSimpleMessageBox`
+- [x] `SDL_ShowMessageBox`
 
 ### Miscellaneous (P2)
 - [ ] `SDL_OpenURL`
@@ -829,7 +858,7 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_PenButtonEvent`
 
 ### Key Constants (P1)
-- [ ] Full scancode enum (`SDL_SCANCODE_*`) - ~200+ constants
+- [x] Full scancode enum (`SDL_SCANCODE_*`) - ~80 constants (letters, numbers, F-keys, navigation, keypad, modifiers, media)
 - [x] Core keycode constants (`SDLK_*`) - letters, numbers, F-keys, arrows, modifiers, etc.
 - [x] Modifier key constants (`SDL_KMOD_NONE`, `SDL_KMOD_LSHIFT`, `SDL_KMOD_RSHIFT`, `SDL_KMOD_CTRL`, `SDL_KMOD_ALT`, `SDL_KMOD_GUI`, etc.)
 
@@ -899,13 +928,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 
 ## Implementation Statistics
 
-**Currently Implemented:** ~160 functions
+**Currently Implemented:** ~190 functions
 **Estimated Total Available:** 500+ functions
 
 ### Coverage by Library
 | Library | Implemented | Estimated Total | Coverage |
 |---------|-------------|-----------------|----------|
-| SDL3 Core | ~140 | ~350 | ~40% |
+| SDL3 Core | ~170 | ~350 | ~49% |
 | SDL3_image | 5 | ~60 | ~8% |
 | SDL3_ttf | 16 | ~120 | ~13% |
 
@@ -917,6 +946,11 @@ All P0 (essential) features are now complete:
 - Advanced texture rendering (affine, tiled, 9-grid)
 - Geometry rendering (arbitrary triangles with per-vertex colors)
 - Debug text rendering (built-in 8x8 bitmap font)
+- Keyboard state polling and scancodes
+- Mouse warping, global state, and capture
+- Display/monitor management (multi-monitor support)
+- Message boxes (info, warning, error, custom dialogs)
+- File dialogs (open, save, folder selection)
 
 ---
 
@@ -925,10 +959,14 @@ All P0 (essential) features are now complete:
 1. ~~**P0 - Integer Rect:** `SDL_Rect`, `SDL_Point` types~~ ✓ DONE
 2. ~~**P1 - Image Loading:** `IMG_Load` (surface), `IMG_SavePNG`~~ ✓ DONE
 3. ~~**P1 - Texture Creation:** `SDL_CreateTexture`, `SDL_SetTextureScaleMode`~~ ✓ DONE
-4. **P1 - Scancodes:** Add full scancode enum (`SDL_SCANCODE_*`)
+4. ~~**P1 - Scancodes:** Add full scancode enum (`SDL_SCANCODE_*`)~~ ✓ DONE
 5. ~~**P1 - Mouse:** `SDL_GetRelativeMouseState`, cursor functions~~ ✓ DONE
 6. ~~**P2 - Timer:** `SDL_GetPerformanceCounter`, `SDL_GetPerformanceFrequency`~~ ✓ DONE
 7. ~~**P2 - Clipboard:** `SDL_SetClipboardText`, `SDL_GetClipboardText`~~ ✓ DONE
 8. ~~**P2 - Audio:** Basic audio playback~~ ✓ DONE
-9. **P1 - Message Box:** `SDL_ShowSimpleMessageBox`
-10. **P2 - Joystick/Gamepad:** Basic input support
+9. ~~**P1 - Message Box:** `SDL_ShowSimpleMessageBox`~~ ✓ DONE
+10. ~~**P1 - Display Management:** Multi-monitor support~~ ✓ DONE
+11. ~~**P2 - File Dialogs:** Open/save file dialogs~~ ✓ DONE
+12. **P1 - Surface Operations:** Create, manipulate, and blit surfaces
+13. **P2 - Joystick/Gamepad:** Basic input support
+14. **P2 - OpenGL Support:** GL context creation and management

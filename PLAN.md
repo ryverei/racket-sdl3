@@ -1,308 +1,319 @@
-# Implementation Plan: Remaining P0 Features
+# Implementation Plan: P1 Features
 
-This document outlines the plan for completing all remaining P0 (essential) features for the SDL3 Racket bindings.
+This document outlines the plan for implementing P1 (important) features for the SDL3 Racket bindings. With P0 complete, these features round out the library for most game and application development.
 
 ## Goals
 
-Complete the foundational SDL3 bindings needed for basic games and applications by implementing all remaining P0-priority functions for window management, rendering, and drawing.
+Add commonly-needed features for games and applications:
+- Keyboard state queries for smooth input handling
+- Additional mouse functionality
+- Display/monitor information for proper fullscreen and multi-monitor support
+- Message boxes for alerts and confirmations
+- File dialogs for loading/saving user files
 
 ---
 
-## Phase 1: Window Management Functions
+## Phase 1: Keyboard State & Scancodes
 
-Essential window control functions that most applications need.
+Query keyboard state for smooth, polling-based input (complements event-based input). Add full scancode support.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Window creation convenience
-SDL-CreateWindowAndRenderer  ; title w h flags win-ptr-ptr ren-ptr-ptr -> bool
+;; Keyboard state
+SDL-GetKeyboardState         ; numkeys-ptr -> uint8-array
+SDL-GetModState              ; -> keymod
+SDL-ResetKeyboard            ; -> void
 
-;; Window properties
-SDL-GetWindowTitle           ; window -> string
-SDL-SetWindowIcon            ; window surface -> bool
-SDL-GetWindowID              ; window -> uint32
-SDL-GetWindowFromID          ; id -> window
-
-;; Window visibility
-SDL-ShowWindow               ; window -> bool
-SDL-HideWindow               ; window -> bool
-SDL-RaiseWindow              ; window -> bool
-
-;; Window state
-SDL-MaximizeWindow           ; window -> bool
-SDL-MinimizeWindow           ; window -> bool
-SDL-RestoreWindow            ; window -> bool
-
-;; Window constraints
-SDL-SetWindowMinimumSize     ; window w h -> bool
-SDL-SetWindowMaximumSize     ; window w h -> bool
-SDL-GetWindowMinimumSize     ; window w-ptr h-ptr -> bool
-SDL-GetWindowMaximumSize     ; window w-ptr h-ptr -> bool
-
-;; Window decoration
-SDL-SetWindowBordered        ; window bordered -> bool
-SDL-SetWindowResizable       ; window resizable -> bool
-
-;; Window effects
-SDL-SetWindowOpacity         ; window opacity -> bool
-SDL-GetWindowOpacity         ; window -> float
-SDL-FlashWindow              ; window operation -> bool
-
-;; Surface rendering (alternative to hardware renderer)
-SDL-GetWindowSurface         ; window -> surface
-SDL-UpdateWindowSurface      ; window -> bool
+;; Scancode/keycode conversion
+SDL-GetKeyFromScancode       ; scancode modstate key-event -> keycode
+SDL-GetScancodeFromKey       ; keycode modstate -> scancode
+SDL-GetScancodeName          ; scancode -> string
+SDL-GetScancodeFromName      ; name -> scancode
+SDL-GetKeyFromName           ; name -> keycode
 ```
 
 ### Types (`private/types.rkt`)
 
 ```racket
-;; Flash operation enum
-_SDL_FlashOperation
-SDL_FLASH_CANCEL             ; 0
-SDL_FLASH_BRIEFLY            ; 1
-SDL_FLASH_UNTIL_FOCUSED      ; 2
+;; Scancode enum (physical key positions)
+_SDL_Scancode
+SDL_SCANCODE_A through SDL_SCANCODE_Z
+SDL_SCANCODE_1 through SDL_SCANCODE_0
+SDL_SCANCODE_RETURN
+SDL_SCANCODE_ESCAPE
+SDL_SCANCODE_BACKSPACE
+SDL_SCANCODE_TAB
+SDL_SCANCODE_SPACE
+SDL_SCANCODE_F1 through SDL_SCANCODE_F12
+SDL_SCANCODE_RIGHT, SDL_SCANCODE_LEFT, SDL_SCANCODE_DOWN, SDL_SCANCODE_UP
+SDL_SCANCODE_LCTRL, SDL_SCANCODE_LSHIFT, SDL_SCANCODE_LALT
+SDL_SCANCODE_RCTRL, SDL_SCANCODE_RSHIFT, SDL_SCANCODE_RALT
+; ... ~120 most useful ones
 ```
 
-### Safe Wrappers (`safe/window.rkt`)
+### Safe Wrappers (`safe/keyboard.rkt`)
 
 ```racket
-;; Window control
-(show-window! window)
-(hide-window! window)
-(raise-window! window)
-(maximize-window! window)
-(minimize-window! window)
-(restore-window! window)
+;; Keyboard state queries
+(get-keyboard-state)         ; -> procedure (scancode -> bool)
+(key-pressed? scancode)      ; -> bool (requires get-keyboard-state first)
+(get-mod-state)              ; -> integer (bitmask)
+(mod-state-has? mod-flag)    ; -> bool
 
-;; Window properties
-(window-title window)
-(set-window-icon! window surface)
-(window-id window)
-(window-from-id id)
-
-;; Size constraints
-(set-window-minimum-size! window w h)
-(set-window-maximum-size! window w h)
-(window-minimum-size window)  ; -> (values w h)
-(window-maximum-size window)  ; -> (values w h)
-
-;; Decoration
-(set-window-bordered! window bordered?)
-(set-window-resizable! window resizable?)
-
-;; Effects
-(window-opacity window)
-(set-window-opacity! window opacity)
-(flash-window! window [operation])
+;; Scancode/keycode utilities
+(scancode-name scancode)     ; -> string
+(scancode-from-name name)    ; -> scancode
+(key-from-name name)         ; -> keycode
 ```
+
+### Example: `23-keyboard-state.rkt`
+
+Demonstrate keyboard state:
+- Smooth character movement with polling
+- Show all currently pressed keys
+- Modifier state display
+- Compare polling vs event-based input
 
 ---
 
-## Phase 2: Renderer Query Functions
+## Phase 2: Mouse Enhancements
 
-Functions to query renderer capabilities and state.
+Additional mouse functionality for warping and global state.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Driver enumeration
-SDL-GetNumRenderDrivers      ; -> int
-SDL-GetRenderDriver          ; index -> string
+;; Mouse warping
+SDL-WarpMouseInWindow        ; window x y -> void
+SDL-WarpMouseGlobal          ; x y -> bool
 
-;; Renderer queries
-SDL-GetRenderer              ; window -> renderer
-SDL-GetRenderWindow          ; renderer -> window
-SDL-GetRendererName          ; renderer -> string
+;; Global mouse state
+SDL-GetGlobalMouseState      ; x-ptr y-ptr -> button-flags
 
-;; Output size
-SDL-GetRenderOutputSize          ; renderer w-ptr h-ptr -> bool
-SDL-GetCurrentRenderOutputSize   ; renderer w-ptr h-ptr -> bool
-
-;; Draw color getters
-SDL-GetRenderDrawColor       ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
-SDL-SetRenderDrawColorFloat  ; renderer r g b a -> bool
-SDL-GetRenderDrawColorFloat  ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
-
-;; VSync control
-SDL-SetRenderVSync           ; renderer vsync -> bool
-SDL-GetRenderVSync           ; renderer vsync-ptr -> bool
+;; Mouse capture
+SDL-CaptureMouse             ; enabled -> bool
 ```
 
-### Safe Wrappers (`safe/draw.rkt`)
+### Safe Wrappers (`safe/mouse.rkt`)
 
 ```racket
-;; Renderer info
-(renderer-name renderer)
-(render-output-size renderer)        ; -> (values w h)
-(current-render-output-size renderer) ; -> (values w h)
+;; Mouse warping
+(warp-mouse! window x y)     ; move mouse to position in window
+(warp-mouse-global! x y)     ; move mouse to screen position
 
-;; Draw color
-(draw-color renderer)                ; -> (values r g b a)
+;; Global state
+(get-global-mouse-state)     ; -> (values buttons x y)
 
-;; VSync
-(set-render-vsync! renderer vsync)
-(render-vsync renderer)
+;; Capture
+(capture-mouse! enabled?)    ; capture mouse outside window
 ```
+
+### Example: `24-mouse-warp.rkt`
+
+Demonstrate mouse features:
+- Warp mouse to center on key press
+- Show global vs window-relative coordinates
+- Mouse capture for drag operations
 
 ---
 
-## Phase 3: Viewport and Clipping
+## Phase 3: Display Management
 
-Control what portion of the renderer is visible and where drawing occurs.
+Query monitor information for proper fullscreen modes and multi-monitor setups.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-;; Viewport (visible area)
-SDL-SetRenderViewport        ; renderer rect -> bool
-SDL-GetRenderViewport        ; renderer rect-ptr -> bool
+;; Display enumeration
+SDL-GetDisplays              ; count-ptr -> display-id-array
+SDL-GetPrimaryDisplay        ; -> display-id
+SDL-GetDisplayName           ; display-id -> string
 
-;; Clip rectangle (drawing constraint)
-SDL-SetRenderClipRect        ; renderer rect -> bool
-SDL-GetRenderClipRect        ; renderer rect-ptr -> bool
-SDL-RenderClipEnabled        ; renderer -> bool
+;; Display bounds
+SDL-GetDisplayBounds         ; display-id rect-ptr -> bool
+SDL-GetDisplayUsableBounds   ; display-id rect-ptr -> bool (excludes taskbar, etc.)
 
-;; Render scale (for resolution independence)
-SDL-SetRenderScale           ; renderer scale-x scale-y -> bool
-SDL-GetRenderScale           ; renderer scale-x-ptr scale-y-ptr -> bool
-```
+;; Display modes
+SDL-GetCurrentDisplayMode    ; display-id -> display-mode-ptr
+SDL-GetDesktopDisplayMode    ; display-id -> display-mode-ptr
+SDL-GetFullscreenDisplayModes ; display-id count-ptr -> display-mode-array
 
-### Safe Wrappers (`safe/draw.rkt`)
-
-```racket
-;; Viewport/clipping
-(set-render-viewport! renderer rect)
-(render-viewport renderer)
-(set-render-clip-rect! renderer rect)
-(render-clip-rect renderer)
-(render-clip-enabled? renderer)
-
-;; Scale
-(set-render-scale! renderer sx sy)
-(render-scale renderer)  ; -> (values sx sy)
-```
-
----
-
-## Phase 4: Advanced Texture Rendering
-
-Additional texture rendering modes for special effects and UI.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Affine transform rendering (arbitrary 2D transforms)
-SDL-RenderTextureAffine      ; renderer texture src-rect origin right down -> bool
-
-;; Tiled rendering (for backgrounds, patterns)
-SDL-RenderTextureTiled       ; renderer texture src-rect scale dst-rect -> bool
-
-;; 9-grid rendering (for scalable UI elements like buttons, panels)
-SDL-RenderTexture9Grid       ; renderer texture src-rect
-                             ; left-width right-width top-height bottom-height
-                             ; scale dst-rect -> bool
-```
-
-### Safe Wrappers (`safe/texture.rkt`)
-
-```racket
-;; Advanced texture rendering
-(draw-texture-affine! renderer texture src-rect origin right down)
-(draw-texture-tiled! renderer texture src-rect scale dst-rect)
-(draw-texture-9grid! renderer texture src-rect
-                     left-width right-width top-height bottom-height
-                     scale dst-rect)
-```
-
----
-
-## Phase 5: Geometry Rendering
-
-Hardware-accelerated arbitrary geometry for particle effects, custom shapes, etc.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Geometry rendering
-SDL-RenderGeometry           ; renderer texture vertices num-verts
-                             ; indices num-indices -> bool
-SDL-RenderGeometryRaw        ; (lower-level, pointer-based)
+;; Window-display relationship
+SDL-GetDisplayForWindow      ; window -> display-id
+SDL-GetDisplayContentScale   ; display-id -> float
+SDL-GetWindowDisplayScale    ; window -> float
 ```
 
 ### Types (`private/types.rkt`)
 
 ```racket
-;; FColor struct (float colors for vertices)
-_SDL_FColor
-  - r : float
-  - g : float
-  - b : float
-  - a : float
+;; Display ID type
+_SDL_DisplayID               ; uint32
 
-;; Vertex struct
-_SDL_Vertex
-  - position : SDL_FPoint
-  - color : SDL_FColor
-  - tex_coord : SDL_FPoint
+;; Display mode struct
+_SDL_DisplayMode
+  - displayID : SDL_DisplayID
+  - format : SDL_PixelFormat
+  - w : int
+  - h : int
+  - pixel_density : float
+  - refresh_rate : float
 ```
 
-### Safe Wrappers (`safe/draw.rkt`)
+### Safe Wrappers (`safe/display.rkt`)
 
 ```racket
-;; Geometry rendering
-(draw-geometry! renderer vertices [texture] [indices])
+;; Display enumeration
+(get-displays)               ; -> (listof display-id)
+(primary-display)            ; -> display-id
+(display-name display-id)    ; -> string
+
+;; Display bounds
+(display-bounds display-id)  ; -> (values x y w h)
+(display-usable-bounds display-id) ; -> (values x y w h)
+
+;; Display modes
+(current-display-mode display-id)  ; -> display-mode struct
+(desktop-display-mode display-id)  ; -> display-mode struct
+(fullscreen-display-modes display-id) ; -> (listof display-mode)
+
+;; Window relationship
+(window-display window)      ; -> display-id
+(display-content-scale display-id) ; -> float
+(window-display-scale window) ; -> float
 ```
+
+### Example: `25-display-info.rkt`
+
+Show display information:
+- List all connected displays
+- Show resolution, refresh rate, scale factor
+- Demonstrate proper fullscreen mode selection
 
 ---
 
-## Phase 6: Debug Text Rendering
+## Phase 4: Message Boxes
 
-Built-in debug text for quick prototyping (no TTF needed).
+Native dialog boxes for alerts, confirmations, and errors.
 
 ### Raw Bindings (`raw.rkt`)
 
 ```racket
-SDL-RenderDebugText          ; renderer x y text -> bool
-SDL-RenderDebugTextFormat    ; renderer x y fmt ... -> bool (variadic - may skip)
+;; Simple message box
+SDL-ShowSimpleMessageBox     ; flags title message window -> bool
+
+;; Full message box (with custom buttons)
+SDL-ShowMessageBox           ; messageboxdata buttonid-ptr -> bool
 ```
 
-Note: `SDL_RenderDebugTextFormat` uses C variadic arguments which are complex in FFI. We may implement only `SDL_RenderDebugText` and handle formatting on the Racket side.
-
-### Safe Wrappers (`safe/draw.rkt`)
+### Types (`private/types.rkt`)
 
 ```racket
-(draw-debug-text! renderer x y text)
+;; Message box flags
+_SDL_MessageBoxFlags
+SDL_MESSAGEBOX_ERROR         ; 0x00000010
+SDL_MESSAGEBOX_WARNING       ; 0x00000020
+SDL_MESSAGEBOX_INFORMATION   ; 0x00000040
+SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT  ; 0x00000080
+SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT  ; 0x00000100
+
+;; Message box button data (for custom buttons)
+_SDL_MessageBoxButtonData
+  - flags : uint32
+  - buttonID : int
+  - text : string
+
+;; Message box data
+_SDL_MessageBoxData
+  - flags : uint32
+  - window : window-ptr/null
+  - title : string
+  - message : string
+  - numbuttons : int
+  - buttons : button-array-ptr
+  - colorScheme : color-scheme-ptr/null
 ```
+
+### Safe Wrappers (`safe/dialog.rkt`)
+
+```racket
+;; Simple message boxes
+(show-message-box title message
+                  #:type ['info 'warning 'error]
+                  #:window [window #f])
+
+;; Confirmation dialog (returns 'yes, 'no, or 'cancel)
+(show-confirm-dialog title message
+                     #:buttons ['yes-no 'yes-no-cancel 'ok-cancel]
+                     #:window [window #f])
+```
+
+### Example: `26-message-box.rkt`
+
+Demonstrate message boxes:
+- Info, warning, error styles
+- Confirmation dialogs
+- Using with/without parent window
 
 ---
 
-## Phase 7: Example Updates
+## Phase 5: File Dialogs
 
-Update examples to demonstrate new features.
+Native file open/save dialogs for user file selection.
 
-### Update Example: `11-window-controls.rkt`
+### Raw Bindings (`raw.rkt`)
 
-Enhance to demonstrate new window management features:
-- Show/hide window
-- Minimize/maximize/restore
-- Flash window
-- Opacity changes
-- Size constraints
+```racket
+;; Async file dialogs (SDL3 uses callbacks)
+SDL-ShowOpenFileDialog       ; callback userdata window filters nfilters default allow-many -> void
+SDL-ShowSaveFileDialog       ; callback userdata window filters nfilters default -> void
+SDL-ShowOpenFolderDialog     ; callback userdata window default allow-many -> void
+```
 
-### New Example: `21-viewport-clipping.rkt`
+### Types (`private/types.rkt`)
 
-Demonstrate viewport and clipping:
-- Split-screen effect with viewports
-- Clipping for UI regions
-- Render scale for resolution independence
+```racket
+;; Dialog file filter
+_SDL_DialogFileFilter
+  - name : string    ; e.g., "Image files"
+  - pattern : string ; e.g., "*.png;*.jpg;*.gif"
 
-### New Example: `22-geometry.rkt`
+;; Callback type
+_SDL_DialogFileCallback      ; (userdata filelist filter) -> void
+```
 
-Demonstrate geometry rendering:
-- Colored triangles
-- Textured geometry
-- Simple particle system
+### Safe Wrappers (`safe/dialog.rkt`)
+
+```racket
+;; Synchronous wrappers (block until user responds)
+(open-file-dialog #:title [title "Open"]
+                  #:filters [filters '()]
+                  #:default-path [path #f]
+                  #:allow-multiple? [multi #f]
+                  #:window [window #f])
+; -> path-string or (listof path-string) or #f
+
+(save-file-dialog #:title [title "Save"]
+                  #:filters [filters '()]
+                  #:default-path [path #f]
+                  #:window [window #f])
+; -> path-string or #f
+
+(open-folder-dialog #:title [title "Select Folder"]
+                    #:default-path [path #f]
+                    #:allow-multiple? [multi #f]
+                    #:window [window #f])
+; -> path-string or (listof path-string) or #f
+```
+
+### Example: `27-file-dialog.rkt`
+
+Demonstrate file dialogs:
+- Open single file with filters
+- Open multiple files
+- Save file dialog
+- Folder selection
 
 ---
 
@@ -310,90 +321,61 @@ Demonstrate geometry rendering:
 
 | Step | Phase | Files | Deliverable |
 |------|-------|-------|-------------|
-| 1 | Phase 1 | `private/types.rkt`, `raw.rkt`, `safe/window.rkt` | Window management |
-| 2 | Phase 2 | `raw.rkt`, `safe/draw.rkt` | Renderer queries |
-| 3 | Phase 3 | `raw.rkt`, `safe/draw.rkt` | Viewport and clipping |
-| 4 | Phase 4 | `raw.rkt`, `safe/texture.rkt` | Advanced texture rendering |
-| 5 | Phase 5 | `private/types.rkt`, `raw.rkt`, `safe/draw.rkt` | Geometry rendering |
-| 6 | Phase 6 | `raw.rkt`, `safe/draw.rkt` | Debug text |
-| 7 | Phase 7 | `examples/` | Example programs |
-
----
-
-## Key SDL3 Concepts
-
-### Viewports vs Clip Rects
-
-- **Viewport**: Defines the output rectangle where rendering appears. Changing the viewport affects coordinate mapping.
-- **Clip Rect**: Restricts drawing to a rectangle without changing coordinates. Drawing outside the clip rect is discarded.
-
-### Render Scale
-
-Render scale allows resolution-independent rendering. Set scale to 2.0 and all coordinates are doubled, useful for:
-- HiDPI displays
-- Pixel art games
-- Dynamic resolution scaling
-
-### 9-Grid Rendering
-
-The 9-grid (or 9-slice) technique divides a texture into 9 regions:
-- 4 corners (fixed size)
-- 4 edges (stretch in one direction)
-- 1 center (stretches both directions)
-
-This allows UI elements like buttons and panels to scale without distorting corners.
-
-### Geometry Rendering
-
-`SDL_RenderGeometry` draws arbitrary triangles with per-vertex:
-- Position (x, y)
-- Color (r, g, b, a as floats)
-- Texture coordinates (u, v)
-
-Useful for particle systems, custom shapes, and 2D mesh deformation.
-
----
-
-## Testing Notes
-
-After each phase:
-1. Clear compiled cache: `rm -rf compiled private/compiled`
-2. Compile: `raco make raw.rkt` (or relevant files)
-3. Test in REPL or with example programs
-4. Verify no regressions in existing examples
+| 1 | Phase 1 | `private/types.rkt`, `raw.rkt`, `safe/keyboard.rkt` | Keyboard state + scancodes |
+| 2 | Phase 2 | `raw.rkt`, `safe/mouse.rkt` | Mouse warp/capture |
+| 3 | Phase 3 | `private/types.rkt`, `raw.rkt`, `safe/display.rkt` | Display info |
+| 4 | Phase 4 | `private/types.rkt`, `raw.rkt`, `safe/dialog.rkt` | Message boxes |
+| 5 | Phase 5 | `private/types.rkt`, `raw.rkt`, `safe/dialog.rkt` | File dialogs |
 
 ---
 
 ## Dependencies Between Phases
 
 ```
-Phase 1 (Window) ─────► Phase 7 (Examples)
+Phase 1 (Keyboard) ─────► Examples
                               ▲
-Phase 2 (Renderer) ───────────┤
+Phase 2 (Mouse) ──────────────┤
                               │
-Phase 3 (Viewport) ───────────┤
+Phase 3 (Display) ────────────┤
                               │
-Phase 4 (Texture) ────────────┤
+Phase 4 (Message Box) ────────┤
                               │
-Phase 5 (Geometry) ───────────┤
-                              │
-Phase 6 (Debug) ──────────────┘
+Phase 5 (File Dialog) ────────┘
 ```
 
-Phases 1-6 can be implemented in any order. Phase 7 (Examples) depends on all prior phases.
+All phases are independent and can be implemented in any order.
 
 ---
 
 ## Estimated Function Count
 
-| Phase | Raw Functions | Safe Wrappers | Running Total |
-|-------|---------------|---------------|---------------|
-| Phase 1 | 22 | 19 | 41 |
-| Phase 2 | 11 | 6 | 58 |
-| Phase 3 | 7 | 7 | 72 |
-| Phase 4 | 3 | 3 | 78 |
-| Phase 5 | 2 | 1 | 81 |
-| Phase 6 | 1 | 1 | 83 |
-| **Total** | **46** | **37** | **83** |
+| Phase | Raw Functions | Safe Wrappers | Types/Constants |
+|-------|---------------|---------------|-----------------|
+| Phase 1 | 7 | 6 | ~120 (scancodes) |
+| Phase 2 | 4 | 4 | 0 |
+| Phase 3 | 11 | 10 | ~5 |
+| Phase 4 | 2 | 2 | ~10 |
+| Phase 5 | 3 | 3 | ~5 |
+| **Total** | **27** | **25** | **~140** |
 
-After completing this plan, the P0 coverage will be essentially complete.
+---
+
+## Deferred (P2)
+
+These features are useful but lower priority:
+
+- **Gamepad Input**: Controller support - defer until testable
+- **Joystick API**: Lower-level than gamepad, for non-standard controllers
+- **OpenGL Context**: For users who want raw OpenGL instead of SDL_Renderer
+- **Texture Streaming**: `SDL_LockTexture`/`SDL_UnlockTexture` for dynamic textures
+- **Surface Operations**: `SDL_BlitSurface`, pixel manipulation
+
+---
+
+## Testing Strategy
+
+After each phase:
+1. Clear compiled cache: `rm -rf compiled private/compiled safe/compiled`
+2. Compile: `raco make safe.rkt`
+3. Run the phase's example program
+4. Verify existing examples still work

@@ -84,6 +84,52 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_GetRectIntersection`
 - [x] `SDL_HasRectIntersectionFloat`
 - [x] `SDL_GetRectIntersectionFloat`
+- [x] `SDL_CreateWindowAndRenderer`
+- [x] `SDL_GetWindowTitle`
+- [x] `SDL_SetWindowIcon`
+- [x] `SDL_GetWindowID`
+- [x] `SDL_GetWindowFromID`
+- [x] `SDL_ShowWindow`
+- [x] `SDL_HideWindow`
+- [x] `SDL_RaiseWindow`
+- [x] `SDL_MaximizeWindow`
+- [x] `SDL_MinimizeWindow`
+- [x] `SDL_RestoreWindow`
+- [x] `SDL_SetWindowMinimumSize`
+- [x] `SDL_SetWindowMaximumSize`
+- [x] `SDL_GetWindowMinimumSize`
+- [x] `SDL_GetWindowMaximumSize`
+- [x] `SDL_SetWindowBordered`
+- [x] `SDL_SetWindowResizable`
+- [x] `SDL_SetWindowOpacity`
+- [x] `SDL_GetWindowOpacity`
+- [x] `SDL_FlashWindow`
+- [x] `SDL_GetWindowSurface`
+- [x] `SDL_UpdateWindowSurface`
+- [x] `SDL_GetNumRenderDrivers`
+- [x] `SDL_GetRenderDriver`
+- [x] `SDL_GetRenderer`
+- [x] `SDL_GetRenderWindow`
+- [x] `SDL_GetRendererName`
+- [x] `SDL_GetRenderOutputSize`
+- [x] `SDL_GetCurrentRenderOutputSize`
+- [x] `SDL_GetRenderDrawColor`
+- [x] `SDL_SetRenderDrawColorFloat`
+- [x] `SDL_GetRenderDrawColorFloat`
+- [x] `SDL_SetRenderVSync`
+- [x] `SDL_GetRenderVSync`
+- [x] `SDL_SetRenderViewport`
+- [x] `SDL_GetRenderViewport`
+- [x] `SDL_SetRenderClipRect`
+- [x] `SDL_GetRenderClipRect`
+- [x] `SDL_RenderClipEnabled`
+- [x] `SDL_SetRenderScale`
+- [x] `SDL_GetRenderScale`
+- [x] `SDL_RenderTextureAffine`
+- [x] `SDL_RenderTextureTiled`
+- [x] `SDL_RenderTexture9Grid`
+- [x] `SDL_RenderGeometry`
+- [x] `SDL_RenderDebugText`
 
 ### SDL3_image (`image.rkt`)
 - [x] `IMG_Version`
@@ -118,6 +164,9 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `_SDL_Point` struct, `_SDL_FPoint` struct
 - [x] `_SDL_Rect` struct, `_SDL_FRect` struct
 - [x] `_SDL_Color` struct
+- [x] `_SDL_FColor` struct (float colors for vertices)
+- [x] `_SDL_Vertex` struct (for geometry rendering)
+- [x] `_SDL_FlashOperation` enum
 - [x] Event constants: `SDL_EVENT_QUIT`, window events, keyboard events, mouse events (incl. `SDL_EVENT_MOUSE_WHEEL`), text input
 - [x] Event structs: `_SDL_CommonEvent`, `_SDL_KeyboardEvent`, `_SDL_MouseMotionEvent`, `_SDL_MouseButtonEvent`, `_SDL_TextInputEvent`, `_SDL_MouseWheelEvent`
 - [x] Keyboard modifier constants: `SDL_KMOD_NONE`, `SDL_KMOD_LSHIFT`, `SDL_KMOD_RSHIFT`, `SDL_KMOD_CTRL`, `SDL_KMOD_ALT`, etc.
@@ -153,34 +202,34 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_GetAppMetadataProperty`
 
 ### Window Management (P0)
-- [ ] `SDL_CreateWindowAndRenderer`
-- [ ] `SDL_GetWindowTitle`
-- [ ] `SDL_SetWindowIcon`
+- [x] `SDL_CreateWindowAndRenderer`
+- [x] `SDL_GetWindowTitle`
+- [x] `SDL_SetWindowIcon`
 - [x] `SDL_GetWindowSize`
 - [x] `SDL_SetWindowSize`
 - [x] `SDL_GetWindowPosition`
 - [x] `SDL_SetWindowPosition`
 - [x] `SDL_GetWindowFlags`
-- [ ] `SDL_ShowWindow`
-- [ ] `SDL_HideWindow`
-- [ ] `SDL_RaiseWindow`
-- [ ] `SDL_MaximizeWindow`
-- [ ] `SDL_MinimizeWindow`
-- [ ] `SDL_RestoreWindow`
+- [x] `SDL_ShowWindow`
+- [x] `SDL_HideWindow`
+- [x] `SDL_RaiseWindow`
+- [x] `SDL_MaximizeWindow`
+- [x] `SDL_MinimizeWindow`
+- [x] `SDL_RestoreWindow`
 - [x] `SDL_SetWindowFullscreen`
-- [ ] `SDL_SetWindowBordered`
-- [ ] `SDL_SetWindowResizable`
-- [ ] `SDL_GetWindowSurface`
-- [ ] `SDL_UpdateWindowSurface`
-- [ ] `SDL_GetWindowID`
-- [ ] `SDL_GetWindowFromID`
-- [ ] `SDL_SetWindowMinimumSize`
-- [ ] `SDL_SetWindowMaximumSize`
-- [ ] `SDL_GetWindowMinimumSize`
-- [ ] `SDL_GetWindowMaximumSize`
-- [ ] `SDL_SetWindowOpacity`
-- [ ] `SDL_GetWindowOpacity`
-- [ ] `SDL_FlashWindow`
+- [x] `SDL_SetWindowBordered`
+- [x] `SDL_SetWindowResizable`
+- [x] `SDL_GetWindowSurface`
+- [x] `SDL_UpdateWindowSurface`
+- [x] `SDL_GetWindowID`
+- [x] `SDL_GetWindowFromID`
+- [x] `SDL_SetWindowMinimumSize`
+- [x] `SDL_SetWindowMaximumSize`
+- [x] `SDL_GetWindowMinimumSize`
+- [x] `SDL_GetWindowMaximumSize`
+- [x] `SDL_SetWindowOpacity`
+- [x] `SDL_GetWindowOpacity`
+- [x] `SDL_FlashWindow`
 
 ### Display Management (P1)
 - [ ] `SDL_GetDisplays`
@@ -196,29 +245,29 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_GetWindowDisplayScale`
 
 ### Renderer (P0)
-- [ ] `SDL_GetNumRenderDrivers`
-- [ ] `SDL_GetRenderDriver`
-- [ ] `SDL_GetRenderer`
-- [ ] `SDL_GetRenderWindow`
-- [ ] `SDL_GetRendererName`
-- [ ] `SDL_GetRenderOutputSize`
-- [ ] `SDL_GetCurrentRenderOutputSize`
+- [x] `SDL_GetNumRenderDrivers`
+- [x] `SDL_GetRenderDriver`
+- [x] `SDL_GetRenderer`
+- [x] `SDL_GetRenderWindow`
+- [x] `SDL_GetRendererName`
+- [x] `SDL_GetRenderOutputSize`
+- [x] `SDL_GetCurrentRenderOutputSize`
 - [x] `SDL_SetRenderTarget`
 - [x] `SDL_GetRenderTarget`
-- [ ] `SDL_SetRenderViewport`
-- [ ] `SDL_GetRenderViewport`
-- [ ] `SDL_SetRenderClipRect`
-- [ ] `SDL_GetRenderClipRect`
-- [ ] `SDL_RenderClipEnabled`
-- [ ] `SDL_SetRenderScale`
-- [ ] `SDL_GetRenderScale`
-- [ ] `SDL_SetRenderDrawColorFloat`
-- [ ] `SDL_GetRenderDrawColor`
-- [ ] `SDL_GetRenderDrawColorFloat`
+- [x] `SDL_SetRenderViewport`
+- [x] `SDL_GetRenderViewport`
+- [x] `SDL_SetRenderClipRect`
+- [x] `SDL_GetRenderClipRect`
+- [x] `SDL_RenderClipEnabled`
+- [x] `SDL_SetRenderScale`
+- [x] `SDL_GetRenderScale`
+- [x] `SDL_SetRenderDrawColorFloat`
+- [x] `SDL_GetRenderDrawColor`
+- [x] `SDL_GetRenderDrawColorFloat`
 - [x] `SDL_SetRenderDrawBlendMode`
 - [x] `SDL_GetRenderDrawBlendMode`
-- [ ] `SDL_SetRenderVSync`
-- [ ] `SDL_GetRenderVSync`
+- [x] `SDL_SetRenderVSync`
+- [x] `SDL_GetRenderVSync`
 
 ### Renderer Drawing (P0)
 - [x] `SDL_RenderPoint`
@@ -230,13 +279,13 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_RenderFillRect`
 - [x] `SDL_RenderFillRects`
 - [x] `SDL_RenderTextureRotated`
-- [ ] `SDL_RenderTextureAffine`
-- [ ] `SDL_RenderTextureTiled`
-- [ ] `SDL_RenderTexture9Grid`
-- [ ] `SDL_RenderGeometry`
+- [x] `SDL_RenderTextureAffine`
+- [x] `SDL_RenderTextureTiled`
+- [x] `SDL_RenderTexture9Grid`
+- [x] `SDL_RenderGeometry`
 - [ ] `SDL_RenderGeometryRaw`
 - [x] `SDL_RenderReadPixels`
-- [ ] `SDL_RenderDebugText`
+- [x] `SDL_RenderDebugText`
 - [ ] `SDL_RenderDebugTextFormat`
 
 ### Texture (P1)
@@ -850,15 +899,24 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 
 ## Implementation Statistics
 
-**Currently Implemented:** ~112 functions
+**Currently Implemented:** ~160 functions
 **Estimated Total Available:** 500+ functions
 
 ### Coverage by Library
 | Library | Implemented | Estimated Total | Coverage |
 |---------|-------------|-----------------|----------|
-| SDL3 Core | 93 | ~350 | ~27% |
+| SDL3 Core | ~140 | ~350 | ~40% |
 | SDL3_image | 5 | ~60 | ~8% |
 | SDL3_ttf | 16 | ~120 | ~13% |
+
+### P0 Features Status
+All P0 (essential) features are now complete:
+- Window management (create, show/hide, minimize/maximize, opacity, size constraints)
+- Renderer queries (driver info, output size, VSync)
+- Viewport and clipping (viewport, clip rect, render scale)
+- Advanced texture rendering (affine, tiled, 9-grid)
+- Geometry rendering (arbitrary triangles with per-vertex colors)
+- Debug text rendering (built-in 8x8 bitmap font)
 
 ---
 

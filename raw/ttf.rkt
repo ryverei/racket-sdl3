@@ -7,9 +7,9 @@
 
 (require ffi/unsafe
          ffi/unsafe/define
-         "private/lib.rkt"
-         "private/types.rkt"
-         "private/syntax.rkt")
+         "../private/lib.rkt"
+         "../private/types.rkt"
+         "../private/syntax.rkt")
 
 (provide (all-defined-out))
 

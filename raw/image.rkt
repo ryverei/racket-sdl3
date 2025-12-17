@@ -10,8 +10,8 @@
 
 (require ffi/unsafe
          ffi/unsafe/define
-         "private/types.rkt"
-         "private/syntax.rkt")
+         "../private/types.rkt"
+         "../private/syntax.rkt")
 
 (provide ;; Functions
          IMG-LoadTexture

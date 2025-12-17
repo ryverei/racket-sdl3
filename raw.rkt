@@ -23,7 +23,9 @@
          "raw/timer.rkt"
          "raw/clipboard.rkt"
          "raw/audio.rkt"
-         "raw/dialog.rkt")
+         "raw/dialog.rkt"
+         "raw/image.rkt"
+         "raw/ttf.rkt")
 
 (provide (all-from-out "private/lib.rkt")
          (all-from-out "private/types.rkt")
@@ -39,4 +41,6 @@
          (all-from-out "raw/timer.rkt")
          (all-from-out "raw/clipboard.rkt")
          (all-from-out "raw/audio.rkt")
-         (all-from-out "raw/dialog.rkt"))
+         (all-from-out "raw/dialog.rkt")
+         (all-from-out "raw/image.rkt")
+         (all-from-out "raw/ttf.rkt"))

@@ -5,7 +5,7 @@
 (require ffi/unsafe
          ffi/unsafe/custodian
          "../raw.rkt"
-         "../ttf.rkt"
+         "../raw/ttf.rkt"
          "texture.rkt"
          "window.rkt"
          "draw.rkt"

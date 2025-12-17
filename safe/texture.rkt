@@ -5,7 +5,7 @@
 (require ffi/unsafe
          ffi/unsafe/custodian
          "../raw.rkt"
-         "../image.rkt"
+         "../raw/image.rkt"
          "window.rkt"
          "draw.rkt"
          "../private/safe-syntax.rkt")

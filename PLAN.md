@@ -181,20 +181,21 @@ Note: `raw/hints.rkt` not created as no hint functions were in the original raw.
 
 ---
 
-## Phase 3: Move image.rkt and ttf.rkt to raw/
+## Phase 3: Move image.rkt and ttf.rkt to raw/ ✓ COMPLETED
 
 Move the extension library bindings into the raw/ directory structure.
 
 ### Steps
 
-1. Move `image.rkt` to `raw/image.rkt`
-   - Update require paths (private/ becomes ../private/)
-2. Move `ttf.rkt` to `raw/ttf.rkt`
-   - Update require paths
-3. Update `raw.rkt` aggregator to include image and ttf
-4. Update `safe/texture.rkt` to require `"../raw/image.rkt"` or `"../raw.rkt"`
-5. Update `safe/ttf.rkt` to require `"../raw/ttf.rkt"` or `"../raw.rkt"`
-6. Test: `racket examples/04-image.rkt && racket examples/05-text.rkt`
+1. ✓ Move `image.rkt` to `raw/image.rkt`
+   - Updated require paths (private/ becomes ../private/)
+2. ✓ Move `ttf.rkt` to `raw/ttf.rkt`
+   - Updated require paths
+3. ✓ Update `raw.rkt` aggregator to include image and ttf
+4. ✓ Update `safe/texture.rkt` to require `"../raw/image.rkt"`
+5. ✓ Update `safe/ttf.rkt` to require `"../raw/ttf.rkt"`
+6. ✓ Delete old top-level `image.rkt` and `ttf.rkt`
+7. ✓ Test: `racket examples/04-image.rkt && racket examples/05-text.rkt`
 
 ---
 

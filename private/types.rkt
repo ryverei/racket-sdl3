@@ -324,6 +324,13 @@
          set-SDL_AudioSpec-freq!
          _SDL_AudioStream-pointer
          _SDL_AudioStream-pointer/null
+         ;; Window ID type
+         _SDL_WindowID
+         ;; Flash operation enum
+         _SDL_FlashOperation
+         SDL_FLASH_CANCEL
+         SDL_FLASH_BRIEFLY
+         SDL_FLASH_UNTIL_FOCUSED
          ;; Error handling forward reference
          sdl-get-error-proc)
 
@@ -890,6 +897,24 @@
 
 ;; SDL_AudioStream opaque pointer type
 (define-cpointer-type _SDL_AudioStream-pointer)
+
+;; ============================================================================
+;; Window ID
+;; ============================================================================
+
+;; SDL_WindowID - unique identifier for a window (uint32)
+(define _SDL_WindowID _uint32)
+
+;; ============================================================================
+;; Flash Operation
+;; ============================================================================
+
+;; SDL_FlashOperation - window flash behavior
+(define _SDL_FlashOperation _int)
+
+(define SDL_FLASH_CANCEL        0)  ; Cancel any window flash state
+(define SDL_FLASH_BRIEFLY       1)  ; Flash the window briefly to get attention
+(define SDL_FLASH_UNTIL_FOCUSED 2)  ; Flash the window until it gets focus
 
 ;; ============================================================================
 ;; Error Handling

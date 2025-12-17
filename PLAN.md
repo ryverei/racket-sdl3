@@ -64,139 +64,7 @@ SDL_FLASH_BRIEFLY            ; 1
 SDL_FLASH_UNTIL_FOCUSED      ; 2
 ```
 
----
-
-## Phase 2: Renderer Query Functions
-
-Functions to query renderer capabilities and state.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Driver enumeration
-SDL-GetNumRenderDrivers      ; -> int
-SDL-GetRenderDriver          ; index -> string
-
-;; Renderer queries
-SDL-GetRenderer              ; window -> renderer
-SDL-GetRenderWindow          ; renderer -> window
-SDL-GetRendererName          ; renderer -> string
-
-;; Output size
-SDL-GetRenderOutputSize          ; renderer w-ptr h-ptr -> bool
-SDL-GetCurrentRenderOutputSize   ; renderer w-ptr h-ptr -> bool
-
-;; Draw color getters
-SDL-GetRenderDrawColor       ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
-SDL-SetRenderDrawColorFloat  ; renderer r g b a -> bool
-SDL-GetRenderDrawColorFloat  ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
-
-;; VSync control
-SDL-SetRenderVSync           ; renderer vsync -> bool
-SDL-GetRenderVSync           ; renderer vsync-ptr -> bool
-```
-
----
-
-## Phase 3: Viewport and Clipping
-
-Control what portion of the renderer is visible and where drawing occurs.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Viewport (visible area)
-SDL-SetRenderViewport        ; renderer rect -> bool
-SDL-GetRenderViewport        ; renderer rect-ptr -> bool
-
-;; Clip rectangle (drawing constraint)
-SDL-SetRenderClipRect        ; renderer rect -> bool
-SDL-GetRenderClipRect        ; renderer rect-ptr -> bool
-SDL-RenderClipEnabled        ; renderer -> bool
-
-;; Render scale (for resolution independence)
-SDL-SetRenderScale           ; renderer scale-x scale-y -> bool
-SDL-GetRenderScale           ; renderer scale-x-ptr scale-y-ptr -> bool
-```
-
----
-
-## Phase 4: Advanced Texture Rendering
-
-Additional texture rendering modes for special effects and UI.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Affine transform rendering (arbitrary 2D transforms)
-SDL-RenderTextureAffine      ; renderer texture src-rect origin right down -> bool
-
-;; Tiled rendering (for backgrounds, patterns)
-SDL-RenderTextureTiled       ; renderer texture src-rect scale dst-rect -> bool
-
-;; 9-grid rendering (for scalable UI elements like buttons, panels)
-SDL-RenderTexture9Grid       ; renderer texture src-rect
-                             ; left-width right-width top-height bottom-height
-                             ; scale dst-rect -> bool
-```
-
----
-
-## Phase 5: Geometry Rendering
-
-Hardware-accelerated arbitrary geometry for particle effects, custom shapes, etc.
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-;; Vertex struct
-_SDL_Vertex
-  - position : SDL_FPoint
-  - color : SDL_FColor
-  - tex_coord : SDL_FPoint
-
-;; FColor struct (float colors for vertices)
-_SDL_FColor
-  - r : float
-  - g : float
-  - b : float
-  - a : float
-
-;; Geometry rendering
-SDL-RenderGeometry           ; renderer texture vertices num-verts
-                             ; indices num-indices -> bool
-SDL-RenderGeometryRaw        ; (lower-level, pointer-based)
-```
-
-### Types (`private/types.rkt`)
-
-```racket
-_SDL_FColor                  ; float r, g, b, a
-_SDL_Vertex                  ; position, color, tex_coord
-```
-
----
-
-## Phase 6: Debug Text Rendering
-
-Built-in debug text for quick prototyping (no TTF needed).
-
-### Raw Bindings (`raw.rkt`)
-
-```racket
-SDL-RenderDebugText          ; renderer x y text -> bool
-SDL-RenderDebugTextFormat    ; renderer x y fmt ... -> bool (variadic - may skip)
-```
-
-Note: `SDL_RenderDebugTextFormat` uses C variadic arguments which are complex in FFI. We may implement only `SDL_RenderDebugText` and handle formatting on the Racket side.
-
----
-
-## Phase 7: Safe Wrapper Updates
-
-Update `safe/window.rkt` and `safe/draw.rkt` with idiomatic wrappers.
-
-### Window (`safe/window.rkt`)
+### Safe Wrappers (`safe/window.rkt`)
 
 ```racket
 ;; Window control
@@ -229,7 +97,78 @@ Update `safe/window.rkt` and `safe/draw.rkt` with idiomatic wrappers.
 (flash-window! window [operation])
 ```
 
-### Renderer (`safe/draw.rkt`)
+---
+
+## Phase 2: Renderer Query Functions
+
+Functions to query renderer capabilities and state.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+;; Driver enumeration
+SDL-GetNumRenderDrivers      ; -> int
+SDL-GetRenderDriver          ; index -> string
+
+;; Renderer queries
+SDL-GetRenderer              ; window -> renderer
+SDL-GetRenderWindow          ; renderer -> window
+SDL-GetRendererName          ; renderer -> string
+
+;; Output size
+SDL-GetRenderOutputSize          ; renderer w-ptr h-ptr -> bool
+SDL-GetCurrentRenderOutputSize   ; renderer w-ptr h-ptr -> bool
+
+;; Draw color getters
+SDL-GetRenderDrawColor       ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
+SDL-SetRenderDrawColorFloat  ; renderer r g b a -> bool
+SDL-GetRenderDrawColorFloat  ; renderer r-ptr g-ptr b-ptr a-ptr -> bool
+
+;; VSync control
+SDL-SetRenderVSync           ; renderer vsync -> bool
+SDL-GetRenderVSync           ; renderer vsync-ptr -> bool
+```
+
+### Safe Wrappers (`safe/draw.rkt`)
+
+```racket
+;; Renderer info
+(renderer-name renderer)
+(render-output-size renderer)        ; -> (values w h)
+(current-render-output-size renderer) ; -> (values w h)
+
+;; Draw color
+(draw-color renderer)                ; -> (values r g b a)
+
+;; VSync
+(set-render-vsync! renderer vsync)
+(render-vsync renderer)
+```
+
+---
+
+## Phase 3: Viewport and Clipping
+
+Control what portion of the renderer is visible and where drawing occurs.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+;; Viewport (visible area)
+SDL-SetRenderViewport        ; renderer rect -> bool
+SDL-GetRenderViewport        ; renderer rect-ptr -> bool
+
+;; Clip rectangle (drawing constraint)
+SDL-SetRenderClipRect        ; renderer rect -> bool
+SDL-GetRenderClipRect        ; renderer rect-ptr -> bool
+SDL-RenderClipEnabled        ; renderer -> bool
+
+;; Render scale (for resolution independence)
+SDL-SetRenderScale           ; renderer scale-x scale-y -> bool
+SDL-GetRenderScale           ; renderer scale-x-ptr scale-y-ptr -> bool
+```
+
+### Safe Wrappers (`safe/draw.rkt`)
 
 ```racket
 ;; Viewport/clipping
@@ -242,35 +181,123 @@ Update `safe/window.rkt` and `safe/draw.rkt` with idiomatic wrappers.
 ;; Scale
 (set-render-scale! renderer sx sy)
 (render-scale renderer)  ; -> (values sx sy)
-
-;; VSync
-(set-render-vsync! renderer vsync)
-(render-vsync renderer)
 ```
 
 ---
 
-## Phase 8: Example Updates
+## Phase 4: Advanced Texture Rendering
+
+Additional texture rendering modes for special effects and UI.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+;; Affine transform rendering (arbitrary 2D transforms)
+SDL-RenderTextureAffine      ; renderer texture src-rect origin right down -> bool
+
+;; Tiled rendering (for backgrounds, patterns)
+SDL-RenderTextureTiled       ; renderer texture src-rect scale dst-rect -> bool
+
+;; 9-grid rendering (for scalable UI elements like buttons, panels)
+SDL-RenderTexture9Grid       ; renderer texture src-rect
+                             ; left-width right-width top-height bottom-height
+                             ; scale dst-rect -> bool
+```
+
+### Safe Wrappers (`safe/texture.rkt`)
+
+```racket
+;; Advanced texture rendering
+(draw-texture-affine! renderer texture src-rect origin right down)
+(draw-texture-tiled! renderer texture src-rect scale dst-rect)
+(draw-texture-9grid! renderer texture src-rect
+                     left-width right-width top-height bottom-height
+                     scale dst-rect)
+```
+
+---
+
+## Phase 5: Geometry Rendering
+
+Hardware-accelerated arbitrary geometry for particle effects, custom shapes, etc.
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+;; Geometry rendering
+SDL-RenderGeometry           ; renderer texture vertices num-verts
+                             ; indices num-indices -> bool
+SDL-RenderGeometryRaw        ; (lower-level, pointer-based)
+```
+
+### Types (`private/types.rkt`)
+
+```racket
+;; FColor struct (float colors for vertices)
+_SDL_FColor
+  - r : float
+  - g : float
+  - b : float
+  - a : float
+
+;; Vertex struct
+_SDL_Vertex
+  - position : SDL_FPoint
+  - color : SDL_FColor
+  - tex_coord : SDL_FPoint
+```
+
+### Safe Wrappers (`safe/draw.rkt`)
+
+```racket
+;; Geometry rendering
+(draw-geometry! renderer vertices [texture] [indices])
+```
+
+---
+
+## Phase 6: Debug Text Rendering
+
+Built-in debug text for quick prototyping (no TTF needed).
+
+### Raw Bindings (`raw.rkt`)
+
+```racket
+SDL-RenderDebugText          ; renderer x y text -> bool
+SDL-RenderDebugTextFormat    ; renderer x y fmt ... -> bool (variadic - may skip)
+```
+
+Note: `SDL_RenderDebugTextFormat` uses C variadic arguments which are complex in FFI. We may implement only `SDL_RenderDebugText` and handle formatting on the Racket side.
+
+### Safe Wrappers (`safe/draw.rkt`)
+
+```racket
+(draw-debug-text! renderer x y text)
+```
+
+---
+
+## Phase 7: Example Updates
 
 Update examples to demonstrate new features.
 
-### New Example: `19-window-control.rkt`
+### Update Example: `11-window-controls.rkt`
 
-Demonstrate window management:
+Enhance to demonstrate new window management features:
 - Show/hide window
 - Minimize/maximize/restore
 - Flash window
 - Opacity changes
 - Size constraints
 
-### New Example: `20-viewport-clipping.rkt`
+### New Example: `21-viewport-clipping.rkt`
 
 Demonstrate viewport and clipping:
 - Split-screen effect with viewports
 - Clipping for UI regions
 - Render scale for resolution independence
 
-### New Example: `21-geometry.rkt`
+### New Example: `22-geometry.rkt`
 
 Demonstrate geometry rendering:
 - Colored triangles
@@ -283,14 +310,13 @@ Demonstrate geometry rendering:
 
 | Step | Phase | Files | Deliverable |
 |------|-------|-------|-------------|
-| 1 | Phase 1 | `private/types.rkt`, `raw.rkt` | Window management functions |
-| 2 | Phase 2 | `raw.rkt` | Renderer query functions |
-| 3 | Phase 3 | `raw.rkt` | Viewport and clipping |
-| 4 | Phase 4 | `raw.rkt` | Advanced texture rendering |
-| 5 | Phase 5 | `private/types.rkt`, `raw.rkt` | Geometry rendering |
-| 6 | Phase 6 | `raw.rkt` | Debug text |
-| 7 | Phase 7 | `safe/window.rkt`, `safe/draw.rkt` | Safe wrappers |
-| 8 | Phase 8 | `examples/` | Example programs |
+| 1 | Phase 1 | `private/types.rkt`, `raw.rkt`, `safe/window.rkt` | Window management |
+| 2 | Phase 2 | `raw.rkt`, `safe/draw.rkt` | Renderer queries |
+| 3 | Phase 3 | `raw.rkt`, `safe/draw.rkt` | Viewport and clipping |
+| 4 | Phase 4 | `raw.rkt`, `safe/texture.rkt` | Advanced texture rendering |
+| 5 | Phase 5 | `private/types.rkt`, `raw.rkt`, `safe/draw.rkt` | Geometry rendering |
+| 6 | Phase 6 | `raw.rkt`, `safe/draw.rkt` | Debug text |
+| 7 | Phase 7 | `examples/` | Example programs |
 
 ---
 
@@ -341,33 +367,33 @@ After each phase:
 ## Dependencies Between Phases
 
 ```
-Phase 1 (Window) ─────┐
-                      │
-Phase 2 (Renderer) ───┼──► Phase 7 (Safe Wrappers) ──► Phase 8 (Examples)
-                      │
-Phase 3 (Viewport) ───┤
-                      │
-Phase 4 (Texture) ────┤
-                      │
-Phase 5 (Geometry) ───┤
-                      │
-Phase 6 (Debug) ──────┘
+Phase 1 (Window) ─────► Phase 7 (Examples)
+                              ▲
+Phase 2 (Renderer) ───────────┤
+                              │
+Phase 3 (Viewport) ───────────┤
+                              │
+Phase 4 (Texture) ────────────┤
+                              │
+Phase 5 (Geometry) ───────────┤
+                              │
+Phase 6 (Debug) ──────────────┘
 ```
 
-Phases 1-6 can be implemented in parallel, but Phase 7 depends on all of them, and Phase 8 depends on Phase 7.
+Phases 1-6 can be implemented in any order. Phase 7 (Examples) depends on all prior phases.
 
 ---
 
 ## Estimated Function Count
 
-| Phase | New Functions | Running Total |
-|-------|---------------|---------------|
-| Phase 1 | 22 | 22 |
-| Phase 2 | 11 | 33 |
-| Phase 3 | 7 | 40 |
-| Phase 4 | 3 | 43 |
-| Phase 5 | 2 | 45 |
-| Phase 6 | 1 | 46 |
-| **Total** | **46** | - |
+| Phase | Raw Functions | Safe Wrappers | Running Total |
+|-------|---------------|---------------|---------------|
+| Phase 1 | 22 | 19 | 41 |
+| Phase 2 | 11 | 6 | 58 |
+| Phase 3 | 7 | 7 | 72 |
+| Phase 4 | 3 | 3 | 78 |
+| Phase 5 | 2 | 1 | 81 |
+| Phase 6 | 1 | 1 | 83 |
+| **Total** | **46** | **37** | **83** |
 
 After completing this plan, the P0 coverage will be essentially complete.

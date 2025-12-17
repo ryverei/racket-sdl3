@@ -18,6 +18,7 @@
  window-ptr
  window-destroy!
  window-set-title!
+ window-title
  window-pixel-density
  window-size
  window-set-size!
@@ -25,6 +26,36 @@
  window-set-position!
  window-fullscreen?
  window-set-fullscreen!
+
+ ;; Window visibility
+ show-window!
+ hide-window!
+ raise-window!
+
+ ;; Window state
+ maximize-window!
+ minimize-window!
+ restore-window!
+
+ ;; Window properties
+ window-id
+ window-from-id
+ set-window-icon!
+
+ ;; Size constraints
+ set-window-minimum-size!
+ set-window-maximum-size!
+ window-minimum-size
+ window-maximum-size
+
+ ;; Decoration
+ set-window-bordered!
+ set-window-resizable!
+
+ ;; Effects
+ window-opacity
+ set-window-opacity!
+ flash-window!
 
  ;; Renderer management
  make-renderer
@@ -109,6 +140,134 @@
 (define (window-set-fullscreen! win fullscreen?)
   (unless (SDL-SetWindowFullscreen (window-ptr win) fullscreen?)
     (error 'window-set-fullscreen! "Failed to set fullscreen: ~a" (SDL-GetError))))
+
+;; Get the title of a window
+(define (window-title win)
+  (SDL-GetWindowTitle (window-ptr win)))
+
+;; ============================================================================
+;; Window Visibility
+;; ============================================================================
+
+;; Show a window
+(define (show-window! win)
+  (unless (SDL-ShowWindow (window-ptr win))
+    (error 'show-window! "Failed to show window: ~a" (SDL-GetError))))
+
+;; Hide a window
+(define (hide-window! win)
+  (unless (SDL-HideWindow (window-ptr win))
+    (error 'hide-window! "Failed to hide window: ~a" (SDL-GetError))))
+
+;; Raise a window above other windows and set input focus
+(define (raise-window! win)
+  (unless (SDL-RaiseWindow (window-ptr win))
+    (error 'raise-window! "Failed to raise window: ~a" (SDL-GetError))))
+
+;; ============================================================================
+;; Window State
+;; ============================================================================
+
+;; Maximize a window
+(define (maximize-window! win)
+  (unless (SDL-MaximizeWindow (window-ptr win))
+    (error 'maximize-window! "Failed to maximize window: ~a" (SDL-GetError))))
+
+;; Minimize a window
+(define (minimize-window! win)
+  (unless (SDL-MinimizeWindow (window-ptr win))
+    (error 'minimize-window! "Failed to minimize window: ~a" (SDL-GetError))))
+
+;; Restore a minimized or maximized window
+(define (restore-window! win)
+  (unless (SDL-RestoreWindow (window-ptr win))
+    (error 'restore-window! "Failed to restore window: ~a" (SDL-GetError))))
+
+;; ============================================================================
+;; Window Properties
+;; ============================================================================
+
+;; Get the numeric ID of a window
+(define (window-id win)
+  (SDL-GetWindowID (window-ptr win)))
+
+;; Get a window from an ID
+;; Returns #f if not found
+(define (window-from-id id)
+  (SDL-GetWindowFromID id))
+
+;; Set the icon for a window
+(define (set-window-icon! win surface)
+  (unless (SDL-SetWindowIcon (window-ptr win) surface)
+    (error 'set-window-icon! "Failed to set window icon: ~a" (SDL-GetError))))
+
+;; ============================================================================
+;; Size Constraints
+;; ============================================================================
+
+;; Set the minimum size of a window
+(define (set-window-minimum-size! win w h)
+  (unless (SDL-SetWindowMinimumSize (window-ptr win) w h)
+    (error 'set-window-minimum-size! "Failed to set minimum size: ~a" (SDL-GetError))))
+
+;; Set the maximum size of a window
+(define (set-window-maximum-size! win w h)
+  (unless (SDL-SetWindowMaximumSize (window-ptr win) w h)
+    (error 'set-window-maximum-size! "Failed to set maximum size: ~a" (SDL-GetError))))
+
+;; Get the minimum size of a window
+;; Returns: (values width height)
+(define (window-minimum-size win)
+  (define-values (success w h) (SDL-GetWindowMinimumSize (window-ptr win)))
+  (unless success
+    (error 'window-minimum-size "Failed to get minimum size: ~a" (SDL-GetError)))
+  (values w h))
+
+;; Get the maximum size of a window
+;; Returns: (values width height)
+(define (window-maximum-size win)
+  (define-values (success w h) (SDL-GetWindowMaximumSize (window-ptr win)))
+  (unless success
+    (error 'window-maximum-size "Failed to get maximum size: ~a" (SDL-GetError)))
+  (values w h))
+
+;; ============================================================================
+;; Decoration
+;; ============================================================================
+
+;; Set whether the window has a border
+(define (set-window-bordered! win bordered?)
+  (unless (SDL-SetWindowBordered (window-ptr win) bordered?)
+    (error 'set-window-bordered! "Failed to set bordered: ~a" (SDL-GetError))))
+
+;; Set whether the window is resizable
+(define (set-window-resizable! win resizable?)
+  (unless (SDL-SetWindowResizable (window-ptr win) resizable?)
+    (error 'set-window-resizable! "Failed to set resizable: ~a" (SDL-GetError))))
+
+;; ============================================================================
+;; Effects
+;; ============================================================================
+
+;; Get the opacity of a window (0.0 to 1.0)
+(define (window-opacity win)
+  (SDL-GetWindowOpacity (window-ptr win)))
+
+;; Set the opacity of a window (0.0 to 1.0)
+(define (set-window-opacity! win opacity)
+  (unless (SDL-SetWindowOpacity (window-ptr win) opacity)
+    (error 'set-window-opacity! "Failed to set opacity: ~a" (SDL-GetError))))
+
+;; Flash the window to get user attention
+;; operation: 'cancel, 'briefly, or 'until-focused (default: 'briefly)
+(define (flash-window! win [operation 'briefly])
+  (define op (case operation
+               [(cancel) SDL_FLASH_CANCEL]
+               [(briefly) SDL_FLASH_BRIEFLY]
+               [(until-focused) SDL_FLASH_UNTIL_FOCUSED]
+               [else (error 'flash-window! "Invalid operation: ~a (expected 'cancel, 'briefly, or 'until-focused)" operation)]))
+  (unless (SDL-FlashWindow (window-ptr win) op)
+    (error 'flash-window! "Failed to flash window: ~a" (SDL-GetError))))
 
 ;; ============================================================================
 ;; Renderer Management

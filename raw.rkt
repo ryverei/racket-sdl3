@@ -216,7 +216,10 @@
          SDL-BindAudioStream
          SDL-UnbindAudioStream
          ;; Audio - WAV Loading
-         SDL-LoadWAV)
+         SDL-LoadWAV
+         ;; Message Box
+         SDL-ShowSimpleMessageBox
+         SDL-ShowMessageBox)
 
 ;; ============================================================================
 ;; Initialization
@@ -1717,3 +1720,29 @@
         -> (result : _sdl-bool)
         -> (values result audio_buf audio_len))
   #:c-id SDL_LoadWAV)
+
+;; ============================================================================
+;; Message Box
+;; ============================================================================
+
+;; SDL_ShowSimpleMessageBox: Display a simple modal message box
+;; flags: SDL_MessageBoxFlags (ERROR, WARNING, or INFORMATION)
+;; title: UTF-8 title text
+;; message: UTF-8 message text
+;; window: parent window, or NULL for no parent
+;; Returns: true on success, false on failure
+(define-sdl SDL-ShowSimpleMessageBox
+  (_fun _SDL_MessageBoxFlags _string/utf-8 _string/utf-8 _SDL_Window-pointer/null
+        -> _sdl-bool)
+  #:c-id SDL_ShowSimpleMessageBox)
+
+;; SDL_ShowMessageBox: Create a modal message box with custom buttons
+;; messageboxdata: pointer to SDL_MessageBoxData structure
+;; buttonid: pointer to receive the ID of the clicked button
+;; Returns: true on success, false on failure
+(define-sdl SDL-ShowMessageBox
+  (_fun _SDL_MessageBoxData-pointer
+        (buttonid : (_ptr o _int))
+        -> (result : _sdl-bool)
+        -> (values result buttonid))
+  #:c-id SDL_ShowMessageBox)

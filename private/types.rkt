@@ -406,6 +406,42 @@
          SDL_FLASH_CANCEL
          SDL_FLASH_BRIEFLY
          SDL_FLASH_UNTIL_FOCUSED
+         ;; Message box flags and types
+         _SDL_MessageBoxFlags
+         SDL_MESSAGEBOX_ERROR
+         SDL_MESSAGEBOX_WARNING
+         SDL_MESSAGEBOX_INFORMATION
+         SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT
+         SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT
+         _SDL_MessageBoxButtonFlags
+         SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT
+         SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT
+         _SDL_MessageBoxButtonData
+         _SDL_MessageBoxButtonData-pointer
+         make-SDL_MessageBoxButtonData
+         SDL_MessageBoxButtonData-flags
+         SDL_MessageBoxButtonData-buttonID
+         SDL_MessageBoxButtonData-text
+         _SDL_MessageBoxColor
+         make-SDL_MessageBoxColor
+         SDL_MessageBoxColor-r
+         SDL_MessageBoxColor-g
+         SDL_MessageBoxColor-b
+         _SDL_MessageBoxColorScheme
+         _SDL_MessageBoxColorScheme-pointer
+         _SDL_MessageBoxColorScheme-pointer/null
+         make-SDL_MessageBoxColorScheme
+         SDL_MessageBoxColorScheme-colors
+         _SDL_MessageBoxData
+         _SDL_MessageBoxData-pointer
+         make-SDL_MessageBoxData
+         SDL_MessageBoxData-flags
+         SDL_MessageBoxData-window
+         SDL_MessageBoxData-title
+         SDL_MessageBoxData-message
+         SDL_MessageBoxData-numbuttons
+         SDL_MessageBoxData-buttons
+         SDL_MessageBoxData-colorScheme
          ;; Error handling forward reference
          sdl-get-error-proc)
 
@@ -1197,6 +1233,52 @@
 (define SDL_FLASH_CANCEL        0)  ; Cancel any window flash state
 (define SDL_FLASH_BRIEFLY       1)  ; Flash the window briefly to get attention
 (define SDL_FLASH_UNTIL_FOCUSED 2)  ; Flash the window until it gets focus
+
+;; ============================================================================
+;; Message Box Types
+;; ============================================================================
+
+;; SDL_MessageBoxFlags - flags for message box display
+(define _SDL_MessageBoxFlags _uint32)
+
+(define SDL_MESSAGEBOX_ERROR                    #x00000010)  ; error dialog
+(define SDL_MESSAGEBOX_WARNING                  #x00000020)  ; warning dialog
+(define SDL_MESSAGEBOX_INFORMATION              #x00000040)  ; informational dialog
+(define SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT    #x00000080)  ; buttons placed left to right
+(define SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT    #x00000100)  ; buttons placed right to left
+
+;; SDL_MessageBoxButtonFlags - flags for individual buttons
+(define _SDL_MessageBoxButtonFlags _uint32)
+
+(define SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT #x00000001)  ; default button when return is hit
+(define SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT #x00000002)  ; default button when escape is hit
+
+;; SDL_MessageBoxButtonData - individual button data
+(define-cstruct _SDL_MessageBoxButtonData
+  ([flags _SDL_MessageBoxButtonFlags]
+   [buttonID _int]
+   [text _string/utf-8]))
+
+;; SDL_MessageBoxColor - RGB value for message box colors
+(define-cstruct _SDL_MessageBoxColor
+  ([r _uint8]
+   [g _uint8]
+   [b _uint8]))
+
+;; SDL_MessageBoxColorScheme - set of colors for message box dialogs
+;; Contains 5 colors: background, text, button border, button background, button selected
+(define-cstruct _SDL_MessageBoxColorScheme
+  ([colors (_array _SDL_MessageBoxColor 5)]))
+
+;; SDL_MessageBoxData - full message box structure
+(define-cstruct _SDL_MessageBoxData
+  ([flags _SDL_MessageBoxFlags]
+   [window _SDL_Window-pointer/null]
+   [title _string/utf-8]
+   [message _string/utf-8]
+   [numbuttons _int]
+   [buttons _SDL_MessageBoxButtonData-pointer]
+   [colorScheme _SDL_MessageBoxColorScheme-pointer/null]))
 
 ;; ============================================================================
 ;; Error Handling

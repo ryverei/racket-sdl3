@@ -16,6 +16,7 @@
          "safe/texture.rkt"
          "safe/ttf.rkt"
          "safe/mouse.rkt"
+         "safe/keyboard.rkt"
          "safe/clipboard.rkt"
          "safe/timer.rkt"
          "safe/audio.rkt")
@@ -26,6 +27,7 @@
          (all-from-out "safe/texture.rkt")
          (all-from-out "safe/ttf.rkt")
          (all-from-out "safe/mouse.rkt")
+         (all-from-out "safe/keyboard.rkt")
          (all-from-out "safe/clipboard.rkt")
          (all-from-out "safe/timer.rkt")
          (all-from-out "safe/audio.rkt"))

@@ -442,6 +442,14 @@
          SDL_MessageBoxData-numbuttons
          SDL_MessageBoxData-buttons
          SDL_MessageBoxData-colorScheme
+         ;; File dialog types
+         _SDL_DialogFileFilter
+         _SDL_DialogFileFilter-pointer
+         _SDL_DialogFileFilter-pointer/null
+         make-SDL_DialogFileFilter
+         SDL_DialogFileFilter-name
+         SDL_DialogFileFilter-pattern
+         _SDL_DialogFileCallback
          ;; Error handling forward reference
          sdl-get-error-proc)
 
@@ -1279,6 +1287,26 @@
    [numbuttons _int]
    [buttons _SDL_MessageBoxButtonData-pointer]
    [colorScheme _SDL_MessageBoxColorScheme-pointer/null]))
+
+;; ============================================================================
+;; File Dialog Types
+;; ============================================================================
+
+;; SDL_DialogFileFilter - filter for file dialogs
+(define-cstruct _SDL_DialogFileFilter
+  ([name _string/utf-8]      ; user-readable label (e.g., "Image files")
+   [pattern _string/utf-8])) ; semicolon-separated extensions (e.g., "png;jpg;gif")
+
+;; SDL_DialogFileCallback - callback invoked when dialog completes
+;; (userdata filelist filter) -> void
+;; filelist is NULL on error, pointer to NULL if canceled, otherwise null-terminated array
+;; filter is the index of selected filter, or -1 if none
+(define _SDL_DialogFileCallback
+  (_fun #:async-apply (lambda (thunk) (thunk))
+        _pointer           ; userdata
+        _pointer           ; const char * const * filelist
+        _int               ; filter index
+        -> _void))
 
 ;; ============================================================================
 ;; Error Handling

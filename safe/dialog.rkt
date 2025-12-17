@@ -1,8 +1,9 @@
 #lang racket/base
 
-;; Idiomatic dialog boxes - message boxes and confirmations
+;; Idiomatic dialog boxes - message boxes, confirmations, and file dialogs
 
 (require ffi/unsafe
+         racket/match
          "../raw.rkt")
 
 (provide
@@ -10,7 +11,12 @@
  show-message-box
 
  ;; Confirmation dialogs
- show-confirm-dialog)
+ show-confirm-dialog
+
+ ;; File dialogs
+ open-file-dialog
+ save-file-dialog
+ open-folder-dialog)
 
 ;; ============================================================================
 ;; Simple Message Boxes
@@ -126,3 +132,170 @@
          (case button-id [(0) 'ok] [else #f])]
         [else #f])
       #f))
+
+;; ============================================================================
+;; File Dialogs
+;; ============================================================================
+
+;; Helper: wait for a semaphore while pumping SDL events
+;; This is necessary because file dialogs on macOS need the event loop running
+(define (wait-with-event-pump sema)
+  (let loop ()
+    (unless (semaphore-try-wait? sema)
+      (SDL-PumpEvents)
+      (sleep 0.01)  ; Small delay to avoid busy-waiting
+      (loop))))
+
+;; Helper: parse filelist pointer from callback
+;; Returns #f for NULL (error), '() for pointer to NULL (canceled),
+;; or list of strings for selected files
+(define (parse-filelist filelist-ptr)
+  (cond
+    [(not filelist-ptr) #f]  ; NULL = error
+    [else
+     ;; Check if first element is NULL (canceled)
+     (define first (ptr-ref filelist-ptr _pointer 0))
+     (if (not first)
+         '()  ; pointer to NULL = canceled
+         ;; Read null-terminated array of strings
+         (let loop ([i 0] [acc '()])
+           (define ptr (ptr-ref filelist-ptr _pointer i))
+           (if (not ptr)
+               (reverse acc)
+               (loop (add1 i)
+                     (cons (cast ptr _pointer _string/utf-8) acc)))))]))
+
+;; Helper: create filter array from list of (name . pattern) pairs
+;; Returns (values filter-ptr count) where filter-ptr may be #f
+(define (make-filter-array filters)
+  (cond
+    [(or (not filters) (null? filters))
+     (values #f 0)]
+    [else
+     (define count (length filters))
+     (define filter-ptr
+       (cast (malloc (* count (ctype-sizeof _SDL_DialogFileFilter)) 'atomic)
+             _pointer _SDL_DialogFileFilter-pointer))
+     (for ([f (in-list filters)]
+           [i (in-naturals)])
+       (match-define (cons name pattern) f)
+       (ptr-set! filter-ptr _SDL_DialogFileFilter i
+                 (make-SDL_DialogFileFilter name pattern)))
+     (values filter-ptr count)]))
+
+;; open-file-dialog: Display a file open dialog
+;; #:filters: list of (name . pattern) pairs, e.g., '(("Images" . "png;jpg;gif"))
+;; #:default-path: starting folder/file path
+;; #:allow-multiple?: if #t, allow selecting multiple files
+;; #:window: parent window (raw pointer or #f)
+;; Returns: path-string, (listof path-string), or #f if canceled/error
+(define (open-file-dialog #:filters [filters '()]
+                          #:default-path [default-path #f]
+                          #:allow-multiple? [allow-multiple? #f]
+                          #:window [window #f])
+  ;; Use a semaphore + box to wait for async callback
+  (define result-box (box #f))
+  (define done-sema (make-semaphore 0))
+
+  ;; Create callback that stores result and signals completion
+  (define (callback userdata filelist-ptr filter-idx)
+    (set-box! result-box (parse-filelist filelist-ptr))
+    (semaphore-post done-sema))
+
+  ;; Create filter array
+  (define-values (filter-ptr filter-count) (make-filter-array filters))
+
+  ;; Show dialog (async)
+  (SDL-ShowOpenFileDialog callback
+                          #f              ; userdata
+                          window
+                          filter-ptr
+                          filter-count
+                          default-path
+                          allow-multiple?)
+
+  ;; Wait for callback while pumping events
+  (wait-with-event-pump done-sema)
+
+  ;; Return result
+  (define result (unbox result-box))
+  (cond
+    [(not result) #f]           ; error
+    [(null? result) #f]         ; canceled
+    [(and (not allow-multiple?) (= (length result) 1))
+     (car result)]              ; single file
+    [else result]))             ; multiple files
+
+;; save-file-dialog: Display a file save dialog
+;; #:filters: list of (name . pattern) pairs
+;; #:default-path: starting folder/file path
+;; #:window: parent window (raw pointer or #f)
+;; Returns: path-string or #f if canceled/error
+(define (save-file-dialog #:filters [filters '()]
+                          #:default-path [default-path #f]
+                          #:window [window #f])
+  ;; Use a semaphore + box to wait for async callback
+  (define result-box (box #f))
+  (define done-sema (make-semaphore 0))
+
+  ;; Create callback that stores result and signals completion
+  (define (callback userdata filelist-ptr filter-idx)
+    (set-box! result-box (parse-filelist filelist-ptr))
+    (semaphore-post done-sema))
+
+  ;; Create filter array
+  (define-values (filter-ptr filter-count) (make-filter-array filters))
+
+  ;; Show dialog (async)
+  (SDL-ShowSaveFileDialog callback
+                          #f              ; userdata
+                          window
+                          filter-ptr
+                          filter-count
+                          default-path)
+
+  ;; Wait for callback while pumping events
+  (wait-with-event-pump done-sema)
+
+  ;; Return result
+  (define result (unbox result-box))
+  (cond
+    [(not result) #f]           ; error
+    [(null? result) #f]         ; canceled
+    [else (car result)]))       ; selected file
+
+;; open-folder-dialog: Display a folder selection dialog
+;; #:default-path: starting folder path
+;; #:allow-multiple?: if #t, allow selecting multiple folders
+;; #:window: parent window (raw pointer or #f)
+;; Returns: path-string, (listof path-string), or #f if canceled/error
+(define (open-folder-dialog #:default-path [default-path #f]
+                            #:allow-multiple? [allow-multiple? #f]
+                            #:window [window #f])
+  ;; Use a semaphore + box to wait for async callback
+  (define result-box (box #f))
+  (define done-sema (make-semaphore 0))
+
+  ;; Create callback that stores result and signals completion
+  (define (callback userdata filelist-ptr filter-idx)
+    (set-box! result-box (parse-filelist filelist-ptr))
+    (semaphore-post done-sema))
+
+  ;; Show dialog (async)
+  (SDL-ShowOpenFolderDialog callback
+                            #f              ; userdata
+                            window
+                            default-path
+                            allow-multiple?)
+
+  ;; Wait for callback while pumping events
+  (wait-with-event-pump done-sema)
+
+  ;; Return result
+  (define result (unbox result-box))
+  (cond
+    [(not result) #f]           ; error
+    [(null? result) #f]         ; canceled
+    [(and (not allow-multiple?) (= (length result) 1))
+     (car result)]              ; single folder
+    [else result]))             ; multiple folders

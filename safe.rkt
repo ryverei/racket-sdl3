@@ -22,7 +22,8 @@
          "safe/timer.rkt"
          "safe/audio.rkt"
          "safe/display.rkt"
-         "safe/dialog.rkt")
+         "safe/dialog.rkt"
+         "safe/collision.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
@@ -36,4 +37,5 @@
          (all-from-out "safe/timer.rkt")
          (all-from-out "safe/audio.rkt")
          (all-from-out "safe/display.rkt")
-         (all-from-out "safe/dialog.rkt"))
+         (all-from-out "safe/dialog.rkt")
+         (all-from-out "safe/collision.rkt"))

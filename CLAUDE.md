@@ -18,7 +18,7 @@
 ln -sf . sdl3
 
 # Run examples against THIS worktree's code (not the installed package)
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/01-window.rkt
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/window/basic.rkt
 
 # Compile against this worktree
 PLTCOLLECTS="$PWD:" /opt/homebrew/bin/raco make safe.rkt
@@ -41,6 +41,7 @@ racket-sdl3/
 ├── main.rkt          # Package entry point, re-exports safe.rkt
 ├── safe.rkt          # Aggregates all safe/* modules
 ├── raw.rkt           # Aggregates all raw/* modules
+├── README.md         # User documentation and tutorial
 │
 ├── raw/              # Low-level FFI bindings by subsystem
 │   ├── init.rkt      # SDL-Init, SDL-Quit, errors
@@ -72,7 +73,8 @@ racket-sdl3/
 │   ├── dialog.rkt    # open-file-dialog, save-file-dialog
 │   ├── timer.rkt     # current-ticks, delay!
 │   ├── image.rkt     # load-surface, save-png!, save-jpg!
-│   └── ttf.rkt       # open-font, draw-text!
+│   ├── ttf.rkt       # open-font, draw-text!
+│   └── collision.rkt # make-rect, rects-intersect?, rect-intersection
 │
 ├── private/          # Implementation details
 │   ├── lib.rkt       # Library loading, define-sdl macro
@@ -82,7 +84,20 @@ racket-sdl3/
 │   ├── constants.rkt # Flags and constant values (init, window, event, etc.)
 │   └── enums.rkt     # Keycodes and scancodes
 │
-└── examples/         # Example programs (01-window.rkt through 27-file-dialog.rkt)
+├── examples/         # Example programs organized by concept
+│   ├── window/       # Window creation and management
+│   ├── drawing/      # Shapes, blend modes, geometry
+│   ├── textures/     # Images, tinting, rotation, render targets
+│   ├── text/         # TTF font rendering
+│   ├── input/        # Keyboard and mouse handling
+│   ├── animation/    # Time-based animation
+│   ├── audio/        # Sound playback
+│   ├── advanced/     # Collision, viewports, clipping
+│   ├── dialogs/      # Message boxes
+│   └── assets/       # Images for examples
+│
+└── demos/            # Complete demo applications
+    └── mini-paint.rkt # Drawing app with file dialogs
 ```
 
 ## Architecture
@@ -204,9 +219,9 @@ Run examples to verify bindings work. Remember to use `PLTCOLLECTS` in worktrees
 
 ```bash
 # In a worktree, always prefix with PLTCOLLECTS="$PWD:"
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/01-window.rkt   # Basic window
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/02-input.rkt    # Keyboard/mouse events
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/04-image.rkt    # Image loading
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/05-text.rkt     # TTF rendering
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/15-repl.rkt     # Raw bindings (uses sdl3/raw)
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/window/basic.rkt      # Basic window
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/input/keyboard-events.rkt  # Keyboard/mouse
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/textures/image.rkt    # Image loading
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/text/text.rkt         # TTF rendering
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/advanced/collision.rkt    # Collision detection
 ```

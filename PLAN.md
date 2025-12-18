@@ -1,331 +1,171 @@
-# Repository Restructuring Plan
+# Examples Cleanup Plan
 
-This document outlines the plan for restructuring the racket-sdl3 repository to make the safe, idiomatic interface the default.
+## Overview
 
-## Goals
+Reorganize and consolidate the examples directory to reduce redundancy, fill coverage gaps, and improve the learning progression.
 
-1. **Make safe the default**: `(require sdl3)` gives the idiomatic Racket API
-2. **Raw access via sdl3/raw**: Low-level C-style bindings for power users
-3. **Consistent module structure**: Both raw/ and safe/ follow the same organization
-4. **Move implementation details to private/**: Keep public directories clean
+## Phase 1: Merges
 
-## Current Structure
+### 1.1 Merge keyboard-events.rkt + keyboard-state.rkt → keyboard.rkt
+- Combine into single example showing both approaches
+- Section 1: Event-driven input (for menus, typing, one-shot actions)
+- Section 2: State polling (for smooth continuous movement)
+- Show when to use each approach
+- Delete: `keyboard-events.rkt`, `keyboard-state.rkt`
+
+### 1.2 Merge tint.rkt + rotate.rkt → texture-transforms.rkt
+- Combine color modulation and geometric transforms
+- Demo: tinting, alpha fade, rotation, flipping, custom pivot
+- Delete: `tint.rkt`, `rotate.rkt`
+
+### 1.3 Merge mouse-events.rkt + mouse-warp.rkt → mouse.rkt
+- Combine basic tracking with warping
+- Section 1: Following cursor, button states, trail effect
+- Section 2: Warping, capturing, drawing lines
+- Delete: `mouse-events.rkt`, `mouse-warp.rkt`
+
+### 1.4 Merge shapes.rkt + geometry.rkt → drawing.rkt
+- Combine basic primitives with advanced geometry
+- Section 1: Built-in primitives (rects, lines, points)
+- Section 2: Hardware-accelerated geometry with vertex colors
+- Delete: `shapes.rkt`, `geometry.rkt`
+
+## Phase 2: Removals
+
+### 2.1 Remove image.rkt
+- Functionality covered by texture-transforms.rkt and other texture examples
+- Basic image loading is shown in multiple places
+
+## Phase 3: Additions
+
+### 3.1 Add sprite-animation.rkt (textures/)
+- Load a sprite sheet
+- Animate through frames based on time
+- Show walk cycle or similar
+- Demonstrate frame timing independent of FPS
+- Need: sprite sheet asset (or create simple one programmatically)
+
+### 3.2 Add camera.rkt (advanced/)
+- Scrolling world larger than the window
+- Camera follows player smoothly
+- Show world coordinates vs screen coordinates
+- Optional: parallax background layers
+
+### 3.3 Add error-handling.rkt (window/ or new basics/)
+- Graceful handling of missing image files
+- Graceful handling of missing font files
+- Show proper error messages to users
+- Demonstrate fallback behavior
+
+### 3.4 Add buttons.rkt (input/)
+- Clickable rectangular buttons
+- Hover state detection
+- Click handling
+- Visual feedback (normal/hover/pressed states)
+
+### 3.5 Add custom-cursor.rkt (input/)
+- Hide system cursor
+- Draw custom cursor sprite at mouse position
+- Optional: different cursors for different states
+
+## Phase 4: Structural Reorganization
+
+### 4.1 Create basics/ directory
+Move or create simple introductory examples:
+- `basics/window.rkt` (rename from window/basic.rkt)
+- `basics/drawing.rkt` (simple shapes only, simpler than drawing/drawing.rkt)
+- `basics/input.rkt` (minimal keyboard + mouse)
+- `basics/image.rkt` (load and display one image)
+
+### 4.2 Simplify complex examples
+
+**display-info.rkt**: Trim to essential display querying, remove excessive UI chrome
+
+**keyboard-visual.rkt**: Consider moving to demos/ or simplifying the keyboard layout code
+
+**viewport-clip.rkt**: Split into three separate examples:
+- `viewport.rkt` - split-screen viewports
+- `clipping.rkt` - clipping rectangles
+- `scaling.rkt` - render scaling
+
+### 4.3 Rebalance directories
+After all changes, target structure:
 
 ```
-racket-sdl3/
-├── main.rkt          # Re-exports raw.rkt (PROBLEM: raw is default)
-├── raw.rkt           # Monolithic 1,800-line FFI bindings
-├── safe.rkt          # Aggregates safe/* modules
-├── image.rkt         # Top-level oddity
-├── ttf.rkt           # Top-level oddity
-├── private/
-│   ├── lib.rkt
-│   ├── syntax.rkt
-│   └── types.rkt     # Large 1,300-line file
-├── safe/
-│   ├── syntax.rkt    # Should be in private/
+examples/
+├── basics/           # Start here (4 examples)
 │   ├── window.rkt
-│   ├── draw.rkt
-│   ├── texture.rkt
-│   ├── events.rkt
-│   ├── keyboard.rkt
-│   ├── mouse.rkt
-│   ├── audio.rkt
-│   ├── display.rkt
-│   ├── clipboard.rkt
-│   ├── dialog.rkt
-│   ├── timer.rkt
-│   └── ttf.rkt
-└── examples/
+│   ├── drawing.rkt
+│   ├── input.rkt
+│   └── image.rkt
+│
+├── window/           # Window management (2 examples)
+│   ├── controls.rkt
+│   └── display-info.rkt
+│
+├── drawing/          # Drawing & rendering (2 examples)
+│   ├── drawing.rkt       # merged shapes + geometry
+│   └── blend-modes.rkt
+│
+├── textures/         # Texture operations (4 examples)
+│   ├── texture-transforms.rkt  # merged tint + rotate
+│   ├── render-target.rkt
+│   ├── screenshot.rkt
+│   └── sprite-animation.rkt    # NEW
+│
+├── text/             # Text rendering (1 example)
+│   └── text.rkt
+│
+├── input/            # Input handling (6 examples)
+│   ├── keyboard.rkt      # merged events + state
+│   ├── keyboard-visual.rkt
+│   ├── mouse.rkt         # merged events + warp
+│   ├── mouse-relative.rkt
+│   ├── mouse-scroll.rkt
+│   ├── buttons.rkt       # NEW
+│   └── custom-cursor.rkt # NEW
+│
+├── animation/        # Animation (1 example)
+│   └── animation.rkt
+│
+├── audio/            # Audio (1 example)
+│   └── audio.rkt
+│
+├── advanced/         # Advanced topics (5 examples)
+│   ├── collision.rkt
+│   ├── viewport.rkt      # split from viewport-clip
+│   ├── clipping.rkt      # split from viewport-clip
+│   ├── scaling.rkt       # split from viewport-clip
+│   ├── camera.rkt        # NEW
+│   └── wait-events.rkt
+│
+├── dialogs/          # System dialogs (1 example)
+│   └── message-box.rkt
+│
+└── assets/           # Shared assets
+    ├── (existing images)
+    └── spritesheet.png   # NEW (for sprite-animation)
 ```
 
-## Target Structure
-
-```
-racket-sdl3/
-├── main.rkt              # Re-exports safe.rkt (safe is default)
-├── raw.rkt               # Aggregates all raw/* modules
-├── safe.rkt              # Aggregates all safe/* modules
-│
-├── raw/                  # Low-level FFI bindings by subsystem
-│   ├── init.rkt          # SDL-Init, SDL-Quit, version info
-│   ├── window.rkt        # Window creation/management
-│   ├── render.rkt        # Renderer, basic drawing
-│   ├── texture.rkt       # Texture management
-│   ├── surface.rkt       # Surface operations
-│   ├── events.rkt        # Event polling and types
-│   ├── keyboard.rkt      # Keyboard functions
-│   ├── mouse.rkt         # Mouse functions
-│   ├── audio.rkt         # Audio device/stream
-│   ├── display.rkt       # Display/monitor info
-│   ├── clipboard.rkt     # Clipboard access
-│   ├── dialog.rkt        # File dialogs, message boxes
-│   ├── timer.rkt         # Timing functions
-│   ├── hints.rkt         # Configuration hints
-│   ├── image.rkt         # SDL_image bindings (moved from top-level)
-│   └── ttf.rkt           # SDL_ttf bindings (moved from top-level)
-│
-├── safe/                 # Idiomatic wrappers (parallel structure)
-│   ├── window.rkt
-│   ├── draw.rkt
-│   ├── texture.rkt
-│   ├── events.rkt
-│   ├── keyboard.rkt
-│   ├── mouse.rkt
-│   ├── audio.rkt
-│   ├── display.rkt
-│   ├── clipboard.rkt
-│   ├── dialog.rkt
-│   ├── timer.rkt
-│   ├── image.rkt         # New: safe surface loading/saving
-│   └── ttf.rkt           # Updated requires
-│
-├── private/
-│   ├── lib.rkt           # Library loading, define-sdl macro
-│   ├── syntax.rkt        # Error handling helpers
-│   ├── safe-syntax.rkt   # Resource wrapping macros (moved from safe/)
-│   ├── types.rkt         # Struct definitions
-│   ├── constants.rkt     # Flags and enum values (split from types)
-│   └── enums.rkt         # Keycodes, scancodes (split from types)
-│
-└── examples/             # Update imports as needed
-```
-
-## Access Patterns After Restructuring
-
-| Want | Require |
-|------|---------|
-| Safe API (default) | `sdl3` |
-| All raw bindings | `sdl3/raw` |
-| Specific raw module | `sdl3/raw/window` |
-| Specific safe module | `sdl3/safe/window` |
-
----
-
-## Phase 1: Move safe/syntax.rkt to private/ ✓ COMPLETED
-
-Low-risk change that establishes the pattern.
-
-### Steps
-
-1. ✓ Create `private/safe-syntax.rkt` with contents of `safe/syntax.rkt`
-2. ✓ Update all `safe/*.rkt` files to require `"../private/safe-syntax.rkt"` instead of `"syntax.rkt"`
-3. ✓ Delete `safe/syntax.rkt`
-4. ✓ Test: `raco make safe.rkt && racket examples/01-window.rkt`
-
-### Files Modified
-- `private/safe-syntax.rkt` (new)
-- `safe/window.rkt`
-- `safe/draw.rkt`
-- `safe/texture.rkt`
-- `safe/ttf.rkt`
-- `safe/syntax.rkt` (deleted)
-
-Note: `safe/display.rkt` and `safe/dialog.rkt` did not require syntax.rkt, so no changes needed.
-
----
-
-## Phase 2: Split raw.rkt into raw/*.rkt ✓ COMPLETED
-
-The largest mechanical change. Split the monolithic raw.rkt by SDL subsystem.
-
-### Module Breakdown
-
-Based on the current raw.rkt sections:
-
-| New Module | Contents |
-|------------|----------|
-| `raw/init.rkt` | SDL-Init, SDL-Quit, SDL-GetError, SDL-free |
-| `raw/window.rkt` | SDL-CreateWindow, SDL-DestroyWindow, SDL-GetWindowSize, SDL-SetWindowTitle, etc. |
-| `raw/render.rkt` | SDL-CreateRenderer, SDL-DestroyRenderer, SDL-RenderClear, SDL-RenderPresent, SDL-SetRenderDrawColor, drawing primitives |
-| `raw/texture.rkt` | SDL-CreateTexture, SDL-DestroyTexture, SDL-CreateTextureFromSurface, SDL-RenderTexture, etc. |
-| `raw/surface.rkt` | SDL-DestroySurface |
-| `raw/events.rkt` | SDL-PollEvent, SDL-WaitEvent, SDL-WaitEventTimeout, SDL-PumpEvents |
-| `raw/keyboard.rkt` | SDL-GetKeyboardState, SDL-GetModState, scancode/keycode functions, text input |
-| `raw/mouse.rkt` | SDL-GetMouseState, SDL-WarpMouseInWindow, SDL-SetCursor, cursor functions |
-| `raw/audio.rkt` | SDL-OpenAudioDevice, SDL-CloseAudioDevice, audio stream functions |
-| `raw/display.rkt` | SDL-GetDisplays, SDL-GetDisplayBounds, display mode functions |
-| `raw/clipboard.rkt` | SDL-GetClipboardText, SDL-SetClipboardText, SDL-HasClipboardText |
-| `raw/dialog.rkt` | SDL-ShowOpenFileDialog, SDL-ShowSaveFileDialog, SDL-ShowMessageBox |
-| `raw/timer.rkt` | SDL-GetTicks, SDL-Delay, performance counter functions |
-
-### Steps
-
-1. ✓ Create `raw/` directory
-2. ✓ Create each `raw/*.rkt` module:
-   - Copy relevant functions from current `raw.rkt`
-   - Add appropriate requires (private/lib.rkt, private/types.rkt)
-   - Add provides for all functions
-3. ✓ Create new `raw.rkt` that re-exports all `raw/*.rkt` modules
-4. ✓ safe/*.rkt files already require from `raw.rkt` (no changes needed)
-5. ✓ Old raw.rkt content replaced with the aggregator
-6. ✓ Test: `raco make raw.rkt && raco make safe.rkt`
-
-### Files Created
-- `raw/init.rkt`
-- `raw/window.rkt`
-- `raw/render.rkt`
-- `raw/texture.rkt`
-- `raw/surface.rkt`
-- `raw/events.rkt`
-- `raw/keyboard.rkt`
-- `raw/mouse.rkt`
-- `raw/display.rkt`
-- `raw/timer.rkt`
-- `raw/clipboard.rkt`
-- `raw/audio.rkt`
-- `raw/dialog.rkt`
-- `raw.rkt` (aggregator, replaces old monolithic file)
-
-Note: `raw/hints.rkt` not created as no hint functions were in the original raw.rkt.
-
----
-
-## Phase 3: Move image.rkt and ttf.rkt to raw/ ✓ COMPLETED
-
-Move the extension library bindings into the raw/ directory structure.
-
-### Steps
-
-1. ✓ Move `image.rkt` to `raw/image.rkt`
-   - Updated require paths (private/ becomes ../private/)
-2. ✓ Move `ttf.rkt` to `raw/ttf.rkt`
-   - Updated require paths
-3. ✓ Update `raw.rkt` aggregator to include image and ttf
-4. ✓ Update `safe/texture.rkt` to require `"../raw/image.rkt"`
-5. ✓ Update `safe/ttf.rkt` to require `"../raw/ttf.rkt"`
-6. ✓ Delete old top-level `image.rkt` and `ttf.rkt`
-7. ✓ Test: `racket examples/04-image.rkt && racket examples/05-text.rkt`
-
----
-
-## Phase 4: Create safe/image.rkt ✓ COMPLETED
-
-Add a safe wrapper for image operations that aren't texture-related.
-
-### New Module: safe/image.rkt
-
-```racket
-;; Surface loading with custodian cleanup
-load-surface      ; path -> surface
-surface?
-surface-ptr
-surface-destroy!
-
-;; Saving (new API)
-save-png!         ; surface path -> void
-save-jpg!         ; surface path quality -> void
-
-;; Saving (backward-compatible aliases)
-save-surface-png  ; alias for save-png!
-save-surface-jpg  ; alias for save-jpg!
-
-;; Screenshots
-render-read-pixels  ; renderer -> surface (with custodian cleanup)
-```
-
-### Steps
-
-1. ✓ Create `safe/image.rkt` with surface wrapper struct using `define-sdl-resource`
-2. ✓ Implement `load-surface` using `IMG-Load` with custodian registration
-3. ✓ Implement `save-png!` and `save-jpg!` wrappers (accept both surface objects and raw pointers)
-4. ✓ Move `render-read-pixels` from `safe/texture.rkt` to `safe/image.rkt`
-5. ✓ Update `safe.rkt` to require and re-export `safe/image.rkt`
-6. ✓ Update `safe/texture.rkt` to re-export from `safe/image.rkt` for backward compatibility
-7. ✓ Add backward-compatible aliases (`save-surface-png`, `save-surface-jpg`)
-8. ✓ Test with examples (04-image.rkt, 18-screenshot.rkt)
-
----
-
-## Phase 5: Flip main.rkt to safe ✓ COMPLETED
-
-The actual "flip" - make safe the default interface.
-
-### Steps
-
-1. ✓ Update `main.rkt` to re-export `safe.rkt` instead of `raw.rkt`
-2. ✓ Verified all examples already use `sdl3/safe` explicitly (no changes needed)
-3. ✓ Tested examples: 01-window, 04-image, 05-text, 15-repl all work
-4. ✓ Updated CLAUDE.md with correct PLTCOLLECTS + symlink documentation
-5. ✓ Added `/sdl3` to .gitignore (worktree symlink)
-
----
-
-## Phase 6: Update Examples and Documentation ✓ COMPLETED
-
-Ensure everything works with the new structure.
-
-### Steps
-
-1. ✓ Run all examples, fix any broken imports (all 27 examples work)
-2. ✓ Update CLAUDE.md with new structure documentation
-3. ✓ Update AGENTS.md with new structure documentation
-
----
-
-## Phase 7: Split private/types.rkt ✓ COMPLETED
-
-Split the large types.rkt file into three modules for maintainability.
-
-### Module Split
-
-| Module | Contents |
-|--------|----------|
-| `private/types.rkt` | Struct definitions, FFI type aliases |
-| `private/constants.rkt` | Init flags, window flags, event types, blend modes |
-| `private/enums.rkt` | Keycodes, scancodes, modifier key masks |
-
-### Steps
-
-1. ✓ Created `private/constants.rkt` with all flag/constant definitions
-2. ✓ Created `private/enums.rkt` with keycode/scancode tables
-3. ✓ Updated `private/types.rkt` to keep only struct definitions and FFI types
-4. ✓ Updated `raw.rkt` to re-export from constants.rkt and enums.rkt
-5. ✓ Tested compilation and examples
-
----
-
-## Testing Strategy
-
-After each phase:
-
-1. Clear compiled cache: `rm -rf compiled private/compiled safe/compiled raw/compiled examples/compiled`
-2. Compile aggregators: `raco make main.rkt raw.rkt safe.rkt`
-3. Run example subset:
-   - `racket examples/01-window.rkt` (basic)
-   - `racket examples/02-input.rkt` (events)
-   - `racket examples/04-image.rkt` (image loading)
-   - `racket examples/05-text.rkt` (ttf)
-   - `racket examples/15-repl.rkt` (raw bindings)
-
----
-
-## Rollback Plan
-
-If issues arise:
-1. Git stash or branch before starting each phase
-2. Each phase is independently revertible
-3. The aggregator pattern (raw.rkt re-exporting raw/*) means external code keeps working
-
----
-
-## Summary
-
-All phases completed successfully:
-
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Move safe/syntax.rkt to private/ | ✓ COMPLETED |
-| 2 | Split raw.rkt into raw/*.rkt | ✓ COMPLETED |
-| 3 | Move image.rkt, ttf.rkt to raw/ | ✓ COMPLETED |
-| 4 | Create safe/image.rkt | ✓ COMPLETED |
-| 5 | Make safe the default (flip main.rkt) | ✓ COMPLETED |
-| 6 | Update examples and documentation | ✓ COMPLETED |
-| 7 | Split types.rkt into constants/enums | ✓ COMPLETED |
-
-The repository restructuring is complete. Key outcomes:
-- `(require sdl3)` now gives the safe, idiomatic Racket API
-- `(require sdl3/raw)` provides low-level C-style bindings
-- Both raw/ and safe/ directories have parallel structure by SDL subsystem
-- All implementation details moved to private/
-- All 27 examples verified working
+## Phase 5: Documentation
+
+### 5.1 Add examples/README.md
+- Learning path: basics → specific topics → advanced
+- Brief description of each example
+- Which concepts each example demonstrates
+
+## Execution Order
+
+1. Phase 1 (Merges) - reduces file count, no new features needed
+2. Phase 2 (Removals) - quick cleanup
+3. Phase 4.2 (Split viewport-clip.rkt) - reduces complexity
+4. Phase 4.1 (Create basics/) - improves onboarding
+5. Phase 3 (Additions) - new examples
+6. Phase 5 (Documentation) - final polish
+
+## Notes
+
+- Each merge should preserve all demonstrated functionality
+- Test each example after changes: `PLTCOLLECTS="$PWD:" racket examples/path/to/example.rkt`
+- Keep individual examples under ~200 lines where possible
+- New examples need assets added to examples/assets/

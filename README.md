@@ -15,7 +15,7 @@ Requires SDL3, SDL3_image, and SDL3_ttf libraries installed on your system.
 Run an example to verify everything works:
 
 ```bash
-racket examples/window/basic.rkt
+racket examples/basics/window.rkt
 ```
 
 ## Tutorial
@@ -63,7 +63,7 @@ To clean up when you're done:
 (window-destroy! win)
 ```
 
-See: [examples/window/basic.rkt](examples/window/basic.rkt)
+See: [examples/basics/window.rkt](examples/basics/window.rkt)
 
 ### 2. Drawing Shapes
 
@@ -97,7 +97,7 @@ Let's draw some shapes. Start fresh:
 (render-present! ren)
 ```
 
-See: [examples/drawing/shapes.rkt](examples/drawing/shapes.rkt)
+See: [examples/basics/drawing.rkt](examples/basics/drawing.rkt)
 
 ### 3. Handling Events
 
@@ -135,7 +135,7 @@ SDL3 programs use an event loop. Here's the pattern:
 
 Press Escape or close the window to quit. You'll need to restart Racket after this loop.
 
-See: [examples/input/keyboard-events.rkt](examples/input/keyboard-events.rkt)
+See: [examples/input/keyboard.rkt](examples/input/keyboard.rkt)
 
 ### 4. Loading Images
 
@@ -160,7 +160,7 @@ Load and display images with SDL3_image:
 (render-present! ren)
 ```
 
-See: [examples/textures/image.rkt](examples/textures/image.rkt)
+See: [examples/basics/image.rkt](examples/basics/image.rkt)
 
 ### 5. Rendering Text
 
@@ -218,53 +218,14 @@ Use `current-ticks` for time-based animation:
 
 See: [examples/animation/animation.rkt](examples/animation/animation.rkt)
 
-## Examples by Category
+## Examples
 
-### Window Management
-- [window/basic.rkt](examples/window/basic.rkt) - Create a window
-- [window/controls.rkt](examples/window/controls.rkt) - Resize, fullscreen, opacity
-- [window/display-info.rkt](examples/window/display-info.rkt) - Monitor enumeration
+See [examples/README.md](examples/README.md) for a complete guide to all examples, organized by topic with a suggested learning path.
 
-### Drawing
-- [drawing/shapes.rkt](examples/drawing/shapes.rkt) - Rectangles, lines, points
-- [drawing/blend-modes.rkt](examples/drawing/blend-modes.rkt) - Alpha blending modes
-- [drawing/geometry.rkt](examples/drawing/geometry.rkt) - Hardware-accelerated triangles
-
-### Textures
-- [textures/image.rkt](examples/textures/image.rkt) - Load and display images
-- [textures/tint.rkt](examples/textures/tint.rkt) - Color and alpha modulation
-- [textures/rotate.rkt](examples/textures/rotate.rkt) - Rotation and flipping
-- [textures/render-target.rkt](examples/textures/render-target.rkt) - Off-screen rendering
-- [textures/screenshot.rkt](examples/textures/screenshot.rkt) - Save screenshots
-
-### Text
-- [text/text.rkt](examples/text/text.rkt) - TTF font rendering
-
-### Input
-- [input/keyboard-events.rkt](examples/input/keyboard-events.rkt) - Event-driven keyboard
-- [input/keyboard-state.rkt](examples/input/keyboard-state.rkt) - Polling keyboard state
-- [input/keyboard-visual.rkt](examples/input/keyboard-visual.rkt) - Virtual keyboard display
-- [input/mouse-events.rkt](examples/input/mouse-events.rkt) - Mouse tracking and buttons
-- [input/mouse-scroll.rkt](examples/input/mouse-scroll.rkt) - Scroll wheel events
-- [input/mouse-warp.rkt](examples/input/mouse-warp.rkt) - Mouse capture and warping
-- [input/mouse-relative.rkt](examples/input/mouse-relative.rkt) - FPS-style mouse look
-
-### Animation
-- [animation/animation.rkt](examples/animation/animation.rkt) - Time-based animation
-
-### Audio
-- [audio/audio.rkt](examples/audio/audio.rkt) - WAV playback
-
-### Advanced
-- [advanced/collision.rkt](examples/advanced/collision.rkt) - Rectangle collision detection
-- [advanced/viewport-clip.rkt](examples/advanced/viewport-clip.rkt) - Viewports and clipping
-- [advanced/wait-events.rkt](examples/advanced/wait-events.rkt) - CPU-efficient event handling
-
-### Dialogs
-- [dialogs/message-box.rkt](examples/dialogs/message-box.rkt) - Message boxes and confirmations
-
-### Demos
-- [demos/mini-paint.rkt](demos/mini-paint.rkt) - Simple drawing application with file dialogs
+Quick start:
+- [examples/basics/](examples/basics/) - Start here: window, drawing, input, images
+- [examples/advanced/](examples/advanced/) - Cameras, collision, viewports
+- [demos/](demos/) - Complete applications
 
 ## API Overview
 

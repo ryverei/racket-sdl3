@@ -21,7 +21,15 @@
  SDL-LockSurface
  SDL-UnlockSurface
  SDL-SetSurfaceRLE
- SDL-SurfaceHasRLE)
+ SDL-SurfaceHasRLE
+ ;; Pixel access
+ SDL-ReadSurfacePixel
+ SDL-WriteSurfacePixel
+ SDL-ReadSurfacePixelFloat
+ SDL-WriteSurfacePixelFloat
+ ;; Color mapping
+ SDL-MapSurfaceRGB
+ SDL-MapSurfaceRGBA)
 
 ;; ============================================================================
 ;; Surface Creation/Destruction
@@ -100,3 +108,75 @@
 (define-sdl SDL-SurfaceHasRLE
   (_fun _SDL_Surface-pointer -> _sdl-bool)
   #:c-id SDL_SurfaceHasRLE)
+
+;; ============================================================================
+;; Pixel Access
+;; ============================================================================
+
+;; SDL_ReadSurfacePixel: Read a single pixel from a surface
+;; surface: the surface to read from
+;; x, y: coordinates of the pixel
+;; r, g, b, a: pointers to receive the color components (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-ReadSurfacePixel
+  (_fun _SDL_Surface-pointer _int _int
+        (r : (_ptr o _uint8))
+        (g : (_ptr o _uint8))
+        (b : (_ptr o _uint8))
+        (a : (_ptr o _uint8))
+        -> (result : _sdl-bool)
+        -> (values result r g b a))
+  #:c-id SDL_ReadSurfacePixel)
+
+;; SDL_WriteSurfacePixel: Write a single pixel to a surface
+;; surface: the surface to write to
+;; x, y: coordinates of the pixel
+;; r, g, b, a: color components (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-WriteSurfacePixel
+  (_fun _SDL_Surface-pointer _int _int _uint8 _uint8 _uint8 _uint8 -> _sdl-bool)
+  #:c-id SDL_WriteSurfacePixel)
+
+;; SDL_ReadSurfacePixelFloat: Read a single pixel from a surface as floats
+;; surface: the surface to read from
+;; x, y: coordinates of the pixel
+;; r, g, b, a: pointers to receive the color components (0.0-1.0)
+;; Returns: true on success, false on failure
+(define-sdl SDL-ReadSurfacePixelFloat
+  (_fun _SDL_Surface-pointer _int _int
+        (r : (_ptr o _float))
+        (g : (_ptr o _float))
+        (b : (_ptr o _float))
+        (a : (_ptr o _float))
+        -> (result : _sdl-bool)
+        -> (values result r g b a))
+  #:c-id SDL_ReadSurfacePixelFloat)
+
+;; SDL_WriteSurfacePixelFloat: Write a single pixel to a surface as floats
+;; surface: the surface to write to
+;; x, y: coordinates of the pixel
+;; r, g, b, a: color components (0.0-1.0)
+;; Returns: true on success, false on failure
+(define-sdl SDL-WriteSurfacePixelFloat
+  (_fun _SDL_Surface-pointer _int _int _float _float _float _float -> _sdl-bool)
+  #:c-id SDL_WriteSurfacePixelFloat)
+
+;; ============================================================================
+;; Color Mapping
+;; ============================================================================
+
+;; SDL_MapSurfaceRGB: Map an RGB triple to a pixel value for a surface
+;; surface: the surface to use for the mapping
+;; r, g, b: color components (0-255)
+;; Returns: a pixel value suitable for the surface's format
+(define-sdl SDL-MapSurfaceRGB
+  (_fun _SDL_Surface-pointer _uint8 _uint8 _uint8 -> _uint32)
+  #:c-id SDL_MapSurfaceRGB)
+
+;; SDL_MapSurfaceRGBA: Map an RGBA quadruple to a pixel value for a surface
+;; surface: the surface to use for the mapping
+;; r, g, b, a: color components (0-255)
+;; Returns: a pixel value suitable for the surface's format
+(define-sdl SDL-MapSurfaceRGBA
+  (_fun _SDL_Surface-pointer _uint8 _uint8 _uint8 _uint8 -> _uint32)
+  #:c-id SDL_MapSurfaceRGBA)

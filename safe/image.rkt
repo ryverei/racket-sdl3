@@ -43,6 +43,20 @@
          surface-unlock!
          call-with-locked-surface
 
+         ;; Pixel access
+         surface-get-pixel
+         surface-set-pixel!
+         surface-get-pixel-float
+         surface-set-pixel-float!
+
+         ;; Color mapping
+         surface-map-rgb
+         surface-map-rgba
+
+         ;; Bulk pixel access
+         surface-fill-pixels!
+         call-with-surface-pixels
+
          ;; Saving
          save-png!
          save-jpg!
@@ -235,5 +249,112 @@
             (surface-width surf)
             (surface-height surf)
             (surface-pitch surf)))
+    (lambda ()
+      (surface-unlock! surf))))
+
+;; ============================================================================
+;; Pixel Access
+;; ============================================================================
+
+;; surface-get-pixel: Read a pixel from a surface
+;; Returns (values r g b a) where each component is 0-255
+(define (surface-get-pixel surf x y)
+  (define-values (ok r g b a)
+    (SDL-ReadSurfacePixel (surface-ptr surf) x y))
+  (unless ok
+    (error 'surface-get-pixel "failed to read pixel at (~a, ~a): ~a" x y (SDL-GetError)))
+  (values r g b a))
+
+;; surface-set-pixel!: Write a pixel to a surface
+;; r, g, b, a are 0-255 (a defaults to 255)
+(define (surface-set-pixel! surf x y r g b [a 255])
+  (unless (SDL-WriteSurfacePixel (surface-ptr surf) x y r g b a)
+    (error 'surface-set-pixel! "failed to write pixel at (~a, ~a): ~a" x y (SDL-GetError))))
+
+;; surface-get-pixel-float: Read a pixel from a surface as floats
+;; Returns (values r g b a) where each component is 0.0-1.0
+(define (surface-get-pixel-float surf x y)
+  (define-values (ok r g b a)
+    (SDL-ReadSurfacePixelFloat (surface-ptr surf) x y))
+  (unless ok
+    (error 'surface-get-pixel-float "failed to read pixel at (~a, ~a): ~a" x y (SDL-GetError)))
+  (values r g b a))
+
+;; surface-set-pixel-float!: Write a pixel to a surface as floats
+;; r, g, b, a are 0.0-1.0 (a defaults to 1.0)
+(define (surface-set-pixel-float! surf x y r g b [a 1.0])
+  (unless (SDL-WriteSurfacePixelFloat (surface-ptr surf) x y r g b a)
+    (error 'surface-set-pixel-float! "failed to write pixel at (~a, ~a): ~a" x y (SDL-GetError))))
+
+;; ============================================================================
+;; Color Mapping
+;; ============================================================================
+
+;; surface-map-rgb: Map an RGB triple to a pixel value for a surface
+;; Returns a 32-bit pixel value suitable for direct buffer access
+(define (surface-map-rgb surf r g b)
+  (SDL-MapSurfaceRGB (surface-ptr surf) r g b))
+
+;; surface-map-rgba: Map an RGBA quadruple to a pixel value for a surface
+;; Returns a 32-bit pixel value suitable for direct buffer access
+(define (surface-map-rgba surf r g b a)
+  (SDL-MapSurfaceRGBA (surface-ptr surf) r g b a))
+
+;; ============================================================================
+;; Bulk Pixel Access
+;; ============================================================================
+
+;; surface-fill-pixels!: Fill a surface by calling a generator function for each pixel
+;; This is the recommended way to do procedural texture generation.
+;; generator: (x y) -> (values r g b a) where r,g,b,a are 0-255
+;;
+;; Example:
+;;   (surface-fill-pixels! surf
+;;     (lambda (x y)
+;;       (values (quotient (* x 255) width)   ; red gradient
+;;               128                           ; constant green
+;;               (quotient (* y 255) height)  ; blue gradient
+;;               255)))                        ; opaque
+(define (surface-fill-pixels! surf generator)
+  (define ptr (surface-ptr surf))
+  (define w (surface-width surf))
+  (define h (surface-height surf))
+  (define pitch (surface-pitch surf))
+  (define format (SDL_Surface-format ptr))
+  (define bpp (bitwise-and format #xFF))
+  (surface-lock! surf)
+  (define pixels (surface-pixels surf))
+  (dynamic-wind
+    void
+    (lambda ()
+      (for* ([y (in-range h)]
+             [x (in-range w)])
+        (define-values (r g b a) (generator x y))
+        (define offset (+ (* y pitch) (* x bpp)))
+        (ptr-set! pixels _uint8 offset r)
+        (ptr-set! pixels _uint8 (+ offset 1) g)
+        (ptr-set! pixels _uint8 (+ offset 2) b)
+        (ptr-set! pixels _uint8 (+ offset 3) a)))
+    (lambda ()
+      (surface-unlock! surf))))
+
+;; call-with-surface-pixels: Low-level access to the pixel buffer
+;; Use this when you need maximum performance and are comfortable with FFI.
+;; For most cases, prefer surface-fill-pixels! instead.
+;; proc receives: pixels-pointer, width, height, pitch, bytes-per-pixel
+(define (call-with-surface-pixels surf proc)
+  (define ptr (surface-ptr surf))
+  (define format (SDL_Surface-format ptr))
+  ;; SDL_PIXELFORMAT_* encoding: bytes in bits 0-7, bits in bits 8-15
+  (define bytes-per-pixel (bitwise-and format #xFF))
+  (surface-lock! surf)
+  (dynamic-wind
+    void
+    (lambda ()
+      (proc (surface-pixels surf)
+            (surface-width surf)
+            (surface-height surf)
+            (surface-pitch surf)
+            bytes-per-pixel))
     (lambda ()
       (surface-unlock! surf))))

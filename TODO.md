@@ -376,10 +376,12 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [ ] `SDL_GetSurfaceClipRect`
 - [x] `SDL_SetSurfaceRLE`
 - [x] `SDL_SurfaceHasRLE`
-- [ ] `SDL_MapSurfaceRGB`
-- [ ] `SDL_MapSurfaceRGBA`
-- [ ] `SDL_ReadSurfacePixel`
-- [ ] `SDL_WriteSurfacePixel`
+- [x] `SDL_MapSurfaceRGB`
+- [x] `SDL_MapSurfaceRGBA`
+- [x] `SDL_ReadSurfacePixel`
+- [x] `SDL_WriteSurfacePixel`
+- [x] `SDL_ReadSurfacePixelFloat`
+- [x] `SDL_WriteSurfacePixelFloat`
 
 ### Events (P0)
 - [x] `SDL_WaitEvent`

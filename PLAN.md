@@ -2,7 +2,7 @@
 
 This document outlines the plan for implementing surface operations (CPU-side pixel manipulation) and the SDL hints API.
 
-**Status:** Phase 1 (Surface Creation & Basics) is complete. See `TODO.md` for full implementation status.
+**Status:** Phase 2 (Pixel Access) is complete. See `TODO.md` for full implementation status.
 
 ## Goals
 
@@ -132,7 +132,7 @@ Demonstrate surface creation:
 
 ---
 
-## Phase 2: Pixel Access
+## Phase 2: Pixel Access ✓ COMPLETE
 
 Read and write individual pixels. Essential for procedural generation.
 

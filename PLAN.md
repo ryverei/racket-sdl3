@@ -2,7 +2,7 @@
 
 This document outlines the plan for implementing surface operations (CPU-side pixel manipulation) and the SDL hints API.
 
-**Status:** Phase 6 (Advanced Surface Operations) is complete. See `TODO.md` for full implementation status.
+**Status:** Phase 7 (Hints API) is complete. All phases are done! See `TODO.md` for full implementation status.
 
 ## Goals
 
@@ -351,7 +351,7 @@ Demonstrate advanced features:
 
 ---
 
-## Phase 7: Hints API
+## Phase 7: Hints API ✓ COMPLETE
 
 SDL hints for runtime configuration.
 

@@ -26,6 +26,7 @@
          "raw/clipboard.rkt"
          "raw/audio.rkt"
          "raw/dialog.rkt"
+         "raw/hints.rkt"
          "raw/image.rkt"
          "raw/ttf.rkt")
 
@@ -46,5 +47,6 @@
          (all-from-out "raw/clipboard.rkt")
          (all-from-out "raw/audio.rkt")
          (all-from-out "raw/dialog.rkt")
+         (all-from-out "raw/hints.rkt")
          (all-from-out "raw/image.rkt")
          (all-from-out "raw/ttf.rkt"))

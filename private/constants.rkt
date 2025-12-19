@@ -130,7 +130,19 @@
  SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT
  SDL_MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT
  SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT
- SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT)
+ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT
+ ;; Hint priority
+ SDL_HINT_DEFAULT
+ SDL_HINT_NORMAL
+ SDL_HINT_OVERRIDE
+ ;; Common hint names
+ SDL_HINT_APP_NAME
+ SDL_HINT_APP_ID
+ SDL_HINT_RENDER_DRIVER
+ SDL_HINT_RENDER_VSYNC
+ SDL_HINT_VIDEO_ALLOW_SCREENSAVER
+ SDL_HINT_FRAMEBUFFER_ACCELERATION
+ SDL_HINT_MOUSE_RELATIVE_MODE_WARP)
 
 ;; ============================================================================
 ;; Init Flags (SDL_InitFlags) - used with SDL_Init
@@ -314,3 +326,21 @@
 ;; SDL_MessageBoxButtonFlags - flags for individual buttons
 (define SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT #x00000001)  ; default button when return is hit
 (define SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT #x00000002)  ; default button when escape is hit
+
+;; ============================================================================
+;; Hint Priority
+;; ============================================================================
+(define SDL_HINT_DEFAULT  0)  ; low priority, used for default values
+(define SDL_HINT_NORMAL   1)  ; medium priority
+(define SDL_HINT_OVERRIDE 2)  ; high priority
+
+;; ============================================================================
+;; Common Hint Names
+;; ============================================================================
+(define SDL_HINT_APP_NAME "SDL_APP_NAME")
+(define SDL_HINT_APP_ID "SDL_APP_ID")
+(define SDL_HINT_RENDER_DRIVER "SDL_RENDER_DRIVER")
+(define SDL_HINT_RENDER_VSYNC "SDL_RENDER_VSYNC")
+(define SDL_HINT_VIDEO_ALLOW_SCREENSAVER "SDL_VIDEO_ALLOW_SCREENSAVER")
+(define SDL_HINT_FRAMEBUFFER_ACCELERATION "SDL_FRAMEBUFFER_ACCELERATION")
+(define SDL_HINT_MOUSE_RELATIVE_MODE_WARP "SDL_MOUSE_RELATIVE_MODE_WARP")

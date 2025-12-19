@@ -57,6 +57,7 @@ racket-sdl3/
 │   ├── clipboard.rkt # Clipboard access
 │   ├── dialog.rkt    # File dialogs, message boxes
 │   ├── timer.rkt     # Timing functions
+│   ├── hints.rkt     # Hints/configuration
 │   ├── image.rkt     # SDL_image bindings
 │   └── ttf.rkt       # SDL_ttf bindings
 │
@@ -72,6 +73,7 @@ racket-sdl3/
 │   ├── clipboard.rkt # get-clipboard-text, set-clipboard-text!
 │   ├── dialog.rkt    # open-file-dialog, save-file-dialog
 │   ├── timer.rkt     # current-ticks, delay!
+│   ├── hints.rkt     # set-hint!, get-hint, set-app-name!
 │   ├── image.rkt     # load-surface, save-png!, save-jpg!
 │   ├── ttf.rkt       # open-font, draw-text!
 │   └── collision.rkt # make-rect, rects-intersect?, rect-intersection

@@ -11,7 +11,7 @@ A complete idiomatic Racket layer on top of the raw bindings, providing:
 - Simpler APIs (fewer pointer manipulations)
 - Drawing helpers, texture management, font/text rendering, mouse state
 
-Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rkt`, `safe/ttf.rkt`, `safe/mouse.rkt`, `safe/clipboard.rkt`, `safe/timer.rkt`, `safe/audio.rkt`, `safe/keyboard.rkt`, `safe/display.rkt`, `safe/dialog.rkt`
+Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rkt`, `safe/ttf.rkt`, `safe/mouse.rkt`, `safe/clipboard.rkt`, `safe/timer.rkt`, `safe/audio.rkt`, `safe/keyboard.rkt`, `safe/display.rkt`, `safe/dialog.rkt`, `safe/hints.rkt`
 
 ### SDL3 Core (`raw.rkt`)
 - [x] `SDL_Init`
@@ -573,6 +573,14 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 ### Message Box (P1)
 - [x] `SDL_ShowSimpleMessageBox`
 - [x] `SDL_ShowMessageBox`
+
+### Hints (P2)
+- [x] `SDL_SetHint`
+- [x] `SDL_SetHintWithPriority`
+- [x] `SDL_GetHint`
+- [x] `SDL_GetHintBoolean`
+- [x] `SDL_ResetHint`
+- [x] `SDL_ResetHints`
 
 ### Miscellaneous (P2)
 - [ ] `SDL_OpenURL`

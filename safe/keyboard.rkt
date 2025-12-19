@@ -4,7 +4,8 @@
 
 (require ffi/unsafe
          "../raw.rkt"
-         "../private/enums.rkt")
+         "../private/enums.rkt"
+         "window.rkt")
 
 (provide
  ;; Keyboard state
@@ -24,6 +25,10 @@
 
  ;; Reset keyboard
  reset-keyboard!
+
+ ;; Text input
+ start-text-input!
+ stop-text-input!
 
  ;; Re-export keycodes, scancodes, and modifiers from enums
  (all-from-out "../private/enums.rkt"))
@@ -108,3 +113,18 @@
 ;; This generates key up events for all pressed keys
 (define (reset-keyboard!)
   (SDL-ResetKeyboard))
+
+;; =========================================================================
+;; Text Input
+;; =========================================================================
+
+;; Start accepting text input events for a window
+;; This enables the text-input-event in the event stream
+(define (start-text-input! win)
+  (unless (SDL-StartTextInput (window-ptr win))
+    (error 'start-text-input! "Failed to start text input: ~a" (SDL-GetError))))
+
+;; Stop accepting text input events for a window
+(define (stop-text-input! win)
+  (unless (SDL-StopTextInput (window-ptr win))
+    (error 'stop-text-input! "Failed to stop text input: ~a" (SDL-GetError))))

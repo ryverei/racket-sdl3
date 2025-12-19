@@ -77,7 +77,7 @@
     (draw-pattern! renderer texture-size))
 
   ;; Animation state
-  (define start-time (SDL-GetTicks))
+  (define start-time (current-ticks))
 
   (let loop ([running? #t]
              [current-scale 'nearest])
@@ -109,7 +109,7 @@
 
       (when still-running?
         ;; Calculate animation time
-        (define elapsed (/ (- (SDL-GetTicks) start-time) 1000.0))
+        (define elapsed (/ (- (current-ticks) start-time) 1000.0))
 
         ;; Clear the window
         (set-draw-color! renderer 40 40 60)

@@ -35,7 +35,7 @@
   (define font (open-font font-path font-size))
 
   ;; Enable text input events
-  (SDL-StartTextInput window)
+  (start-text-input! window)
 
   (define static-color '(255 255 255 255))
   (define typed-color '(0 255 0 255))
@@ -120,7 +120,7 @@
 
         (loop new-text next-fps-text next-frame next-last-time still-running?))))
 
-  (SDL-StopTextInput window)
+  (stop-text-input! window)
 
   (when static-texture
     (texture-destroy! static-texture))

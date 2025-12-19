@@ -42,7 +42,22 @@
  SDL-ScaleSurface
  ;; File I/O
  SDL-LoadBMP
- SDL-SaveBMP)
+ SDL-SaveBMP
+ ;; Color key (transparency)
+ SDL-SetSurfaceColorKey
+ SDL-GetSurfaceColorKey
+ SDL-SurfaceHasColorKey
+ ;; Color/alpha modulation
+ SDL-SetSurfaceColorMod
+ SDL-GetSurfaceColorMod
+ SDL-SetSurfaceAlphaMod
+ SDL-GetSurfaceAlphaMod
+ ;; Blend mode
+ SDL-SetSurfaceBlendMode
+ SDL-GetSurfaceBlendMode
+ ;; Clipping
+ SDL-SetSurfaceClipRect
+ SDL-GetSurfaceClipRect)
 
 ;; ============================================================================
 ;; Surface Creation/Destruction
@@ -298,3 +313,117 @@
 (define-sdl SDL-SaveBMP
   (_fun _SDL_Surface-pointer _string -> _sdl-bool)
   #:c-id SDL_SaveBMP)
+
+;; ============================================================================
+;; Color Key (Transparency)
+;; ============================================================================
+
+;; SDL_SetSurfaceColorKey: Set the color key (transparent pixel) for a surface
+;; surface: the surface to set the color key on
+;; enabled: true to enable color key, false to disable
+;; key: the transparent pixel value (use SDL_MapSurfaceRGB/RGBA to get this)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetSurfaceColorKey
+  (_fun _SDL_Surface-pointer _sdl-bool _uint32 -> _sdl-bool)
+  #:c-id SDL_SetSurfaceColorKey)
+
+;; SDL_SurfaceHasColorKey: Check whether a surface has a color key set
+;; surface: the surface to check
+;; Returns: true if color key is set, false otherwise
+(define-sdl SDL-SurfaceHasColorKey
+  (_fun _SDL_Surface-pointer -> _sdl-bool)
+  #:c-id SDL_SurfaceHasColorKey)
+
+;; SDL_GetSurfaceColorKey: Get the color key (transparent pixel) for a surface
+;; surface: the surface to query
+;; key: pointer to receive the color key value
+;; Returns: true on success, false on failure (e.g., no color key set)
+(define-sdl SDL-GetSurfaceColorKey
+  (_fun _SDL_Surface-pointer (key : (_ptr o _uint32))
+        -> (result : _sdl-bool)
+        -> (values result key))
+  #:c-id SDL_GetSurfaceColorKey)
+
+;; ============================================================================
+;; Color/Alpha Modulation
+;; ============================================================================
+
+;; SDL_SetSurfaceColorMod: Set color modulation multiplied into blit operations
+;; surface: the surface to set modulation on
+;; r, g, b: color components (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetSurfaceColorMod
+  (_fun _SDL_Surface-pointer _uint8 _uint8 _uint8 -> _sdl-bool)
+  #:c-id SDL_SetSurfaceColorMod)
+
+;; SDL_GetSurfaceColorMod: Get the color modulation values for a surface
+;; surface: the surface to query
+;; Returns: success bool and r, g, b values
+(define-sdl SDL-GetSurfaceColorMod
+  (_fun _SDL_Surface-pointer
+        (r : (_ptr o _uint8))
+        (g : (_ptr o _uint8))
+        (b : (_ptr o _uint8))
+        -> (result : _sdl-bool)
+        -> (values result r g b))
+  #:c-id SDL_GetSurfaceColorMod)
+
+;; SDL_SetSurfaceAlphaMod: Set alpha modulation multiplied into blit operations
+;; surface: the surface to set modulation on
+;; alpha: the alpha value (0-255)
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetSurfaceAlphaMod
+  (_fun _SDL_Surface-pointer _uint8 -> _sdl-bool)
+  #:c-id SDL_SetSurfaceAlphaMod)
+
+;; SDL_GetSurfaceAlphaMod: Get the alpha modulation value for a surface
+;; surface: the surface to query
+;; Returns: success bool and alpha value
+(define-sdl SDL-GetSurfaceAlphaMod
+  (_fun _SDL_Surface-pointer (alpha : (_ptr o _uint8))
+        -> (result : _sdl-bool)
+        -> (values result alpha))
+  #:c-id SDL_GetSurfaceAlphaMod)
+
+;; ============================================================================
+;; Blend Mode
+;; ============================================================================
+
+;; SDL_SetSurfaceBlendMode: Set the blend mode for blit operations
+;; surface: the surface to set blend mode on
+;; blendMode: the blend mode to use
+;; Returns: true on success, false on failure
+(define-sdl SDL-SetSurfaceBlendMode
+  (_fun _SDL_Surface-pointer _SDL_BlendMode -> _sdl-bool)
+  #:c-id SDL_SetSurfaceBlendMode)
+
+;; SDL_GetSurfaceBlendMode: Get the blend mode for blit operations
+;; surface: the surface to query
+;; Returns: success bool and blend mode value
+(define-sdl SDL-GetSurfaceBlendMode
+  (_fun _SDL_Surface-pointer (blendMode : (_ptr o _SDL_BlendMode))
+        -> (result : _sdl-bool)
+        -> (values result blendMode))
+  #:c-id SDL_GetSurfaceBlendMode)
+
+;; ============================================================================
+;; Clipping
+;; ============================================================================
+
+;; SDL_SetSurfaceClipRect: Set the clipping rectangle for a surface
+;; surface: the surface to set clip rect on
+;; rect: the clipping rectangle, or NULL to disable clipping
+;; Returns: true if the rectangle intersects the surface, false otherwise
+(define-sdl SDL-SetSurfaceClipRect
+  (_fun _SDL_Surface-pointer _SDL_Rect-pointer/null -> _sdl-bool)
+  #:c-id SDL_SetSurfaceClipRect)
+
+;; SDL_GetSurfaceClipRect: Get the clipping rectangle for a surface
+;; surface: the surface to query
+;; rect: pointer to receive the clipping rectangle
+;; Returns: true on success, false on failure
+(define-sdl SDL-GetSurfaceClipRect
+  (_fun _SDL_Surface-pointer (rect : (_ptr o _SDL_Rect))
+        -> (result : _sdl-bool)
+        -> (values result rect))
+  #:c-id SDL_GetSurfaceClipRect)

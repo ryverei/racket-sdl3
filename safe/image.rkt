@@ -85,7 +85,26 @@
 
          ;; Pixel format symbols
          symbol->pixel-format
-         pixel-format->symbol)
+         pixel-format->symbol
+
+         ;; Color key (transparency)
+         set-surface-color-key!
+         surface-color-key
+         surface-has-color-key?
+
+         ;; Color/alpha modulation
+         set-surface-color-mod!
+         surface-color-mod
+         set-surface-alpha-mod!
+         surface-alpha-mod
+
+         ;; Blend mode
+         set-surface-blend-mode!
+         surface-blend-mode
+
+         ;; Clipping
+         set-surface-clip-rect!
+         surface-clip-rect)
 
 ;; ============================================================================
 ;; Surface Wrapper
@@ -510,3 +529,122 @@
   (define ptr (if (surface? surf) (surface-ptr surf) surf))
   (unless (SDL-SaveBMP ptr path)
     (error 'save-bmp! "failed to save BMP: ~a (~a)" path (SDL-GetError))))
+
+;; ============================================================================
+;; Color Key (Transparency)
+;; ============================================================================
+
+;; set-surface-color-key!: Set the color key (transparent pixel) for a surface
+;; surf: the surface to modify
+;; color: color as (list r g b) to enable, or #f to disable color key
+(define (set-surface-color-key! surf color)
+  (define ptr (surface-ptr surf))
+  (if color
+      (let ([key (SDL-MapSurfaceRGB ptr (first color) (second color) (third color))])
+        (unless (SDL-SetSurfaceColorKey ptr #t key)
+          (error 'set-surface-color-key! "failed to set color key: ~a" (SDL-GetError))))
+      (unless (SDL-SetSurfaceColorKey ptr #f 0)
+        (error 'set-surface-color-key! "failed to disable color key: ~a" (SDL-GetError)))))
+
+;; surface-color-key: Get the color key for a surface
+;; Returns the raw pixel value, or #f if no color key is set
+;; Note: The pixel value is format-specific; use surface-has-color-key? to check first
+(define (surface-color-key surf)
+  (define-values (ok key) (SDL-GetSurfaceColorKey (surface-ptr surf)))
+  (if ok key #f))
+
+;; surface-has-color-key?: Check if a surface has a color key set
+(define (surface-has-color-key? surf)
+  (SDL-SurfaceHasColorKey (surface-ptr surf)))
+
+;; ============================================================================
+;; Color/Alpha Modulation
+;; ============================================================================
+
+;; set-surface-color-mod!: Set color modulation for blit operations
+;; surf: the surface to modify
+;; r, g, b: color components (0-255)
+;; Note: These values are multiplied with source pixels during blitting
+(define (set-surface-color-mod! surf r g b)
+  (unless (SDL-SetSurfaceColorMod (surface-ptr surf) r g b)
+    (error 'set-surface-color-mod! "failed to set color mod: ~a" (SDL-GetError))))
+
+;; surface-color-mod: Get the color modulation values
+;; Returns (values r g b) where each component is 0-255
+(define (surface-color-mod surf)
+  (define-values (ok r g b) (SDL-GetSurfaceColorMod (surface-ptr surf)))
+  (unless ok
+    (error 'surface-color-mod "failed to get color mod: ~a" (SDL-GetError)))
+  (values r g b))
+
+;; set-surface-alpha-mod!: Set alpha modulation for blit operations
+;; surf: the surface to modify
+;; alpha: alpha value (0-255)
+;; Note: This value is multiplied with source alpha during blitting
+(define (set-surface-alpha-mod! surf alpha)
+  (unless (SDL-SetSurfaceAlphaMod (surface-ptr surf) alpha)
+    (error 'set-surface-alpha-mod! "failed to set alpha mod: ~a" (SDL-GetError))))
+
+;; surface-alpha-mod: Get the alpha modulation value
+;; Returns alpha value (0-255)
+(define (surface-alpha-mod surf)
+  (define-values (ok alpha) (SDL-GetSurfaceAlphaMod (surface-ptr surf)))
+  (unless ok
+    (error 'surface-alpha-mod "failed to get alpha mod: ~a" (SDL-GetError)))
+  alpha)
+
+;; ============================================================================
+;; Blend Mode
+;; ============================================================================
+
+;; set-surface-blend-mode!: Set the blend mode for blit operations
+;; surf: the surface to modify
+;; mode: blend mode symbol: 'none, 'blend, 'add, 'mod, 'mul, 'invalid
+(define (set-surface-blend-mode! surf mode)
+  (define blend-mode
+    (case mode
+      [(none) SDL_BLENDMODE_NONE]
+      [(blend) SDL_BLENDMODE_BLEND]
+      [(add) SDL_BLENDMODE_ADD]
+      [(mod) SDL_BLENDMODE_MOD]
+      [(mul) SDL_BLENDMODE_MUL]
+      [else (error 'set-surface-blend-mode! "invalid blend mode: ~a" mode)]))
+  (unless (SDL-SetSurfaceBlendMode (surface-ptr surf) blend-mode)
+    (error 'set-surface-blend-mode! "failed to set blend mode: ~a" (SDL-GetError))))
+
+;; surface-blend-mode: Get the blend mode for blit operations
+;; Returns a symbol: 'none, 'blend, 'add, 'mod, 'mul, or the raw value if unknown
+(define (surface-blend-mode surf)
+  (define-values (ok blend-mode) (SDL-GetSurfaceBlendMode (surface-ptr surf)))
+  (unless ok
+    (error 'surface-blend-mode "failed to get blend mode: ~a" (SDL-GetError)))
+  (cond
+    [(= blend-mode SDL_BLENDMODE_NONE) 'none]
+    [(= blend-mode SDL_BLENDMODE_BLEND) 'blend]
+    [(= blend-mode SDL_BLENDMODE_ADD) 'add]
+    [(= blend-mode SDL_BLENDMODE_MOD) 'mod]
+    [(= blend-mode SDL_BLENDMODE_MUL) 'mul]
+    [else blend-mode]))
+
+;; ============================================================================
+;; Clipping
+;; ============================================================================
+
+;; set-surface-clip-rect!: Set the clipping rectangle for a surface
+;; surf: the surface to modify
+;; rect: rectangle as (list x y w h), or #f to disable clipping
+;; Returns #t if the rectangle intersects the surface, #f otherwise
+(define (set-surface-clip-rect! surf rect)
+  (define rect-ptr (list->rect rect))
+  (SDL-SetSurfaceClipRect (surface-ptr surf) rect-ptr))
+
+;; surface-clip-rect: Get the clipping rectangle for a surface
+;; Returns (list x y w h) representing the clip rectangle
+(define (surface-clip-rect surf)
+  (define-values (ok rect) (SDL-GetSurfaceClipRect (surface-ptr surf)))
+  (unless ok
+    (error 'surface-clip-rect "failed to get clip rect: ~a" (SDL-GetError)))
+  (list (SDL_Rect-x rect)
+        (SDL_Rect-y rect)
+        (SDL_Rect-w rect)
+        (SDL_Rect-h rect)))

@@ -364,17 +364,17 @@ Modules: `safe.rkt`, `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `saf
 - [x] `SDL_ScaleSurface`
 - [x] `SDL_FlipSurface`
 - [x] `SDL_ClearSurface`
-- [ ] `SDL_SetSurfaceColorKey`
-- [ ] `SDL_GetSurfaceColorKey`
-- [ ] `SDL_SurfaceHasColorKey`
-- [ ] `SDL_SetSurfaceAlphaMod`
-- [ ] `SDL_GetSurfaceAlphaMod`
-- [ ] `SDL_SetSurfaceColorMod`
-- [ ] `SDL_GetSurfaceColorMod`
-- [ ] `SDL_SetSurfaceBlendMode`
-- [ ] `SDL_GetSurfaceBlendMode`
-- [ ] `SDL_SetSurfaceClipRect`
-- [ ] `SDL_GetSurfaceClipRect`
+- [x] `SDL_SetSurfaceColorKey`
+- [x] `SDL_GetSurfaceColorKey`
+- [x] `SDL_SurfaceHasColorKey`
+- [x] `SDL_SetSurfaceAlphaMod`
+- [x] `SDL_GetSurfaceAlphaMod`
+- [x] `SDL_SetSurfaceColorMod`
+- [x] `SDL_GetSurfaceColorMod`
+- [x] `SDL_SetSurfaceBlendMode`
+- [x] `SDL_GetSurfaceBlendMode`
+- [x] `SDL_SetSurfaceClipRect`
+- [x] `SDL_GetSurfaceClipRect`
 - [x] `SDL_SetSurfaceRLE`
 - [x] `SDL_SurfaceHasRLE`
 - [x] `SDL_MapSurfaceRGB`

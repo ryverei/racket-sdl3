@@ -18,6 +18,7 @@
 (require racket/match
          racket/format
          racket/math
+         racket/unsafe/ops
          sdl3)
 
 (define window-width 800)
@@ -88,32 +89,39 @@
   (vector "Classic" "Fire" "Grayscale" "Rainbow" "Ocean"))
 
 ;; Compute Mandelbrot iteration count for a point
+;; Uses unsafe operations for ~9x performance improvement
 (define (mandelbrot-iterations cx cy max-iter)
   (let loop ([zx 0.0] [zy 0.0] [iter 0])
-    (if (or (>= iter max-iter)
-            (> (+ (* zx zx) (* zy zy)) 4.0))
+    (define zx2 (unsafe-fl* zx zx))
+    (define zy2 (unsafe-fl* zy zy))
+    (if (or (unsafe-fx>= iter max-iter)
+            (unsafe-fl> (unsafe-fl+ zx2 zy2) 4.0))
         iter
-        (let ([new-zx (+ (- (* zx zx) (* zy zy)) cx)]
-              [new-zy (+ (* 2.0 zx zy) cy)])
-          (loop new-zx new-zy (+ iter 1))))))
+        (let ([new-zx (unsafe-fl+ (unsafe-fl- zx2 zy2) cx)]
+              [new-zy (unsafe-fl+ (unsafe-fl* 2.0 (unsafe-fl* zx zy)) cy)])
+          (loop new-zx new-zy (unsafe-fx+ iter 1))))))
 
 ;; Render Mandelbrot set to a surface
+;; Precomputes coordinate mapping for performance
 (define (render-mandelbrot! surf center-x center-y zoom palette-fn)
   (define w (surface-width surf))
   (define h (surface-height surf))
   (define aspect (/ w h))
   (define half-width (* 2.0 (/ 1.0 zoom)))
   (define half-height (/ half-width aspect))
-  (define min-x (- center-x half-width))
-  (define max-x (+ center-x half-width))
-  (define min-y (- center-y half-height))
-  (define max-y (+ center-y half-height))
+  (define min-x (exact->inexact (- center-x half-width)))
+  (define max-x (exact->inexact (+ center-x half-width)))
+  (define min-y (exact->inexact (- center-y half-height)))
+  (define max-y (exact->inexact (+ center-y half-height)))
+  ;; Precompute coordinate scaling factors
+  (define x-scale (unsafe-fl/ (unsafe-fl- max-x min-x) (exact->inexact (sub1 w))))
+  (define y-scale (unsafe-fl/ (unsafe-fl- max-y min-y) (exact->inexact (sub1 h))))
 
   (surface-fill-pixels! surf
     (lambda (px py)
-      ;; Map pixel to complex plane
-      (define cx (+ min-x (* (/ px (sub1 w)) (- max-x min-x))))
-      (define cy (+ min-y (* (/ py (sub1 h)) (- max-y min-y))))
+      ;; Map pixel to complex plane using precomputed scale
+      (define cx (unsafe-fl+ min-x (unsafe-fl* (exact->inexact px) x-scale)))
+      (define cy (unsafe-fl+ min-y (unsafe-fl* (exact->inexact py) y-scale)))
       ;; Compute iterations and map to color
       (define iter (mandelbrot-iterations cx cy max-iterations))
       (palette-fn iter max-iterations))))

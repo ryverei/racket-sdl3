@@ -38,43 +38,48 @@ Reorganize and consolidate the examples directory to reduce redundancy, fill cov
 
 Deleted 8 old files. Also fixed a pre-existing bug in `safe/window.rkt` where `(all-from-out "../raw.rkt")` caused duplicate identifier exports when combined with `safe/events.rkt`.
 
-## Phase 2: Removals
+## Phase 2: Removals ✓ DONE
 
-### 2.1 Remove image.rkt
+### 2.1 Remove image.rkt ✓
 - Functionality covered by texture-transforms.rkt and other texture examples
 - Basic image loading is shown in multiple places
 
-## Phase 3: Additions
+## Phase 3: Additions ✓ DONE
 
-### 3.1 Add sprite-animation.rkt (textures/)
-- Load a sprite sheet
+### 3.1 Add sprite-animation.rkt (textures/) ✓
+- Programmatically generated sprite sheet (no external asset needed)
 - Animate through frames based on time
-- Show walk cycle or similar
-- Demonstrate frame timing independent of FPS
-- Need: sprite sheet asset (or create simple one programmatically)
+- Variable animation speed control
+- Frame timing independent of FPS
+- Controls: Left/Right move, Up/Down speed, Space pause, R reverse
 
-### 3.2 Add camera.rkt (advanced/)
-- Scrolling world larger than the window
-- Camera follows player smoothly
-- Show world coordinates vs screen coordinates
-- Optional: parallax background layers
+### 3.2 Add camera.rkt (advanced/) ✓
+- World 3x larger than window (2400x1800)
+- Smooth camera follow with lerp
+- World coordinates vs screen coordinates
+- Parallax background layers (toggleable)
+- Mini-map showing viewport position
+- Controls: WASD/Arrows, Space toggle smooth, P toggle parallax
 
-### 3.3 Add error-handling.rkt (window/ or new basics/)
+### 3.3 Add error-handling.rkt (window/) ✓
 - Graceful handling of missing image files
 - Graceful handling of missing font files
-- Show proper error messages to users
-- Demonstrate fallback behavior
+- Interactive demo with keyboard triggers
+- Shows caught exception messages
+- Also fixed `raw/ttf.rkt` to properly return null on font load failure
 
-### 3.4 Add buttons.rkt (input/)
-- Clickable rectangular buttons
-- Hover state detection
-- Click handling
-- Visual feedback (normal/hover/pressed states)
+### 3.4 Add buttons.rkt (input/) ✓
+- Clickable rectangular buttons with 3D effect
+- Hover, pressed, and disabled states
+- Click detection with proper press/release handling
+- Counter demo with increment, decrement, reset, double, random buttons
 
-### 3.5 Add custom-cursor.rkt (input/)
-- Hide system cursor
-- Draw custom cursor sprite at mouse position
-- Optional: different cursors for different states
+### 3.5 Add custom-cursor.rkt (input/) ✓
+- Hide system cursor and draw custom cursor at mouse position
+- 5 cursor styles: crosshair, circle, arrow, target, hand
+- Click effect animation
+- Toggle system cursor visibility for comparison
+- Cycle through system cursor types
 
 ## Phase 4: Structural Reorganization
 

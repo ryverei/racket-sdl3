@@ -55,7 +55,7 @@
 ;; file: path to font file
 ;; ptsize: point size (float in SDL3_ttf 3.x)
 ;; Returns: pointer to font, or NULL on failure
-(define-ttf TTF-OpenFont (_fun _string _float -> _TTF_Font-pointer)
+(define-ttf TTF-OpenFont (_fun _string _float -> _TTF_Font-pointer/null)
   #:c-id TTF_OpenFont)
 
 ;; TTF_CloseFont: Close a font and free resources

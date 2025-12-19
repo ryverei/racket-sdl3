@@ -19,10 +19,14 @@
          _SDL_Renderer-pointer/null
          _SDL_Texture-pointer
          _SDL_Texture-pointer/null
-         _SDL_Surface-pointer
-         _SDL_Surface-pointer/null
          _SDL_Cursor-pointer
          _SDL_Cursor-pointer/null
+         ;; Surface struct
+         _SDL_Surface
+         _SDL_Surface-pointer
+         _SDL_Surface-pointer/null
+         SDL_Surface-w
+         SDL_Surface-h
          ;; Integer point struct
          _SDL_Point
          _SDL_Point-pointer
@@ -265,8 +269,20 @@
 (define-cpointer-type _SDL_Window-pointer)
 (define-cpointer-type _SDL_Renderer-pointer)
 (define-cpointer-type _SDL_Texture-pointer)
-(define-cpointer-type _SDL_Surface-pointer)
 (define-cpointer-type _SDL_Cursor-pointer)
+
+;; ============================================================================
+;; Surface Struct
+;; ============================================================================
+
+;; SDL_Surface - image data in CPU memory
+;; We only define the read-only fields we need; the rest is opaque
+(define-cstruct _SDL_Surface
+  ([flags _uint32]        ; SDL_SurfaceFlags
+   [format _uint32]       ; SDL_PixelFormat
+   [w _int]               ; width
+   [h _int]))             ; height
+  ;; Additional fields (pitch, pixels, etc.) exist but are omitted
 
 ;; ============================================================================
 ;; Point and Rectangle Structs

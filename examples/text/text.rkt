@@ -47,6 +47,25 @@
                  static-color
                  #:renderer renderer))
 
+  ;; Cache textures for typed text and FPS counter
+  ;; Only recreate when the text changes
+  (define typed-texture #f)
+  (define typed-texture-text "")
+  (define fps-texture #f)
+  (define fps-texture-text "")
+
+  (define (update-typed-texture! new-text)
+    (unless (string=? new-text typed-texture-text)
+      (when typed-texture (texture-destroy! typed-texture))
+      (set! typed-texture (render-text font new-text typed-color #:renderer renderer))
+      (set! typed-texture-text new-text)))
+
+  (define (update-fps-texture! new-text)
+    (unless (string=? new-text fps-texture-text)
+      (when fps-texture (texture-destroy! fps-texture))
+      (set! fps-texture (render-text font new-text fps-color #:renderer renderer))
+      (set! fps-texture-text new-text)))
+
   (let loop ([typed-text ""] [fps-text "FPS: --"]
              [frame-count 0]
              [last-time (current-inexact-milliseconds)]
@@ -101,6 +120,10 @@
             (values fps-text next-frame-count last-time)))
 
       (when still-running?
+        ;; Update cached textures only when text changes
+        (update-typed-texture! new-text)
+        (update-fps-texture! next-fps-text)
+
         ;; Clear background
         (set-draw-color! renderer 0 0 0)
         (render-clear! renderer)
@@ -109,21 +132,25 @@
         (when static-texture
           (render-texture! renderer static-texture 20 20))
 
-        ;; Live typed text
-        (draw-text! renderer font new-text 20 80 typed-color)
+        ;; Live typed text (from cache)
+        (when typed-texture
+          (render-texture! renderer typed-texture 20 80))
 
-        ;; FPS counter
-        (draw-text! renderer font next-fps-text 20 (- window-height 60) fps-color)
+        ;; FPS counter (from cache)
+        (when fps-texture
+          (render-texture! renderer fps-texture 20 (- window-height 60)))
 
         (render-present! renderer)
-        (delay! 16)
+        ;; No delay! needed - render-present! waits for vsync (~60 FPS)
 
         (loop new-text next-fps-text next-frame next-last-time still-running?))))
 
   (stop-text-input! window)
 
-  (when static-texture
-    (texture-destroy! static-texture))
+  ;; Clean up cached textures
+  (when typed-texture (texture-destroy! typed-texture))
+  (when fps-texture (texture-destroy! fps-texture))
+  (when static-texture (texture-destroy! static-texture))
 
   (close-font! font)
 

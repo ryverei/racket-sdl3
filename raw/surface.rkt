@@ -3,6 +3,7 @@
 ;; SDL3 Surface Operations
 ;;
 ;; Functions for managing surfaces (software-based image buffers).
+;; Surface struct accessors (SDL_Surface-w, SDL_Surface-h) are in private/types.rkt.
 
 (require ffi/unsafe
          "../private/lib.rkt"

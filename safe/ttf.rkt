@@ -105,14 +105,25 @@
         (unless surface
           (error 'render-text "Failed to render text: ~a" (SDL-GetError)))
 
-        ;; Convert to a texture for rendering
-        (define tex-ptr (SDL-CreateTextureFromSurface (renderer-ptr rend) surface))
-        (SDL-DestroySurface surface)
+        ;; Check surface dimensions - textures are limited to 16384x16384
+        (define w (SDL_Surface-w surface))
+        (define h (SDL_Surface-h surface))
+        (define max-size 16384)
 
-        (unless tex-ptr
-          (error 'render-text "Failed to create texture from text: ~a" (SDL-GetError)))
+        (cond
+          [(or (> w max-size) (> h max-size))
+           ;; Text too large for a texture - clean up and return #f
+           (SDL-DestroySurface surface)
+           #f]
+          [else
+           ;; Convert to a texture for rendering
+           (define tex-ptr (SDL-CreateTextureFromSurface (renderer-ptr rend) surface))
+           (SDL-DestroySurface surface)
 
-        (texture-from-pointer tex-ptr #:custodian cust))))
+           (unless tex-ptr
+             (error 'render-text "Failed to create texture from text: ~a" (SDL-GetError)))
+
+           (texture-from-pointer tex-ptr #:custodian cust)]))))
 
 (define (draw-text! rend f text x y color
                     #:mode [mode 'blended]

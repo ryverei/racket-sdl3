@@ -81,28 +81,32 @@ Deleted 8 old files. Also fixed a pre-existing bug in `safe/window.rkt` where `(
 - Toggle system cursor visibility for comparison
 - Cycle through system cursor types
 
-## Phase 4: Structural Reorganization
+## Phase 4: Structural Reorganization ✓ DONE
 
-### 4.1 Create basics/ directory
-Move or create simple introductory examples:
-- `basics/window.rkt` (rename from window/basic.rkt)
-- `basics/drawing.rkt` (simple shapes only, simpler than drawing/drawing.rkt)
-- `basics/input.rkt` (minimal keyboard + mouse)
-- `basics/image.rkt` (load and display one image)
+### 4.1 Create basics/ directory ✓
+Created 4 simple introductory examples:
+- `basics/window.rkt` - Simplest SDL3 program, just a window with colored background
+- `basics/drawing.rkt` - Basic shapes: filled/outline rectangles, lines
+- `basics/input.rkt` - Minimal keyboard (WASD) + mouse (click to change color)
+- `basics/image.rkt` - Load and display one image centered
 
-### 4.2 Simplify complex examples
+Deleted `window/basic.rkt` (replaced by `basics/window.rkt`).
 
-**display-info.rkt**: Trim to essential display querying, remove excessive UI chrome
+### 4.2 Simplify complex examples ✓
 
-**keyboard-visual.rkt**: Consider moving to demos/ or simplifying the keyboard layout code
+**display-info.rkt**: Simplified from 277 to 123 lines. Removed panel backgrounds, borders, side-by-side layout. Now uses simple line-by-line text output with a clean helper function.
 
-**viewport-clip.rkt**: Split into three separate examples:
-- `viewport.rkt` - split-screen viewports
-- `clipping.rkt` - clipping rectangles
-- `scaling.rkt` - render scaling
+**keyboard-visual.rkt**: Moved to `demos/keyboard-visual.rkt` since it's a more complete visualization/demo rather than a learning example.
 
-### 4.3 Rebalance directories
-After all changes, target structure:
+**viewport-clip.rkt**: Split into three focused examples:
+- `advanced/viewport.rkt` - Split-screen viewports with colored quadrants
+- `advanced/clipping.rkt` - Animated clipping rectangle with grid content
+- `advanced/scaling.rkt` - Interactive render scale (+/- to change)
+
+Deleted `viewport-clip.rkt`.
+
+### 4.3 Rebalance directories ✓
+Final structure achieved:
 
 ```
 examples/
@@ -112,31 +116,31 @@ examples/
 │   ├── input.rkt
 │   └── image.rkt
 │
-├── window/           # Window management (2 examples)
+├── window/           # Window management (3 examples)
 │   ├── controls.rkt
-│   └── display-info.rkt
+│   ├── display-info.rkt
+│   └── error-handling.rkt
 │
 ├── drawing/          # Drawing & rendering (2 examples)
-│   ├── drawing.rkt       # merged shapes + geometry
+│   ├── drawing.rkt
 │   └── blend-modes.rkt
 │
 ├── textures/         # Texture operations (4 examples)
-│   ├── texture-transforms.rkt  # merged tint + rotate
+│   ├── texture-transforms.rkt
 │   ├── render-target.rkt
 │   ├── screenshot.rkt
-│   └── sprite-animation.rkt    # NEW
+│   └── sprite-animation.rkt
 │
 ├── text/             # Text rendering (1 example)
 │   └── text.rkt
 │
 ├── input/            # Input handling (6 examples)
-│   ├── keyboard.rkt      # merged events + state
-│   ├── keyboard-visual.rkt
-│   ├── mouse.rkt         # merged events + warp
+│   ├── keyboard.rkt
+│   ├── mouse.rkt
 │   ├── mouse-relative.rkt
 │   ├── mouse-scroll.rkt
-│   ├── buttons.rkt       # NEW
-│   └── custom-cursor.rkt # NEW
+│   ├── buttons.rkt
+│   └── custom-cursor.rkt
 │
 ├── animation/        # Animation (1 example)
 │   └── animation.rkt
@@ -144,20 +148,22 @@ examples/
 ├── audio/            # Audio (1 example)
 │   └── audio.rkt
 │
-├── advanced/         # Advanced topics (5 examples)
+├── advanced/         # Advanced topics (6 examples)
 │   ├── collision.rkt
-│   ├── viewport.rkt      # split from viewport-clip
-│   ├── clipping.rkt      # split from viewport-clip
-│   ├── scaling.rkt       # split from viewport-clip
-│   ├── camera.rkt        # NEW
+│   ├── viewport.rkt
+│   ├── clipping.rkt
+│   ├── scaling.rkt
+│   ├── camera.rkt
 │   └── wait-events.rkt
 │
 ├── dialogs/          # System dialogs (1 example)
 │   └── message-box.rkt
 │
 └── assets/           # Shared assets
-    ├── (existing images)
-    └── spritesheet.png   # NEW (for sprite-animation)
+
+demos/
+├── mini-paint.rkt
+└── keyboard-visual.rkt
 ```
 
 ## Phase 5: Documentation

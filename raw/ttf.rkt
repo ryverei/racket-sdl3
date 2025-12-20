@@ -318,6 +318,52 @@
   (_fun _TTF_Font-pointer _string _size _SDL_Color _int -> _SDL_Surface-pointer/null)
   #:c-id TTF_RenderText_Blended_Wrapped)
 
+;; TTF_RenderText_Solid_Wrapped: Render word-wrapped text at fast quality
+;; font: the font to use
+;; text: UTF-8 text to render
+;; length: length in bytes, or 0 for null-terminated
+;; fg: foreground color (passed by value)
+;; wrap_width: maximum line width in pixels
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderText-Solid-Wrapped
+  (_fun _TTF_Font-pointer _string _size _SDL_Color _int -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderText_Solid_Wrapped)
+
+;; TTF_RenderText_Shaded_Wrapped: Render word-wrapped text at high quality
+;; font: the font to use
+;; text: UTF-8 text to render
+;; length: length in bytes, or 0 for null-terminated
+;; fg: foreground color (passed by value)
+;; bg: background color (passed by value)
+;; wrap_width: maximum line width in pixels
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderText-Shaded-Wrapped
+  (_fun _TTF_Font-pointer _string _size _SDL_Color _SDL_Color _int -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderText_Shaded_Wrapped)
+
+;; TTF_RenderText_LCD: Render text with LCD subpixel rendering
+;; font: the font to use
+;; text: UTF-8 text to render
+;; length: length in bytes, or 0 for null-terminated
+;; fg: foreground color (passed by value)
+;; bg: background color (passed by value)
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderText-LCD
+  (_fun _TTF_Font-pointer _string _size _SDL_Color _SDL_Color -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderText_LCD)
+
+;; TTF_RenderText_LCD_Wrapped: Render word-wrapped text with LCD subpixel rendering
+;; font: the font to use
+;; text: UTF-8 text to render
+;; length: length in bytes, or 0 for null-terminated
+;; fg: foreground color (passed by value)
+;; bg: background color (passed by value)
+;; wrap_width: maximum line width in pixels
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderText-LCD-Wrapped
+  (_fun _TTF_Font-pointer _string _size _SDL_Color _SDL_Color _int -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderText_LCD_Wrapped)
+
 ;; ============================================================================
 ;; Single Glyph Rendering
 ;; ============================================================================
@@ -339,6 +385,26 @@
 (define-ttf TTF-RenderGlyph-Blended
   (_fun _TTF_Font-pointer _uint32 _SDL_Color -> _SDL_Surface-pointer/null)
   #:c-id TTF_RenderGlyph_Blended)
+
+;; TTF_RenderGlyph_Shaded: Render a single glyph at high quality
+;; font: the font to use
+;; ch: Unicode codepoint
+;; fg: foreground color (passed by value)
+;; bg: background color (passed by value)
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderGlyph-Shaded
+  (_fun _TTF_Font-pointer _uint32 _SDL_Color _SDL_Color -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderGlyph_Shaded)
+
+;; TTF_RenderGlyph_LCD: Render a single glyph with LCD subpixel rendering
+;; font: the font to use
+;; ch: Unicode codepoint
+;; fg: foreground color (passed by value)
+;; bg: background color (passed by value)
+;; Returns: pointer to surface, or NULL on failure
+(define-ttf TTF-RenderGlyph-LCD
+  (_fun _TTF_Font-pointer _uint32 _SDL_Color _SDL_Color -> _SDL_Surface-pointer/null)
+  #:c-id TTF_RenderGlyph_LCD)
 
 ;; ============================================================================
 ;; Glyph Operations

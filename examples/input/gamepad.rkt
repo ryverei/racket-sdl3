@@ -18,7 +18,7 @@
 (require sdl3)
 
 ;; Initialize SDL with joystick support (includes gamepad)
-(sdl-init! '(video joystick))
+(sdl-init! (bitwise-ior SDL_INIT_VIDEO SDL_INIT_JOYSTICK))
 
 (define WIDTH 800)
 (define HEIGHT 600)

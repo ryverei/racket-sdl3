@@ -30,6 +30,13 @@
 (define-cpointer-type _TTF_Font-pointer)
 
 ;; ============================================================================
+;; Text Engine Pointer Types
+;; ============================================================================
+
+(define-cpointer-type _TTF_TextEngine-pointer)
+(define-cpointer-type _TTF_Text-pointer)
+
+;; ============================================================================
 ;; FFI Enum Type Aliases
 ;; ============================================================================
 
@@ -600,3 +607,164 @@
 ;; Returns 0.0.0 if HarfBuzz is not available
 (define-ttf TTF-GetHarfBuzzVersion (_fun _pointer _pointer _pointer -> _void)
   #:c-id TTF_GetHarfBuzzVersion)
+
+;; ============================================================================
+;; Text Engine API - Renderer Text Engine
+;; ============================================================================
+
+;; TTF_CreateRendererTextEngine: Create a text engine for a renderer
+;; renderer: the renderer to use
+;; Returns: text engine pointer, or NULL on failure
+(define-ttf TTF-CreateRendererTextEngine (_fun _SDL_Renderer-pointer -> _TTF_TextEngine-pointer/null)
+  #:c-id TTF_CreateRendererTextEngine)
+
+;; TTF_DestroyRendererTextEngine: Destroy a renderer text engine
+;; engine: the text engine to destroy
+(define-ttf TTF-DestroyRendererTextEngine (_fun _TTF_TextEngine-pointer -> _void)
+  #:c-id TTF_DestroyRendererTextEngine)
+
+;; TTF_DrawRendererText: Draw text created with a renderer engine
+;; text: the text object to draw
+;; x: x position
+;; y: y position
+;; Returns: true on success, false on failure
+(define-ttf TTF-DrawRendererText (_fun _TTF_Text-pointer _float _float -> _bool)
+  #:c-id TTF_DrawRendererText)
+
+;; ============================================================================
+;; Text Engine API - Surface Text Engine
+;; ============================================================================
+
+;; TTF_CreateSurfaceTextEngine: Create a text engine for surfaces
+;; Returns: text engine pointer, or NULL on failure
+(define-ttf TTF-CreateSurfaceTextEngine (_fun -> _TTF_TextEngine-pointer/null)
+  #:c-id TTF_CreateSurfaceTextEngine)
+
+;; TTF_DestroySurfaceTextEngine: Destroy a surface text engine
+;; engine: the text engine to destroy
+(define-ttf TTF-DestroySurfaceTextEngine (_fun _TTF_TextEngine-pointer -> _void)
+  #:c-id TTF_DestroySurfaceTextEngine)
+
+;; TTF_DrawSurfaceText: Draw text onto a surface
+;; text: the text object to draw
+;; x: x position
+;; y: y position
+;; surface: the target surface
+;; Returns: true on success, false on failure
+(define-ttf TTF-DrawSurfaceText (_fun _TTF_Text-pointer _int _int _SDL_Surface-pointer -> _bool)
+  #:c-id TTF_DrawSurfaceText)
+
+;; ============================================================================
+;; Text Engine API - Text Objects
+;; ============================================================================
+
+;; TTF_CreateText: Create a text object
+;; engine: the text engine to use
+;; font: the font to use
+;; text: UTF-8 text string
+;; length: length in bytes, or 0 for null-terminated
+;; Returns: text object pointer, or NULL on failure
+(define-ttf TTF-CreateText (_fun _TTF_TextEngine-pointer _TTF_Font-pointer _string _size -> _TTF_Text-pointer/null)
+  #:c-id TTF_CreateText)
+
+;; TTF_DestroyText: Destroy a text object
+;; text: the text object to destroy
+(define-ttf TTF-DestroyText (_fun _TTF_Text-pointer -> _void)
+  #:c-id TTF_DestroyText)
+
+;; TTF_SetTextString: Set the string of a text object
+;; text: the text object
+;; string: new UTF-8 text string
+;; length: length in bytes, or 0 for null-terminated
+;; Returns: true on success, false on failure
+(define-ttf TTF-SetTextString (_fun _TTF_Text-pointer _string _size -> _bool)
+  #:c-id TTF_SetTextString)
+
+;; TTF_AppendTextString: Append to a text object's string
+;; text: the text object
+;; string: UTF-8 text to append
+;; length: length in bytes, or 0 for null-terminated
+;; Returns: true on success, false on failure
+(define-ttf TTF-AppendTextString (_fun _TTF_Text-pointer _string _size -> _bool)
+  #:c-id TTF_AppendTextString)
+
+;; TTF_InsertTextString: Insert text at a position
+;; text: the text object
+;; offset: byte offset for insertion
+;; string: UTF-8 text to insert
+;; length: length in bytes, or 0 for null-terminated
+;; Returns: true on success, false on failure
+(define-ttf TTF-InsertTextString (_fun _TTF_Text-pointer _int _string _size -> _bool)
+  #:c-id TTF_InsertTextString)
+
+;; TTF_DeleteTextString: Delete text at a position
+;; text: the text object
+;; offset: byte offset for deletion
+;; length: number of bytes to delete
+;; Returns: true on success, false on failure
+(define-ttf TTF-DeleteTextString (_fun _TTF_Text-pointer _int _int -> _bool)
+  #:c-id TTF_DeleteTextString)
+
+;; TTF_GetTextSize: Get the size of a text object
+;; text: the text object
+;; w: pointer to store width (can be NULL)
+;; h: pointer to store height (can be NULL)
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetTextSize (_fun _TTF_Text-pointer _pointer _pointer -> _bool)
+  #:c-id TTF_GetTextSize)
+
+;; TTF_SetTextColor: Set the color of a text object
+;; text: the text object
+;; r: red component (0-255)
+;; g: green component (0-255)
+;; b: blue component (0-255)
+;; a: alpha component (0-255)
+;; Returns: true on success, false on failure
+(define-ttf TTF-SetTextColor (_fun _TTF_Text-pointer _uint8 _uint8 _uint8 _uint8 -> _bool)
+  #:c-id TTF_SetTextColor)
+
+;; TTF_GetTextColor: Get the color of a text object
+;; text: the text object
+;; r: pointer to store red (can be NULL)
+;; g: pointer to store green (can be NULL)
+;; b: pointer to store blue (can be NULL)
+;; a: pointer to store alpha (can be NULL)
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetTextColor (_fun _TTF_Text-pointer _pointer _pointer _pointer _pointer -> _bool)
+  #:c-id TTF_GetTextColor)
+
+;; TTF_SetTextPosition: Set the position of a text object
+;; text: the text object
+;; x: x position
+;; y: y position
+;; Returns: true on success, false on failure
+(define-ttf TTF-SetTextPosition (_fun _TTF_Text-pointer _int _int -> _bool)
+  #:c-id TTF_SetTextPosition)
+
+;; TTF_GetTextPosition: Get the position of a text object
+;; text: the text object
+;; x: pointer to store x (can be NULL)
+;; y: pointer to store y (can be NULL)
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetTextPosition (_fun _TTF_Text-pointer _pointer _pointer -> _bool)
+  #:c-id TTF_GetTextPosition)
+
+;; TTF_SetTextWrapWidth: Set the wrap width of a text object
+;; text: the text object
+;; wrap_width: maximum line width in pixels (0 for no wrapping)
+;; Returns: true on success, false on failure
+(define-ttf TTF-SetTextWrapWidth (_fun _TTF_Text-pointer _int -> _bool)
+  #:c-id TTF_SetTextWrapWidth)
+
+;; TTF_GetTextWrapWidth: Get the wrap width of a text object
+;; text: the text object
+;; wrap_width: pointer to store wrap width
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetTextWrapWidth (_fun _TTF_Text-pointer _pointer -> _bool)
+  #:c-id TTF_GetTextWrapWidth)
+
+;; TTF_UpdateText: Update a text object after changes
+;; text: the text object
+;; Returns: true on success, false on failure
+(define-ttf TTF-UpdateText (_fun _TTF_Text-pointer -> _bool)
+  #:c-id TTF_UpdateText)

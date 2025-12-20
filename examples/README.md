@@ -72,6 +72,7 @@ TrueType font rendering.
 | Example | Concepts |
 |---------|----------|
 | `text.rkt` | Load fonts, render text, sizing, colors |
+| `font-properties.rkt` | Font metrics, styles, text measurement, glyph info, version info |
 
 ### input/
 

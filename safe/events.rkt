@@ -34,6 +34,29 @@
  mouse-wheel-event-direction
  mouse-wheel-event-mouse-x mouse-wheel-event-mouse-y
 
+ ;; Joystick events
+ joy-axis-event joy-axis-event?
+ joy-axis-event-which joy-axis-event-axis joy-axis-event-value
+
+ joy-button-event joy-button-event?
+ joy-button-event-type joy-button-event-which joy-button-event-button
+
+ joy-hat-event joy-hat-event?
+ joy-hat-event-which joy-hat-event-hat joy-hat-event-value
+
+ joy-device-event joy-device-event?
+ joy-device-event-type joy-device-event-which
+
+ ;; Gamepad events
+ gamepad-axis-event gamepad-axis-event?
+ gamepad-axis-event-which gamepad-axis-event-axis gamepad-axis-event-value
+
+ gamepad-button-event gamepad-button-event?
+ gamepad-button-event-type gamepad-button-event-which gamepad-button-event-button
+
+ gamepad-device-event gamepad-device-event?
+ gamepad-device-event-type gamepad-device-event-which
+
  unknown-event unknown-event? unknown-event-type
 
  ;; Polling functions
@@ -159,6 +182,46 @@
 ;; direction is 'normal or 'flipped
 ;; mouse-x, mouse-y are cursor position (floats)
 
+;; Joystick axis motion
+(struct joy-axis-event sdl-event (which axis value) #:transparent)
+;; which is the joystick instance ID
+;; axis is the axis index
+;; value is -32768 to 32767
+
+;; Joystick button press/release
+(struct joy-button-event sdl-event (type which button) #:transparent)
+;; type is 'down or 'up
+;; which is the joystick instance ID
+;; button is the button index
+
+;; Joystick hat motion
+(struct joy-hat-event sdl-event (which hat value) #:transparent)
+;; which is the joystick instance ID
+;; hat is the hat index
+;; value is a symbol: 'centered, 'up, 'down, 'left, 'right, 'up-left, etc.
+
+;; Joystick connected/disconnected
+(struct joy-device-event sdl-event (type which) #:transparent)
+;; type is 'added or 'removed
+;; which is the joystick instance ID
+
+;; Gamepad axis motion
+(struct gamepad-axis-event sdl-event (which axis value) #:transparent)
+;; which is the joystick instance ID
+;; axis is a symbol: 'left-x, 'left-y, 'right-x, 'right-y, 'left-trigger, 'right-trigger
+;; value is -32768 to 32767 for sticks, 0 to 32767 for triggers
+
+;; Gamepad button press/release
+(struct gamepad-button-event sdl-event (type which button) #:transparent)
+;; type is 'down or 'up
+;; which is the joystick instance ID
+;; button is a symbol: 'south, 'east, 'west, 'north, 'back, 'guide, 'start, etc.
+
+;; Gamepad connected/disconnected/remapped
+(struct gamepad-device-event sdl-event (type which) #:transparent)
+;; type is 'added, 'removed, or 'remapped
+;; which is the joystick instance ID
+
 ;; Unknown/unhandled event type
 (struct unknown-event sdl-event (type) #:transparent)
 ;; type is the raw event type integer
@@ -197,6 +260,62 @@
     [(= button-id SDL_BUTTON_X1) 'x1]
     [(= button-id SDL_BUTTON_X2) 'x2]
     [else button-id]))
+
+;; ============================================================================
+;; Joystick Hat Value Mapping
+;; ============================================================================
+
+(define (joy-hat-value->symbol v)
+  (cond
+    [(= v SDL_HAT_CENTERED) 'centered]
+    [(= v SDL_HAT_UP) 'up]
+    [(= v SDL_HAT_RIGHT) 'right]
+    [(= v SDL_HAT_DOWN) 'down]
+    [(= v SDL_HAT_LEFT) 'left]
+    [(= v SDL_HAT_RIGHTUP) 'up-right]
+    [(= v SDL_HAT_RIGHTDOWN) 'down-right]
+    [(= v SDL_HAT_LEFTUP) 'up-left]
+    [(= v SDL_HAT_LEFTDOWN) 'down-left]
+    [else 'unknown]))
+
+;; ============================================================================
+;; Gamepad Button/Axis Mapping
+;; ============================================================================
+
+(define (gamepad-button->symbol btn)
+  (case btn
+    [(0) 'south]
+    [(1) 'east]
+    [(2) 'west]
+    [(3) 'north]
+    [(4) 'back]
+    [(5) 'guide]
+    [(6) 'start]
+    [(7) 'left-stick]
+    [(8) 'right-stick]
+    [(9) 'left-shoulder]
+    [(10) 'right-shoulder]
+    [(11) 'dpad-up]
+    [(12) 'dpad-down]
+    [(13) 'dpad-left]
+    [(14) 'dpad-right]
+    [(15) 'misc1]
+    [(16) 'right-paddle1]
+    [(17) 'left-paddle1]
+    [(18) 'right-paddle2]
+    [(19) 'left-paddle2]
+    [(20) 'touchpad]
+    [else btn]))
+
+(define (gamepad-axis->symbol ax)
+  (case ax
+    [(0) 'left-x]
+    [(1) 'left-y]
+    [(2) 'right-x]
+    [(3) 'right-y]
+    [(4) 'left-trigger]
+    [(5) 'right-trigger]
+    [else ax]))
 
 ;; ============================================================================
 ;; Event Parsing
@@ -263,6 +382,60 @@
                         (if (= dir SDL_MOUSEWHEEL_NORMAL) 'normal 'flipped)
                         (SDL_MouseWheelEvent-mouse_x mw)
                         (SDL_MouseWheelEvent-mouse_y mw))]
+
+    ;; Joystick axis motion
+    [(= type SDL_EVENT_JOYSTICK_AXIS_MOTION)
+     (define ja (event->joy-axis buf))
+     (joy-axis-event (SDL_JoyAxisEvent-which ja)
+                     (SDL_JoyAxisEvent-axis ja)
+                     (SDL_JoyAxisEvent-value ja))]
+
+    ;; Joystick button
+    [(or (= type SDL_EVENT_JOYSTICK_BUTTON_DOWN)
+         (= type SDL_EVENT_JOYSTICK_BUTTON_UP))
+     (define jb (event->joy-button buf))
+     (joy-button-event (if (= type SDL_EVENT_JOYSTICK_BUTTON_DOWN) 'down 'up)
+                       (SDL_JoyButtonEvent-which jb)
+                       (SDL_JoyButtonEvent-button jb))]
+
+    ;; Joystick hat
+    [(= type SDL_EVENT_JOYSTICK_HAT_MOTION)
+     (define jh (event->joy-hat buf))
+     (joy-hat-event (SDL_JoyHatEvent-which jh)
+                    (SDL_JoyHatEvent-hat jh)
+                    (joy-hat-value->symbol (SDL_JoyHatEvent-value jh)))]
+
+    ;; Joystick device added/removed
+    [(or (= type SDL_EVENT_JOYSTICK_ADDED)
+         (= type SDL_EVENT_JOYSTICK_REMOVED))
+     (define jd (event->joy-device buf))
+     (joy-device-event (if (= type SDL_EVENT_JOYSTICK_ADDED) 'added 'removed)
+                       (SDL_JoyDeviceEvent-which jd))]
+
+    ;; Gamepad axis motion
+    [(= type SDL_EVENT_GAMEPAD_AXIS_MOTION)
+     (define ga (event->gamepad-axis buf))
+     (gamepad-axis-event (SDL_GamepadAxisEvent-which ga)
+                         (gamepad-axis->symbol (SDL_GamepadAxisEvent-axis ga))
+                         (SDL_GamepadAxisEvent-value ga))]
+
+    ;; Gamepad button
+    [(or (= type SDL_EVENT_GAMEPAD_BUTTON_DOWN)
+         (= type SDL_EVENT_GAMEPAD_BUTTON_UP))
+     (define gb (event->gamepad-button buf))
+     (gamepad-button-event (if (= type SDL_EVENT_GAMEPAD_BUTTON_DOWN) 'down 'up)
+                           (SDL_GamepadButtonEvent-which gb)
+                           (gamepad-button->symbol (SDL_GamepadButtonEvent-button gb)))]
+
+    ;; Gamepad device added/removed/remapped
+    [(or (= type SDL_EVENT_GAMEPAD_ADDED)
+         (= type SDL_EVENT_GAMEPAD_REMOVED)
+         (= type SDL_EVENT_GAMEPAD_REMAPPED))
+     (define gd (event->gamepad-device buf))
+     (gamepad-device-event (cond [(= type SDL_EVENT_GAMEPAD_ADDED) 'added]
+                                 [(= type SDL_EVENT_GAMEPAD_REMOVED) 'removed]
+                                 [else 'remapped])
+                           (SDL_GamepadDeviceEvent-which gd))]
 
     ;; Unknown
     [else

@@ -246,6 +246,75 @@
          SDL_DialogFileFilter-name
          SDL_DialogFileFilter-pattern
          _SDL_DialogFileCallback
+         ;; Joystick types
+         _SDL_Joystick-pointer
+         _SDL_Joystick-pointer/null
+         _SDL_JoystickID
+         _SDL_JoystickType
+         _SDL_JoystickConnectionState
+         _SDL_PowerState
+         ;; Gamepad types
+         _SDL_Gamepad-pointer
+         _SDL_Gamepad-pointer/null
+         _SDL_GamepadType
+         _SDL_GamepadButton
+         _SDL_GamepadAxis
+         _SDL_GamepadButtonLabel
+         ;; Joystick event structs
+         _SDL_JoyAxisEvent
+         _SDL_JoyAxisEvent-pointer
+         SDL_JoyAxisEvent-type
+         SDL_JoyAxisEvent-timestamp
+         SDL_JoyAxisEvent-which
+         SDL_JoyAxisEvent-axis
+         SDL_JoyAxisEvent-value
+         _SDL_JoyButtonEvent
+         _SDL_JoyButtonEvent-pointer
+         SDL_JoyButtonEvent-type
+         SDL_JoyButtonEvent-timestamp
+         SDL_JoyButtonEvent-which
+         SDL_JoyButtonEvent-button
+         SDL_JoyButtonEvent-down
+         _SDL_JoyHatEvent
+         _SDL_JoyHatEvent-pointer
+         SDL_JoyHatEvent-type
+         SDL_JoyHatEvent-timestamp
+         SDL_JoyHatEvent-which
+         SDL_JoyHatEvent-hat
+         SDL_JoyHatEvent-value
+         _SDL_JoyDeviceEvent
+         _SDL_JoyDeviceEvent-pointer
+         SDL_JoyDeviceEvent-type
+         SDL_JoyDeviceEvent-timestamp
+         SDL_JoyDeviceEvent-which
+         ;; Gamepad event structs
+         _SDL_GamepadAxisEvent
+         _SDL_GamepadAxisEvent-pointer
+         SDL_GamepadAxisEvent-type
+         SDL_GamepadAxisEvent-timestamp
+         SDL_GamepadAxisEvent-which
+         SDL_GamepadAxisEvent-axis
+         SDL_GamepadAxisEvent-value
+         _SDL_GamepadButtonEvent
+         _SDL_GamepadButtonEvent-pointer
+         SDL_GamepadButtonEvent-type
+         SDL_GamepadButtonEvent-timestamp
+         SDL_GamepadButtonEvent-which
+         SDL_GamepadButtonEvent-button
+         SDL_GamepadButtonEvent-down
+         _SDL_GamepadDeviceEvent
+         _SDL_GamepadDeviceEvent-pointer
+         SDL_GamepadDeviceEvent-type
+         SDL_GamepadDeviceEvent-timestamp
+         SDL_GamepadDeviceEvent-which
+         ;; Event conversion helpers
+         event->joy-axis
+         event->joy-button
+         event->joy-hat
+         event->joy-device
+         event->gamepad-axis
+         event->gamepad-button
+         event->gamepad-device
          ;; Error handling forward reference
          sdl-get-error-proc)
 
@@ -578,6 +647,150 @@
         _pointer           ; const char * const * filelist
         _int               ; filter index
         -> _void))
+
+;; ============================================================================
+;; Joystick Types
+;; ============================================================================
+
+;; Joystick opaque pointer
+(define-cpointer-type _SDL_Joystick-pointer)
+
+;; Joystick instance ID (Uint32)
+(define _SDL_JoystickID _uint32)
+
+;; SDL_JoystickType enum
+(define _SDL_JoystickType _int)
+
+;; SDL_JoystickConnectionState enum
+(define _SDL_JoystickConnectionState _int)
+
+;; SDL_PowerState enum (shared with gamepad)
+(define _SDL_PowerState _int)
+
+;; ============================================================================
+;; Gamepad Types
+;; ============================================================================
+
+;; Gamepad opaque pointer
+(define-cpointer-type _SDL_Gamepad-pointer)
+
+;; SDL_GamepadType enum
+(define _SDL_GamepadType _int)
+
+;; SDL_GamepadButton enum
+(define _SDL_GamepadButton _int)
+
+;; SDL_GamepadAxis enum
+(define _SDL_GamepadAxis _int)
+
+;; SDL_GamepadButtonLabel enum
+(define _SDL_GamepadButtonLabel _int)
+
+;; ============================================================================
+;; Joystick Event Structs
+;; ============================================================================
+
+;; SDL_JoyAxisEvent - joystick axis motion event
+(define-cstruct _SDL_JoyAxisEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]
+   [axis _uint8]
+   [padding1 _uint8]
+   [padding2 _uint8]
+   [padding3 _uint8]
+   [value _sint16]
+   [padding4 _uint16]))
+
+;; SDL_JoyButtonEvent - joystick button press/release event
+(define-cstruct _SDL_JoyButtonEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]
+   [button _uint8]
+   [down _stdbool]
+   [padding1 _uint8]
+   [padding2 _uint8]))
+
+;; SDL_JoyHatEvent - joystick hat position change event
+(define-cstruct _SDL_JoyHatEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]
+   [hat _uint8]
+   [value _uint8]
+   [padding1 _uint8]
+   [padding2 _uint8]))
+
+;; SDL_JoyDeviceEvent - joystick connected/disconnected event
+(define-cstruct _SDL_JoyDeviceEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]))
+
+;; ============================================================================
+;; Gamepad Event Structs
+;; ============================================================================
+
+;; SDL_GamepadAxisEvent - gamepad axis motion event
+(define-cstruct _SDL_GamepadAxisEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]
+   [axis _uint8]
+   [padding1 _uint8]
+   [padding2 _uint8]
+   [padding3 _uint8]
+   [value _sint16]
+   [padding4 _uint16]))
+
+;; SDL_GamepadButtonEvent - gamepad button press/release event
+(define-cstruct _SDL_GamepadButtonEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]
+   [button _uint8]
+   [down _stdbool]
+   [padding1 _uint8]
+   [padding2 _uint8]))
+
+;; SDL_GamepadDeviceEvent - gamepad connected/disconnected event
+(define-cstruct _SDL_GamepadDeviceEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [which _SDL_JoystickID]))
+
+;; ============================================================================
+;; Joystick/Gamepad Event Conversion Helpers
+;; ============================================================================
+
+(define (event->joy-axis event-ptr)
+  (cast event-ptr _pointer _SDL_JoyAxisEvent-pointer))
+
+(define (event->joy-button event-ptr)
+  (cast event-ptr _pointer _SDL_JoyButtonEvent-pointer))
+
+(define (event->joy-hat event-ptr)
+  (cast event-ptr _pointer _SDL_JoyHatEvent-pointer))
+
+(define (event->joy-device event-ptr)
+  (cast event-ptr _pointer _SDL_JoyDeviceEvent-pointer))
+
+(define (event->gamepad-axis event-ptr)
+  (cast event-ptr _pointer _SDL_GamepadAxisEvent-pointer))
+
+(define (event->gamepad-button event-ptr)
+  (cast event-ptr _pointer _SDL_GamepadButtonEvent-pointer))
+
+(define (event->gamepad-device event-ptr)
+  (cast event-ptr _pointer _SDL_GamepadDeviceEvent-pointer))
 
 ;; ============================================================================
 ;; Error Handling

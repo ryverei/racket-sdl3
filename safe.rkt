@@ -18,6 +18,8 @@
          "safe/ttf.rkt"
          "safe/mouse.rkt"
          "safe/keyboard.rkt"
+         "safe/joystick.rkt"
+         "safe/gamepad.rkt"
          "safe/clipboard.rkt"
          "safe/timer.rkt"
          "safe/audio.rkt"
@@ -34,6 +36,8 @@
          (all-from-out "safe/ttf.rkt")
          (all-from-out "safe/mouse.rkt")
          (all-from-out "safe/keyboard.rkt")
+         (all-from-out "safe/joystick.rkt")
+         (all-from-out "safe/gamepad.rkt")
          (all-from-out "safe/clipboard.rkt")
          (all-from-out "safe/timer.rkt")
          (all-from-out "safe/audio.rkt")

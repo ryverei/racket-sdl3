@@ -21,6 +21,8 @@
          "raw/events.rkt"
          "raw/keyboard.rkt"
          "raw/mouse.rkt"
+         "raw/joystick.rkt"
+         "raw/gamepad.rkt"
          "raw/display.rkt"
          "raw/timer.rkt"
          "raw/clipboard.rkt"
@@ -42,6 +44,8 @@
          (all-from-out "raw/events.rkt")
          (all-from-out "raw/keyboard.rkt")
          (all-from-out "raw/mouse.rkt")
+         (all-from-out "raw/joystick.rkt")
+         (all-from-out "raw/gamepad.rkt")
          (all-from-out "raw/display.rkt")
          (all-from-out "raw/timer.rkt")
          (all-from-out "raw/clipboard.rkt")

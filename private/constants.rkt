@@ -11,6 +11,8 @@
  ;; Init flags
  SDL_INIT_AUDIO
  SDL_INIT_VIDEO
+ SDL_INIT_JOYSTICK
+ SDL_INIT_GAMEPAD
  SDL_INIT_EVENTS
  ;; Window flags
  SDL_WINDOW_FULLSCREEN
@@ -142,14 +144,132 @@
  SDL_HINT_RENDER_VSYNC
  SDL_HINT_VIDEO_ALLOW_SCREENSAVER
  SDL_HINT_FRAMEBUFFER_ACCELERATION
- SDL_HINT_MOUSE_RELATIVE_MODE_WARP)
+ SDL_HINT_MOUSE_RELATIVE_MODE_WARP
+ ;; Joystick event constants
+ SDL_EVENT_JOYSTICK_AXIS_MOTION
+ SDL_EVENT_JOYSTICK_BALL_MOTION
+ SDL_EVENT_JOYSTICK_HAT_MOTION
+ SDL_EVENT_JOYSTICK_BUTTON_DOWN
+ SDL_EVENT_JOYSTICK_BUTTON_UP
+ SDL_EVENT_JOYSTICK_ADDED
+ SDL_EVENT_JOYSTICK_REMOVED
+ SDL_EVENT_JOYSTICK_BATTERY_UPDATED
+ SDL_EVENT_JOYSTICK_UPDATE_COMPLETE
+ ;; Gamepad event constants
+ SDL_EVENT_GAMEPAD_AXIS_MOTION
+ SDL_EVENT_GAMEPAD_BUTTON_DOWN
+ SDL_EVENT_GAMEPAD_BUTTON_UP
+ SDL_EVENT_GAMEPAD_ADDED
+ SDL_EVENT_GAMEPAD_REMOVED
+ SDL_EVENT_GAMEPAD_REMAPPED
+ SDL_EVENT_GAMEPAD_TOUCHPAD_DOWN
+ SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION
+ SDL_EVENT_GAMEPAD_TOUCHPAD_UP
+ SDL_EVENT_GAMEPAD_SENSOR_UPDATE
+ SDL_EVENT_GAMEPAD_UPDATE_COMPLETE
+ SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED
+ ;; Joystick hat constants
+ SDL_HAT_CENTERED
+ SDL_HAT_UP
+ SDL_HAT_RIGHT
+ SDL_HAT_DOWN
+ SDL_HAT_LEFT
+ SDL_HAT_RIGHTUP
+ SDL_HAT_RIGHTDOWN
+ SDL_HAT_LEFTUP
+ SDL_HAT_LEFTDOWN
+ ;; Joystick type constants
+ SDL_JOYSTICK_TYPE_UNKNOWN
+ SDL_JOYSTICK_TYPE_GAMEPAD
+ SDL_JOYSTICK_TYPE_WHEEL
+ SDL_JOYSTICK_TYPE_ARCADE_STICK
+ SDL_JOYSTICK_TYPE_FLIGHT_STICK
+ SDL_JOYSTICK_TYPE_DANCE_PAD
+ SDL_JOYSTICK_TYPE_GUITAR
+ SDL_JOYSTICK_TYPE_DRUM_KIT
+ SDL_JOYSTICK_TYPE_ARCADE_PAD
+ SDL_JOYSTICK_TYPE_THROTTLE
+ ;; Joystick connection state
+ SDL_JOYSTICK_CONNECTION_INVALID
+ SDL_JOYSTICK_CONNECTION_UNKNOWN
+ SDL_JOYSTICK_CONNECTION_WIRED
+ SDL_JOYSTICK_CONNECTION_WIRELESS
+ ;; Power state
+ SDL_POWERSTATE_ERROR
+ SDL_POWERSTATE_UNKNOWN
+ SDL_POWERSTATE_ON_BATTERY
+ SDL_POWERSTATE_NO_BATTERY
+ SDL_POWERSTATE_CHARGING
+ SDL_POWERSTATE_CHARGED
+ ;; Gamepad type constants
+ SDL_GAMEPAD_TYPE_UNKNOWN
+ SDL_GAMEPAD_TYPE_STANDARD
+ SDL_GAMEPAD_TYPE_XBOX360
+ SDL_GAMEPAD_TYPE_XBOXONE
+ SDL_GAMEPAD_TYPE_PS3
+ SDL_GAMEPAD_TYPE_PS4
+ SDL_GAMEPAD_TYPE_PS5
+ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO
+ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT
+ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT
+ SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR
+ ;; Gamepad button constants
+ SDL_GAMEPAD_BUTTON_INVALID
+ SDL_GAMEPAD_BUTTON_SOUTH
+ SDL_GAMEPAD_BUTTON_EAST
+ SDL_GAMEPAD_BUTTON_WEST
+ SDL_GAMEPAD_BUTTON_NORTH
+ SDL_GAMEPAD_BUTTON_BACK
+ SDL_GAMEPAD_BUTTON_GUIDE
+ SDL_GAMEPAD_BUTTON_START
+ SDL_GAMEPAD_BUTTON_LEFT_STICK
+ SDL_GAMEPAD_BUTTON_RIGHT_STICK
+ SDL_GAMEPAD_BUTTON_LEFT_SHOULDER
+ SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER
+ SDL_GAMEPAD_BUTTON_DPAD_UP
+ SDL_GAMEPAD_BUTTON_DPAD_DOWN
+ SDL_GAMEPAD_BUTTON_DPAD_LEFT
+ SDL_GAMEPAD_BUTTON_DPAD_RIGHT
+ SDL_GAMEPAD_BUTTON_MISC1
+ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1
+ SDL_GAMEPAD_BUTTON_LEFT_PADDLE1
+ SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2
+ SDL_GAMEPAD_BUTTON_LEFT_PADDLE2
+ SDL_GAMEPAD_BUTTON_TOUCHPAD
+ SDL_GAMEPAD_BUTTON_MISC2
+ SDL_GAMEPAD_BUTTON_MISC3
+ SDL_GAMEPAD_BUTTON_MISC4
+ SDL_GAMEPAD_BUTTON_MISC5
+ SDL_GAMEPAD_BUTTON_MISC6
+ SDL_GAMEPAD_BUTTON_COUNT
+ ;; Gamepad axis constants
+ SDL_GAMEPAD_AXIS_INVALID
+ SDL_GAMEPAD_AXIS_LEFTX
+ SDL_GAMEPAD_AXIS_LEFTY
+ SDL_GAMEPAD_AXIS_RIGHTX
+ SDL_GAMEPAD_AXIS_RIGHTY
+ SDL_GAMEPAD_AXIS_LEFT_TRIGGER
+ SDL_GAMEPAD_AXIS_RIGHT_TRIGGER
+ SDL_GAMEPAD_AXIS_COUNT
+ ;; Gamepad button label constants
+ SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN
+ SDL_GAMEPAD_BUTTON_LABEL_A
+ SDL_GAMEPAD_BUTTON_LABEL_B
+ SDL_GAMEPAD_BUTTON_LABEL_X
+ SDL_GAMEPAD_BUTTON_LABEL_Y
+ SDL_GAMEPAD_BUTTON_LABEL_CROSS
+ SDL_GAMEPAD_BUTTON_LABEL_CIRCLE
+ SDL_GAMEPAD_BUTTON_LABEL_SQUARE
+ SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE)
 
 ;; ============================================================================
 ;; Init Flags (SDL_InitFlags) - used with SDL_Init
 ;; ============================================================================
-(define SDL_INIT_AUDIO #x00000010)
-(define SDL_INIT_VIDEO #x00000020)
-(define SDL_INIT_EVENTS #x00004000)
+(define SDL_INIT_AUDIO    #x00000010)
+(define SDL_INIT_VIDEO    #x00000020)
+(define SDL_INIT_JOYSTICK #x00000200)
+(define SDL_INIT_GAMEPAD  #x00001000)
+(define SDL_INIT_EVENTS   #x00004000)
 
 ;; ============================================================================
 ;; Window Flags (SDL_WindowFlags) - 64-bit in SDL3
@@ -344,3 +464,149 @@
 (define SDL_HINT_VIDEO_ALLOW_SCREENSAVER "SDL_VIDEO_ALLOW_SCREENSAVER")
 (define SDL_HINT_FRAMEBUFFER_ACCELERATION "SDL_FRAMEBUFFER_ACCELERATION")
 (define SDL_HINT_MOUSE_RELATIVE_MODE_WARP "SDL_MOUSE_RELATIVE_MODE_WARP")
+
+;; ============================================================================
+;; Joystick Event Constants
+;; ============================================================================
+(define SDL_EVENT_JOYSTICK_AXIS_MOTION     #x600)
+(define SDL_EVENT_JOYSTICK_BALL_MOTION     #x601)
+(define SDL_EVENT_JOYSTICK_HAT_MOTION      #x602)
+(define SDL_EVENT_JOYSTICK_BUTTON_DOWN     #x603)
+(define SDL_EVENT_JOYSTICK_BUTTON_UP       #x604)
+(define SDL_EVENT_JOYSTICK_ADDED           #x605)
+(define SDL_EVENT_JOYSTICK_REMOVED         #x606)
+(define SDL_EVENT_JOYSTICK_BATTERY_UPDATED #x607)
+(define SDL_EVENT_JOYSTICK_UPDATE_COMPLETE #x608)
+
+;; ============================================================================
+;; Gamepad Event Constants
+;; ============================================================================
+(define SDL_EVENT_GAMEPAD_AXIS_MOTION          #x650)
+(define SDL_EVENT_GAMEPAD_BUTTON_DOWN          #x651)
+(define SDL_EVENT_GAMEPAD_BUTTON_UP            #x652)
+(define SDL_EVENT_GAMEPAD_ADDED                #x653)
+(define SDL_EVENT_GAMEPAD_REMOVED              #x654)
+(define SDL_EVENT_GAMEPAD_REMAPPED             #x655)
+(define SDL_EVENT_GAMEPAD_TOUCHPAD_DOWN        #x656)
+(define SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION      #x657)
+(define SDL_EVENT_GAMEPAD_TOUCHPAD_UP          #x658)
+(define SDL_EVENT_GAMEPAD_SENSOR_UPDATE        #x659)
+(define SDL_EVENT_GAMEPAD_UPDATE_COMPLETE      #x65A)
+(define SDL_EVENT_GAMEPAD_STEAM_HANDLE_UPDATED #x65B)
+
+;; ============================================================================
+;; Joystick Hat Constants
+;; ============================================================================
+(define SDL_HAT_CENTERED  #x00)
+(define SDL_HAT_UP        #x01)
+(define SDL_HAT_RIGHT     #x02)
+(define SDL_HAT_DOWN      #x04)
+(define SDL_HAT_LEFT      #x08)
+(define SDL_HAT_RIGHTUP   (bitwise-ior SDL_HAT_RIGHT SDL_HAT_UP))    ; #x03
+(define SDL_HAT_RIGHTDOWN (bitwise-ior SDL_HAT_RIGHT SDL_HAT_DOWN))  ; #x06
+(define SDL_HAT_LEFTUP    (bitwise-ior SDL_HAT_LEFT SDL_HAT_UP))     ; #x09
+(define SDL_HAT_LEFTDOWN  (bitwise-ior SDL_HAT_LEFT SDL_HAT_DOWN))   ; #x0C
+
+;; ============================================================================
+;; Joystick Type Constants
+;; ============================================================================
+(define SDL_JOYSTICK_TYPE_UNKNOWN      0)
+(define SDL_JOYSTICK_TYPE_GAMEPAD      1)
+(define SDL_JOYSTICK_TYPE_WHEEL        2)
+(define SDL_JOYSTICK_TYPE_ARCADE_STICK 3)
+(define SDL_JOYSTICK_TYPE_FLIGHT_STICK 4)
+(define SDL_JOYSTICK_TYPE_DANCE_PAD    5)
+(define SDL_JOYSTICK_TYPE_GUITAR       6)
+(define SDL_JOYSTICK_TYPE_DRUM_KIT     7)
+(define SDL_JOYSTICK_TYPE_ARCADE_PAD   8)
+(define SDL_JOYSTICK_TYPE_THROTTLE     9)
+
+;; ============================================================================
+;; Joystick Connection State Constants
+;; ============================================================================
+(define SDL_JOYSTICK_CONNECTION_INVALID  -1)
+(define SDL_JOYSTICK_CONNECTION_UNKNOWN   0)
+(define SDL_JOYSTICK_CONNECTION_WIRED     1)
+(define SDL_JOYSTICK_CONNECTION_WIRELESS  2)
+
+;; ============================================================================
+;; Power State Constants
+;; ============================================================================
+(define SDL_POWERSTATE_ERROR      -1)
+(define SDL_POWERSTATE_UNKNOWN     0)
+(define SDL_POWERSTATE_ON_BATTERY  1)
+(define SDL_POWERSTATE_NO_BATTERY  2)
+(define SDL_POWERSTATE_CHARGING    3)
+(define SDL_POWERSTATE_CHARGED     4)
+
+;; ============================================================================
+;; Gamepad Type Constants
+;; ============================================================================
+(define SDL_GAMEPAD_TYPE_UNKNOWN                   0)
+(define SDL_GAMEPAD_TYPE_STANDARD                  1)
+(define SDL_GAMEPAD_TYPE_XBOX360                   2)
+(define SDL_GAMEPAD_TYPE_XBOXONE                   3)
+(define SDL_GAMEPAD_TYPE_PS3                       4)
+(define SDL_GAMEPAD_TYPE_PS4                       5)
+(define SDL_GAMEPAD_TYPE_PS5                       6)
+(define SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO       7)
+(define SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_LEFT  8)
+(define SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT 9)
+(define SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR  10)
+
+;; ============================================================================
+;; Gamepad Button Constants
+;; ============================================================================
+(define SDL_GAMEPAD_BUTTON_INVALID        -1)
+(define SDL_GAMEPAD_BUTTON_SOUTH           0)  ; Bottom face button (A on Xbox, Cross on PlayStation)
+(define SDL_GAMEPAD_BUTTON_EAST            1)  ; Right face button (B on Xbox, Circle on PlayStation)
+(define SDL_GAMEPAD_BUTTON_WEST            2)  ; Left face button (X on Xbox, Square on PlayStation)
+(define SDL_GAMEPAD_BUTTON_NORTH           3)  ; Top face button (Y on Xbox, Triangle on PlayStation)
+(define SDL_GAMEPAD_BUTTON_BACK            4)  ; Back button
+(define SDL_GAMEPAD_BUTTON_GUIDE           5)  ; Guide button (Xbox logo, PS button)
+(define SDL_GAMEPAD_BUTTON_START           6)  ; Start button
+(define SDL_GAMEPAD_BUTTON_LEFT_STICK      7)  ; Left stick click
+(define SDL_GAMEPAD_BUTTON_RIGHT_STICK     8)  ; Right stick click
+(define SDL_GAMEPAD_BUTTON_LEFT_SHOULDER   9)  ; Left bumper/shoulder
+(define SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER 10)  ; Right bumper/shoulder
+(define SDL_GAMEPAD_BUTTON_DPAD_UP        11)
+(define SDL_GAMEPAD_BUTTON_DPAD_DOWN      12)
+(define SDL_GAMEPAD_BUTTON_DPAD_LEFT      13)
+(define SDL_GAMEPAD_BUTTON_DPAD_RIGHT     14)
+(define SDL_GAMEPAD_BUTTON_MISC1          15)  ; Xbox Series X share button, PS5 microphone button
+(define SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1  16)  ; Xbox Elite paddle P1 (upper right)
+(define SDL_GAMEPAD_BUTTON_LEFT_PADDLE1   17)  ; Xbox Elite paddle P3 (upper left)
+(define SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2  18)  ; Xbox Elite paddle P2 (lower right)
+(define SDL_GAMEPAD_BUTTON_LEFT_PADDLE2   19)  ; Xbox Elite paddle P4 (lower left)
+(define SDL_GAMEPAD_BUTTON_TOUCHPAD       20)  ; PlayStation touchpad button
+(define SDL_GAMEPAD_BUTTON_MISC2          21)  ; Additional misc button
+(define SDL_GAMEPAD_BUTTON_MISC3          22)  ; Additional misc button
+(define SDL_GAMEPAD_BUTTON_MISC4          23)  ; Additional misc button
+(define SDL_GAMEPAD_BUTTON_MISC5          24)  ; Additional misc button
+(define SDL_GAMEPAD_BUTTON_MISC6          25)  ; Additional misc button
+(define SDL_GAMEPAD_BUTTON_COUNT          26)
+
+;; ============================================================================
+;; Gamepad Axis Constants
+;; ============================================================================
+(define SDL_GAMEPAD_AXIS_INVALID       -1)
+(define SDL_GAMEPAD_AXIS_LEFTX          0)  ; Left stick X axis
+(define SDL_GAMEPAD_AXIS_LEFTY          1)  ; Left stick Y axis
+(define SDL_GAMEPAD_AXIS_RIGHTX         2)  ; Right stick X axis
+(define SDL_GAMEPAD_AXIS_RIGHTY         3)  ; Right stick Y axis
+(define SDL_GAMEPAD_AXIS_LEFT_TRIGGER   4)  ; Left trigger (0 to 32767)
+(define SDL_GAMEPAD_AXIS_RIGHT_TRIGGER  5)  ; Right trigger (0 to 32767)
+(define SDL_GAMEPAD_AXIS_COUNT          6)
+
+;; ============================================================================
+;; Gamepad Button Label Constants
+;; ============================================================================
+(define SDL_GAMEPAD_BUTTON_LABEL_UNKNOWN  0)
+(define SDL_GAMEPAD_BUTTON_LABEL_A        1)  ; Xbox A, Nintendo B
+(define SDL_GAMEPAD_BUTTON_LABEL_B        2)  ; Xbox B, Nintendo A
+(define SDL_GAMEPAD_BUTTON_LABEL_X        3)  ; Xbox X, Nintendo Y
+(define SDL_GAMEPAD_BUTTON_LABEL_Y        4)  ; Xbox Y, Nintendo X
+(define SDL_GAMEPAD_BUTTON_LABEL_CROSS    5)  ; PlayStation Cross
+(define SDL_GAMEPAD_BUTTON_LABEL_CIRCLE   6)  ; PlayStation Circle
+(define SDL_GAMEPAD_BUTTON_LABEL_SQUARE   7)  ; PlayStation Square
+(define SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE 8)  ; PlayStation Triangle

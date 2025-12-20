@@ -341,6 +341,58 @@
   #:c-id TTF_RenderGlyph_Blended)
 
 ;; ============================================================================
+;; Glyph Operations
+;; ============================================================================
+
+;; TTF_FontHasGlyph: Check if a font has a glyph for a codepoint
+;; font: the font to query
+;; ch: Unicode codepoint
+;; Returns: true if the font has the glyph, false otherwise
+(define-ttf TTF-FontHasGlyph (_fun _TTF_Font-pointer _uint32 -> _bool)
+  #:c-id TTF_FontHasGlyph)
+
+;; TTF_GetGlyphImage: Get the glyph image for a codepoint
+;; font: the font to use
+;; ch: Unicode codepoint
+;; image_type: pointer to store the image type (can be NULL)
+;; Returns: surface containing the glyph, or NULL on failure
+(define-ttf TTF-GetGlyphImage
+  (_fun _TTF_Font-pointer _uint32 _pointer -> _SDL_Surface-pointer/null)
+  #:c-id TTF_GetGlyphImage)
+
+;; TTF_GetGlyphImageForIndex: Get the glyph image for a glyph index
+;; font: the font to use
+;; glyph_index: glyph index in the font
+;; image_type: pointer to store the image type (can be NULL)
+;; Returns: surface containing the glyph, or NULL on failure
+(define-ttf TTF-GetGlyphImageForIndex
+  (_fun _TTF_Font-pointer _uint32 _pointer -> _SDL_Surface-pointer/null)
+  #:c-id TTF_GetGlyphImageForIndex)
+
+;; TTF_GetGlyphMetrics: Get metrics for a glyph
+;; font: the font to use
+;; ch: Unicode codepoint
+;; minx: pointer to store minimum x (can be NULL)
+;; maxx: pointer to store maximum x (can be NULL)
+;; miny: pointer to store minimum y (can be NULL)
+;; maxy: pointer to store maximum y (can be NULL)
+;; advance: pointer to store advance width (can be NULL)
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetGlyphMetrics
+  (_fun _TTF_Font-pointer _uint32 _pointer _pointer _pointer _pointer _pointer -> _bool)
+  #:c-id TTF_GetGlyphMetrics)
+
+;; TTF_GetGlyphKerning: Get kerning between two glyphs
+;; font: the font to use
+;; prev_ch: previous character codepoint
+;; ch: current character codepoint
+;; kerning: pointer to store kerning value
+;; Returns: true on success, false on failure
+(define-ttf TTF-GetGlyphKerning
+  (_fun _TTF_Font-pointer _uint32 _uint32 _pointer -> _bool)
+  #:c-id TTF_GetGlyphKerning)
+
+;; ============================================================================
 ;; Text Measurement
 ;; ============================================================================
 

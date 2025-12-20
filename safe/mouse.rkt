@@ -8,6 +8,13 @@
          "window.rkt")
 
 (provide
+ ;; Mouse enumeration
+ has-mouse?
+ get-mice
+ get-mouse-count
+ get-mouse-name-for-id
+ get-mouse-focus
+
  ;; Mouse state
  get-mouse-state
  get-relative-mouse-state
@@ -51,6 +58,34 @@
  SDL_BUTTON_RMASK
  SDL_BUTTON_X1MASK
  SDL_BUTTON_X2MASK)
+
+;; =========================================================================
+;; Mouse Enumeration
+;; =========================================================================
+
+(define (has-mouse?)
+  (SDL-HasMouse))
+
+;; Get list of mouse instance IDs
+(define (get-mice)
+  (define-values (arr count) (SDL-GetMice))
+  (if (or (not arr) (zero? count))
+      '()
+      (begin0
+        (for/list ([i (in-range count)])
+          (ptr-ref arr _uint32 i))
+        (SDL-free arr))))
+
+(define (get-mouse-count)
+  (length (get-mice)))
+
+;; Get the name of a mouse by instance ID
+(define (get-mouse-name-for-id instance-id)
+  (SDL-GetMouseNameForID instance-id))
+
+;; Get the window that currently has mouse focus (or #f)
+(define (get-mouse-focus)
+  (SDL-GetMouseFocus))
 
 ;; =========================================================================
 ;; Mouse State

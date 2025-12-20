@@ -342,21 +342,21 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 - [ ] `SDL_GetWindowFromEvent`
 
 #### Keyboard (Advanced)
-- [ ] `SDL_HasKeyboard`, `SDL_GetKeyboards`, `SDL_GetKeyboardNameForID`
-- [ ] `SDL_GetKeyboardFocus`
+- [x] `SDL_HasKeyboard`, `SDL_GetKeyboards`, `SDL_GetKeyboardNameForID`
+- [x] `SDL_GetKeyboardFocus`
 - [ ] `SDL_SetModState`, `SDL_SetScancodeName`
 - [ ] `SDL_StartTextInputWithProperties`, `SDL_TextInputActive`
 - [ ] `SDL_ClearComposition`, `SDL_SetTextInputArea`, `SDL_GetTextInputArea`
 - [ ] `SDL_HasScreenKeyboardSupport`, `SDL_ScreenKeyboardShown`
 
 #### Mouse (Advanced)
-- [ ] `SDL_HasMouse`, `SDL_GetMice`, `SDL_GetMouseNameForID`, `SDL_GetMouseFocus`
+- [x] `SDL_HasMouse`, `SDL_GetMice`, `SDL_GetMouseNameForID`, `SDL_GetMouseFocus`
 - [ ] `SDL_CreateCursor`, `SDL_CreateColorCursor`, `SDL_GetDefaultCursor`
 
 #### Rectangle Utilities
-- [ ] `SDL_GetRectUnion`, `SDL_GetRectUnionFloat`
-- [ ] `SDL_GetRectEnclosingPoints`, `SDL_GetRectEnclosingPointsFloat`
-- [ ] `SDL_GetRectAndLineIntersection`, `SDL_GetRectAndLineIntersectionFloat`
+- [x] `SDL_GetRectUnion`, `SDL_GetRectUnionFloat`
+- [x] `SDL_GetRectEnclosingPoints`, `SDL_GetRectEnclosingPointsFloat`
+- [x] `SDL_GetRectAndLineIntersection`, `SDL_GetRectAndLineIntersectionFloat`
 
 #### Timer (Advanced)
 - [x] `SDL_AddTimer`, `SDL_AddTimerNS`, `SDL_RemoveTimer`
@@ -484,8 +484,7 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 
 ## Suggested Next Steps
 
-1. **Input Enumeration + Rect Utilities** - keyboard/mouse listing and rect helpers
-2. **Touch + Pen Events** - touch/pen event structs and parsing
-3. **Audio Advanced** - device format/gain, stream open, mix/convert
-4. **SDL_ttf Advanced** - remaining TTF IO and text engine APIs
-5. **SDL_image Animation** - GIF/WebP animation loading and playback
+1. **Touch + Pen Events** - touch/pen event structs and parsing
+2. **Audio Advanced** - device format/gain, stream open, mix/convert
+3. **SDL_ttf Advanced** - remaining TTF IO and text engine APIs
+4. **SDL_image Animation** - GIF/WebP animation loading and playback

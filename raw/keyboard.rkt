@@ -9,6 +9,10 @@
          "../private/types.rkt")
 
 (provide SDL-GetKeyboardState
+         SDL-HasKeyboard
+         SDL-GetKeyboards
+         SDL-GetKeyboardNameForID
+         SDL-GetKeyboardFocus
          SDL-GetModState
          SDL-ResetKeyboard
          SDL-GetKeyFromScancode
@@ -20,6 +24,38 @@
          ;; Text input
          SDL-StartTextInput
          SDL-StopTextInput)
+
+;; ============================================================================
+;; Keyboard Enumeration
+;; ============================================================================
+
+;; SDL_HasKeyboard: Check if any keyboard is connected
+;; Returns: true if a keyboard is connected, false otherwise
+(define-sdl SDL-HasKeyboard (_fun -> _sdl-bool)
+  #:c-id SDL_HasKeyboard)
+
+;; SDL_GetKeyboards: Get a list of connected keyboard IDs
+;; count: pointer to receive the number of keyboards (can be NULL)
+;; Returns: pointer to a 0-terminated array of SDL_KeyboardID values
+;; The returned array must be freed with SDL_free
+(define-sdl SDL-GetKeyboards
+  (_fun (count : (_ptr o _int))
+        -> (result : _pointer)
+        -> (values result count))
+  #:c-id SDL_GetKeyboards)
+
+;; SDL_GetKeyboardNameForID: Get the name of a keyboard by instance ID
+;; instance_id: the SDL_KeyboardID to query
+;; Returns: the name of the keyboard, or NULL on failure
+(define-sdl SDL-GetKeyboardNameForID
+  (_fun _SDL_KeyboardID -> _string/utf-8)
+  #:c-id SDL_GetKeyboardNameForID)
+
+;; SDL_GetKeyboardFocus: Get the window that currently has keyboard focus
+;; Returns: the window with keyboard focus, or NULL if none
+(define-sdl SDL-GetKeyboardFocus
+  (_fun -> _SDL_Window-pointer/null)
+  #:c-id SDL_GetKeyboardFocus)
 
 ;; ============================================================================
 ;; Keyboard State

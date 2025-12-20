@@ -8,6 +8,13 @@
          "window.rkt")
 
 (provide
+ ;; Keyboard enumeration
+ has-keyboard?
+ get-keyboards
+ get-keyboard-count
+ get-keyboard-name-for-id
+ get-keyboard-focus
+
  ;; Keyboard state
  get-keyboard-state
  key-pressed?
@@ -32,6 +39,34 @@
 
  ;; Re-export keycodes, scancodes, and modifiers from enums
  (all-from-out "../private/enums.rkt"))
+
+;; =========================================================================
+;; Keyboard Enumeration
+;; =========================================================================
+
+(define (has-keyboard?)
+  (SDL-HasKeyboard))
+
+;; Get list of keyboard instance IDs
+(define (get-keyboards)
+  (define-values (arr count) (SDL-GetKeyboards))
+  (if (or (not arr) (zero? count))
+      '()
+      (begin0
+        (for/list ([i (in-range count)])
+          (ptr-ref arr _uint32 i))
+        (SDL-free arr))))
+
+(define (get-keyboard-count)
+  (length (get-keyboards)))
+
+;; Get the name of a keyboard by instance ID
+(define (get-keyboard-name-for-id instance-id)
+  (SDL-GetKeyboardNameForID instance-id))
+
+;; Get the window that currently has keyboard focus (or #f)
+(define (get-keyboard-focus)
+  (SDL-GetKeyboardFocus))
 
 ;; =========================================================================
 ;; Keyboard State

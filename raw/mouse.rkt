@@ -9,6 +9,10 @@
          "../private/types.rkt")
 
 (provide ;; Mouse state
+         SDL-HasMouse
+         SDL-GetMice
+         SDL-GetMouseNameForID
+         SDL-GetMouseFocus
          SDL-GetMouseState
          SDL-GetRelativeMouseState
          SDL-GetGlobalMouseState
@@ -25,6 +29,38 @@
          SDL-ShowCursor
          SDL-HideCursor
          SDL-CursorVisible)
+
+;; ============================================================================
+;; Mouse Enumeration
+;; ============================================================================
+
+;; SDL_HasMouse: Check if any mouse is connected
+;; Returns: true if a mouse is connected, false otherwise
+(define-sdl SDL-HasMouse (_fun -> _sdl-bool)
+  #:c-id SDL_HasMouse)
+
+;; SDL_GetMice: Get a list of connected mouse IDs
+;; count: pointer to receive the number of mice (can be NULL)
+;; Returns: pointer to a 0-terminated array of SDL_MouseID values
+;; The returned array must be freed with SDL_free
+(define-sdl SDL-GetMice
+  (_fun (count : (_ptr o _int))
+        -> (result : _pointer)
+        -> (values result count))
+  #:c-id SDL_GetMice)
+
+;; SDL_GetMouseNameForID: Get the name of a mouse by instance ID
+;; instance_id: the SDL_MouseID to query
+;; Returns: the name of the mouse, or NULL on failure
+(define-sdl SDL-GetMouseNameForID
+  (_fun _SDL_MouseID -> _string/utf-8)
+  #:c-id SDL_GetMouseNameForID)
+
+;; SDL_GetMouseFocus: Get the window that currently has mouse focus
+;; Returns: the window with mouse focus, or NULL if none
+(define-sdl SDL-GetMouseFocus
+  (_fun -> _SDL_Window-pointer/null)
+  #:c-id SDL_GetMouseFocus)
 
 ;; ============================================================================
 ;; Mouse State

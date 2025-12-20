@@ -201,6 +201,9 @@
          _SDL_SystemCursor
          ;; Audio types
          _SDL_AudioDeviceID
+         ;; Input device IDs
+         _SDL_KeyboardID
+         _SDL_MouseID
          _SDL_AudioFormat
          _SDL_AudioSpec
          _SDL_AudioSpec-pointer
@@ -367,6 +370,12 @@
 ;; SDL_AudioDeviceID - audio device instance ID (uint32)
 ;; Zero signifies an invalid/null device
 (define _SDL_AudioDeviceID _uint32)
+
+;; SDL_KeyboardID - keyboard instance ID (uint32)
+(define _SDL_KeyboardID _uint32)
+
+;; SDL_MouseID - mouse instance ID (uint32)
+(define _SDL_MouseID _uint32)
 
 ;; SDL_TimerID - timer handle (Uint32)
 (define _SDL_TimerID _uint32)

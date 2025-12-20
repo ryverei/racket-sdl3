@@ -58,7 +58,13 @@
          SDL-HasRectIntersection
          SDL-GetRectIntersection
          SDL-HasRectIntersectionFloat
-         SDL-GetRectIntersectionFloat)
+         SDL-GetRectIntersectionFloat
+         SDL-GetRectUnion
+         SDL-GetRectUnionFloat
+         SDL-GetRectEnclosingPoints
+         SDL-GetRectEnclosingPointsFloat
+         SDL-GetRectAndLineIntersection
+         SDL-GetRectAndLineIntersectionFloat)
 
 ;; ============================================================================
 ;; Renderer Creation/Destruction
@@ -452,3 +458,71 @@
 (define-sdl SDL-GetRectIntersectionFloat
   (_fun _SDL_FRect-pointer _SDL_FRect-pointer _SDL_FRect-pointer -> _sdl-bool)
   #:c-id SDL_GetRectIntersectionFloat)
+
+;; SDL_GetRectUnion: Calculate the union of two rectangles
+;; A: first rectangle
+;; B: second rectangle
+;; result: filled with the union of A and B
+;; Returns: true on success, false on failure
+(define-sdl SDL-GetRectUnion
+  (_fun _SDL_Rect-pointer _SDL_Rect-pointer _SDL_Rect-pointer -> _sdl-bool)
+  #:c-id SDL_GetRectUnion)
+
+;; SDL_GetRectUnionFloat: Calculate the union of two float rectangles
+;; A: first rectangle
+;; B: second rectangle
+;; result: filled with the union of A and B
+;; Returns: true on success, false on failure
+(define-sdl SDL-GetRectUnionFloat
+  (_fun _SDL_FRect-pointer _SDL_FRect-pointer _SDL_FRect-pointer -> _sdl-bool)
+  #:c-id SDL_GetRectUnionFloat)
+
+;; SDL_GetRectEnclosingPoints: Calculate a minimal rect enclosing points
+;; points: array of SDL_Point
+;; count: number of points
+;; clip: optional clipping rect (can be NULL)
+;; result: filled with the enclosing rect
+;; Returns: true if any points were enclosed, false otherwise
+(define-sdl SDL-GetRectEnclosingPoints
+  (_fun _pointer _int _SDL_Rect-pointer/null _SDL_Rect-pointer
+        -> _sdl-bool)
+  #:c-id SDL_GetRectEnclosingPoints)
+
+;; SDL_GetRectEnclosingPointsFloat: Calculate a minimal rect enclosing points
+;; points: array of SDL_FPoint
+;; count: number of points
+;; clip: optional clipping rect (can be NULL)
+;; result: filled with the enclosing rect
+;; Returns: true if any points were enclosed, false otherwise
+(define-sdl SDL-GetRectEnclosingPointsFloat
+  (_fun _pointer _int _SDL_FRect-pointer/null _SDL_FRect-pointer
+        -> _sdl-bool)
+  #:c-id SDL_GetRectEnclosingPointsFloat)
+
+;; SDL_GetRectAndLineIntersection: Clip a line segment to a rectangle
+;; rect: rectangle to intersect
+;; x1, y1, x2, y2: line endpoints (modified in place)
+;; Returns: true if there is an intersection, false otherwise
+(define-sdl SDL-GetRectAndLineIntersection
+  (_fun _SDL_Rect-pointer
+        (x1 : (_ptr io _int))
+        (y1 : (_ptr io _int))
+        (x2 : (_ptr io _int))
+        (y2 : (_ptr io _int))
+        -> (result : _sdl-bool)
+        -> (values result x1 y1 x2 y2))
+  #:c-id SDL_GetRectAndLineIntersection)
+
+;; SDL_GetRectAndLineIntersectionFloat: Clip a line segment to a float rect
+;; rect: rectangle to intersect
+;; x1, y1, x2, y2: line endpoints (modified in place)
+;; Returns: true if there is an intersection, false otherwise
+(define-sdl SDL-GetRectAndLineIntersectionFloat
+  (_fun _SDL_FRect-pointer
+        (x1 : (_ptr io _float))
+        (y1 : (_ptr io _float))
+        (x2 : (_ptr io _float))
+        (y2 : (_ptr io _float))
+        -> (result : _sdl-bool)
+        -> (values result x1 y1 x2 y2))
+  #:c-id SDL_GetRectAndLineIntersectionFloat)

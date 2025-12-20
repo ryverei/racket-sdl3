@@ -51,7 +51,7 @@ bindings, safe wrappers, constants/types, and example coverage.
     - Add safe wrappers that accept ports/bytes.
     - Add `examples/textures/image-io.rkt`.
 
-[ ] Phase 6: Input enumeration + rect utilities
+[x] Phase 6: Input enumeration + rect utilities
     - Add keyboard/mouse enumeration APIs.
     - Add rectangle union/intersection helpers.
     - Add `examples/input/device-enumeration.rkt` and `examples/advanced/rect-utils.rkt`.

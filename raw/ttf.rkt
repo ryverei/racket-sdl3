@@ -576,3 +576,27 @@
 ;; Returns: script tag as uint32
 (define-ttf TTF-GetGlyphScript (_fun _uint32 -> _uint32)
   #:c-id TTF_GetGlyphScript)
+
+;; ============================================================================
+;; Version Information
+;; ============================================================================
+
+;; TTF_Version: Get the version of SDL_ttf
+;; Returns: version as packed integer (major << 24 | minor << 16 | patch)
+(define-ttf TTF-Version (_fun -> _int)
+  #:c-id TTF_Version)
+
+;; TTF_GetFreeTypeVersion: Get the version of FreeType used
+;; major: pointer to store major version (can be NULL)
+;; minor: pointer to store minor version (can be NULL)
+;; patch: pointer to store patch version (can be NULL)
+(define-ttf TTF-GetFreeTypeVersion (_fun _pointer _pointer _pointer -> _void)
+  #:c-id TTF_GetFreeTypeVersion)
+
+;; TTF_GetHarfBuzzVersion: Get the version of HarfBuzz used
+;; major: pointer to store major version (can be NULL)
+;; minor: pointer to store minor version (can be NULL)
+;; patch: pointer to store patch version (can be NULL)
+;; Returns 0.0.0 if HarfBuzz is not available
+(define-ttf TTF-GetHarfBuzzVersion (_fun _pointer _pointer _pointer -> _void)
+  #:c-id TTF_GetHarfBuzzVersion)

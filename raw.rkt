@@ -32,7 +32,8 @@
          "raw/dialog.rkt"
          "raw/hints.rkt"
          "raw/image.rkt"
-         "raw/ttf.rkt")
+         "raw/ttf.rkt"
+         "raw/gl.rkt")
 
 (provide (all-from-out "private/lib.rkt")
          (all-from-out "private/types.rkt")
@@ -57,4 +58,5 @@
          (all-from-out "raw/dialog.rkt")
          (all-from-out "raw/hints.rkt")
          (all-from-out "raw/image.rkt")
-         (all-from-out "raw/ttf.rkt"))
+         (all-from-out "raw/ttf.rkt")
+         (all-from-out "raw/gl.rkt"))

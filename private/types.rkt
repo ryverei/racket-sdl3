@@ -13,6 +13,9 @@
          _SDL_InitFlags
          _SDL_WindowFlags
          _SDL_PropertiesID
+         _SDL_GLContext-pointer
+         _SDL_GLContext-pointer/null
+         _SDL_GLAttr
          ;; Pointer types
          _SDL_Window-pointer
          _SDL_Window-pointer/null
@@ -1129,3 +1132,13 @@
                     "SDL error (SDL_GetError not yet available)"))
     (error who "SDL error: ~a" msg))
   #t)
+
+;; ============================================================================
+;; OpenGL Types
+;; ============================================================================
+
+;; SDL_GLContext opaque pointer type
+(define-cpointer-type _SDL_GLContext-pointer)
+
+;; SDL_GLAttr enum (for setting GL context attributes)
+(define _SDL_GLAttr _int)

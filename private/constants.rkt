@@ -18,6 +18,7 @@
  SDL_WINDOW_FULLSCREEN
  SDL_WINDOW_RESIZABLE
  SDL_WINDOW_HIGH_PIXEL_DENSITY
+ SDL_WINDOW_OPENGL
  ;; Event constants
  SDL_EVENT_QUIT
  ;; Window events
@@ -383,7 +384,45 @@
  ;; TTF GPU text engine winding
  TTF_GPU_TEXTENGINE_WINDING_INVALID
  TTF_GPU_TEXTENGINE_WINDING_CLOCKWISE
- TTF_GPU_TEXTENGINE_WINDING_COUNTER_CLOCKWISE)
+ TTF_GPU_TEXTENGINE_WINDING_COUNTER_CLOCKWISE
+ ;; OpenGL attributes
+ SDL_GL_RED_SIZE
+ SDL_GL_GREEN_SIZE
+ SDL_GL_BLUE_SIZE
+ SDL_GL_ALPHA_SIZE
+ SDL_GL_BUFFER_SIZE
+ SDL_GL_DOUBLEBUFFER
+ SDL_GL_DEPTH_SIZE
+ SDL_GL_STENCIL_SIZE
+ SDL_GL_ACCUM_RED_SIZE
+ SDL_GL_ACCUM_GREEN_SIZE
+ SDL_GL_ACCUM_BLUE_SIZE
+ SDL_GL_ACCUM_ALPHA_SIZE
+ SDL_GL_STEREO
+ SDL_GL_MULTISAMPLEBUFFERS
+ SDL_GL_MULTISAMPLESAMPLES
+ SDL_GL_ACCELERATED_VISUAL
+ SDL_GL_RETAINED_BACKING
+ SDL_GL_CONTEXT_MAJOR_VERSION
+ SDL_GL_CONTEXT_MINOR_VERSION
+ SDL_GL_CONTEXT_FLAGS
+ SDL_GL_CONTEXT_PROFILE_MASK
+ SDL_GL_SHARE_WITH_CURRENT_CONTEXT
+ SDL_GL_FRAMEBUFFER_SRGB_CAPABLE
+ SDL_GL_CONTEXT_RELEASE_BEHAVIOR
+ SDL_GL_CONTEXT_RESET_NOTIFICATION
+ SDL_GL_CONTEXT_NO_ERROR
+ SDL_GL_FLOATBUFFERS
+ SDL_GL_EGL_PLATFORM
+ ;; OpenGL context profiles
+ SDL_GL_CONTEXT_PROFILE_CORE
+ SDL_GL_CONTEXT_PROFILE_COMPATIBILITY
+ SDL_GL_CONTEXT_PROFILE_ES
+ ;; OpenGL context flags
+ SDL_GL_CONTEXT_DEBUG_FLAG
+ SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG
+ SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG
+ SDL_GL_CONTEXT_RESET_ISOLATION_FLAG)
 
 ;; ============================================================================
 ;; Init Flags (SDL_InitFlags) - used with SDL_Init
@@ -400,6 +439,7 @@
 (define SDL_WINDOW_FULLSCREEN          #x0000000000000001)
 (define SDL_WINDOW_RESIZABLE           #x0000000000000020)
 (define SDL_WINDOW_HIGH_PIXEL_DENSITY  #x0000000000002000)
+(define SDL_WINDOW_OPENGL              #x0000000000000002)
 
 ;; ============================================================================
 ;; Event Constants
@@ -904,3 +944,51 @@
 (define SDL_TOUCH_DEVICE_DIRECT            0)  ; touch screen with window-relative coords
 (define SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE 1)  ; trackpad with absolute device coords
 (define SDL_TOUCH_DEVICE_INDIRECT_RELATIVE 2)  ; trackpad with screen cursor-relative coords
+
+;; ============================================================================
+;; OpenGL Attributes (SDL_GLAttr)
+;; ============================================================================
+(define SDL_GL_RED_SIZE                    0)
+(define SDL_GL_GREEN_SIZE                  1)
+(define SDL_GL_BLUE_SIZE                   2)
+(define SDL_GL_ALPHA_SIZE                  3)
+(define SDL_GL_BUFFER_SIZE                 4)
+(define SDL_GL_DOUBLEBUFFER                5)
+(define SDL_GL_DEPTH_SIZE                  6)
+(define SDL_GL_STENCIL_SIZE                7)
+(define SDL_GL_ACCUM_RED_SIZE              8)
+(define SDL_GL_ACCUM_GREEN_SIZE            9)
+(define SDL_GL_ACCUM_BLUE_SIZE             10)
+(define SDL_GL_ACCUM_ALPHA_SIZE            11)
+(define SDL_GL_STEREO                      12)
+(define SDL_GL_MULTISAMPLEBUFFERS          13)
+(define SDL_GL_MULTISAMPLESAMPLES          14)
+(define SDL_GL_ACCELERATED_VISUAL          15)
+(define SDL_GL_RETAINED_BACKING            16)
+(define SDL_GL_CONTEXT_MAJOR_VERSION       17)
+(define SDL_GL_CONTEXT_MINOR_VERSION       18)
+(define SDL_GL_CONTEXT_FLAGS               19)
+(define SDL_GL_CONTEXT_PROFILE_MASK        20)
+(define SDL_GL_SHARE_WITH_CURRENT_CONTEXT  21)
+(define SDL_GL_FRAMEBUFFER_SRGB_CAPABLE    22)
+(define SDL_GL_CONTEXT_RELEASE_BEHAVIOR    23)
+(define SDL_GL_CONTEXT_RESET_NOTIFICATION  24)
+(define SDL_GL_CONTEXT_NO_ERROR            25)
+(define SDL_GL_FLOATBUFFERS                26)
+(define SDL_GL_EGL_PLATFORM                27)
+
+;; ============================================================================
+;; OpenGL Context Profile Flags (SDL_GLprofile)
+;; ============================================================================
+(define SDL_GL_CONTEXT_PROFILE_CORE           #x0001)
+(define SDL_GL_CONTEXT_PROFILE_COMPATIBILITY  #x0002)
+(define SDL_GL_CONTEXT_PROFILE_ES             #x0004)
+
+;; ============================================================================
+;; OpenGL Context Flags (SDL_GLcontextFlag)
+;; ============================================================================
+(define SDL_GL_CONTEXT_DEBUG_FLAG              #x0001)
+(define SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG #x0002)
+(define SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG      #x0004)
+(define SDL_GL_CONTEXT_RESET_ISOLATION_FLAG    #x0008)
+

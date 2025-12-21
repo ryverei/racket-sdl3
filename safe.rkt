@@ -27,7 +27,8 @@
          "safe/dialog.rkt"
          "safe/collision.rkt"
          "safe/hints.rkt"
-         "safe/properties.rkt")
+         "safe/properties.rkt"
+         "safe/gl.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
@@ -46,4 +47,5 @@
          (all-from-out "safe/dialog.rkt")
          (all-from-out "safe/collision.rkt")
          (all-from-out "safe/hints.rkt")
-         (all-from-out "safe/properties.rkt"))
+         (all-from-out "safe/properties.rkt")
+         (all-from-out "safe/gl.rkt"))

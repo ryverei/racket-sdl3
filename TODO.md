@@ -228,6 +228,16 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 - [x] `SDL_SetPointerProperty`, `SDL_SetStringProperty`, `SDL_SetNumberProperty`, `SDL_SetFloatProperty`, `SDL_SetBooleanProperty`
 - [x] `SDL_GetPointerProperty`, `SDL_GetStringProperty`, `SDL_GetNumberProperty`, `SDL_GetFloatProperty`, `SDL_GetBooleanProperty`
 
+#### OpenGL Support (`raw/gl.rkt`)
+- [x] `SDL_GL_LoadLibrary`, `SDL_GL_GetProcAddress`, `SDL_GL_UnloadLibrary`
+- [x] `SDL_GL_ExtensionSupported`
+- [x] `SDL_GL_SetAttribute`, `SDL_GL_GetAttribute`
+- [x] `SDL_GL_CreateContext`, `SDL_GL_MakeCurrent`
+- [x] `SDL_GL_GetCurrentContext`, `SDL_GL_GetCurrentWindow`
+- [x] `SDL_GL_SetSwapInterval`, `SDL_GL_GetSwapInterval`
+- [x] `SDL_GL_SwapWindow`, `SDL_GL_DestroyContext`
+- [x] `SDL_GL_ResetAttributes`
+
 ### SDL3_image (`raw/image.rkt`)
 - [x] `IMG_Version`
 - [x] `IMG_LoadTexture`, `IMG_Load`
@@ -375,8 +385,7 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 - [ ] `SDL_CreateTray`, `SDL_SetTrayIcon`, `SDL_SetTrayTooltip`
 - [ ] Tray menus and menu entries, callbacks
 
-#### OpenGL & Vulkan Support
-- [ ] `SDL_GL_LoadLibrary`, `SDL_GL_CreateContext`, `SDL_GL_SwapWindow`, etc.
+#### Vulkan Support
 - [ ] `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_CreateSurface`, etc.
 
 #### Haptic & Sensors (`SDL_haptic.h`, `SDL_sensor.h`)

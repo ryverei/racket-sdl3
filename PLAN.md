@@ -6,10 +6,10 @@
 - [x] Refactor `examples/animation/timer-callbacks.rkt` to use `racket/timer` or Racket threads to demonstrate the idiomatic way.
 - [x] Verify `safe/timer.rkt` and all existing examples remain functional.
 
-## Phase 2: OpenGL Support
-- [ ] Bind `SDL_GL_LoadLibrary`, `SDL_GL_CreateContext`, `SDL_GL_MakeCurrent`, `SDL_GL_SwapWindow`, etc.
-- [ ] Add `safe/gl.rkt` wrapper for context creation and resource management.
-- [ ] **Example:** Add `examples/graphics/opengl-basic.rkt` showing a simple GL clear and triangle.
+## Phase 2: OpenGL Support [DONE]
+- [x] Bind `SDL_GL_LoadLibrary`, `SDL_GL_CreateContext`, `SDL_GL_MakeCurrent`, `SDL_GL_SwapWindow`, etc.
+- [x] Add `safe/gl.rkt` wrapper for context creation and resource management.
+- [x] **Example:** Add `examples/graphics/opengl-basic.rkt` showing a simple GL clear and triangle.
 
 ## Phase 3: Vulkan Support
 - [ ] Bind `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_CreateSurface`, `SDL_Vulkan_GetPresentationSupport`.

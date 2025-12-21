@@ -36,6 +36,187 @@
          _SDL_GPUDevice-pointer/null
          _SDL_GPUTexture-pointer
          _SDL_GPUTexture-pointer/null
+         _SDL_GPUBuffer-pointer
+         _SDL_GPUBuffer-pointer/null
+         _SDL_GPUTransferBuffer-pointer
+         _SDL_GPUTransferBuffer-pointer/null
+         _SDL_GPUSampler-pointer
+         _SDL_GPUSampler-pointer/null
+         _SDL_GPUShader-pointer
+         _SDL_GPUShader-pointer/null
+         _SDL_GPUComputePipeline-pointer
+         _SDL_GPUComputePipeline-pointer/null
+         _SDL_GPUGraphicsPipeline-pointer
+         _SDL_GPUGraphicsPipeline-pointer/null
+         _SDL_GPUCommandBuffer-pointer
+         _SDL_GPUCommandBuffer-pointer/null
+         _SDL_GPURenderPass-pointer
+         _SDL_GPURenderPass-pointer/null
+         _SDL_GPUComputePass-pointer
+         _SDL_GPUComputePass-pointer/null
+         _SDL_GPUCopyPass-pointer
+         _SDL_GPUCopyPass-pointer/null
+         _SDL_GPUFence-pointer
+         _SDL_GPUFence-pointer/null
+         ;; GPU enums
+         _SDL_GPUPrimitiveType
+         _SDL_GPULoadOp
+         _SDL_GPUStoreOp
+         _SDL_GPUIndexElementSize
+         _SDL_GPUTextureFormat
+         _SDL_GPUTextureUsageFlags
+         _SDL_GPUTextureType
+         _SDL_GPUSampleCount
+         _SDL_GPUBufferUsageFlags
+         _SDL_GPUTransferBufferUsage
+         _SDL_GPUShaderStage
+         _SDL_GPUShaderFormat
+         _SDL_GPUVertexElementFormat
+         _SDL_GPUVertexInputRate
+         _SDL_GPUFillMode
+         _SDL_GPUCullMode
+         _SDL_GPUFrontFace
+         _SDL_GPUCompareOp
+         _SDL_GPUStencilOp
+         _SDL_GPUBlendOp
+         _SDL_GPUBlendFactor
+         _SDL_GPUColorComponentFlags
+         _SDL_GPUFilter
+         _SDL_GPUSamplerMipmapMode
+         _SDL_GPUSamplerAddressMode
+         _SDL_GPUPresentMode
+         _SDL_GPUSwapchainComposition
+         ;; GPU structs
+         _SDL_GPUViewport
+         _SDL_GPUViewport-pointer
+         make-SDL_GPUViewport
+         SDL_GPUViewport-x
+         SDL_GPUViewport-y
+         SDL_GPUViewport-w
+         SDL_GPUViewport-h
+         SDL_GPUViewport-min_depth
+         SDL_GPUViewport-max_depth
+         _SDL_GPUColorTargetInfo
+         _SDL_GPUColorTargetInfo-pointer
+         make-SDL_GPUColorTargetInfo
+         SDL_GPUColorTargetInfo-texture
+         SDL_GPUColorTargetInfo-mip_level
+         SDL_GPUColorTargetInfo-layer_or_depth_plane
+         SDL_GPUColorTargetInfo-clear_color
+         SDL_GPUColorTargetInfo-load_op
+         SDL_GPUColorTargetInfo-store_op
+         SDL_GPUColorTargetInfo-resolve_texture
+         SDL_GPUColorTargetInfo-resolve_mip_level
+         SDL_GPUColorTargetInfo-resolve_layer
+         SDL_GPUColorTargetInfo-cycle
+         SDL_GPUColorTargetInfo-cycle_resolve_texture
+         set-SDL_GPUColorTargetInfo-texture!
+         set-SDL_GPUColorTargetInfo-mip_level!
+         set-SDL_GPUColorTargetInfo-layer_or_depth_plane!
+         set-SDL_GPUColorTargetInfo-clear_color!
+         set-SDL_GPUColorTargetInfo-load_op!
+         set-SDL_GPUColorTargetInfo-store_op!
+         set-SDL_GPUColorTargetInfo-resolve_texture!
+         set-SDL_GPUColorTargetInfo-resolve_mip_level!
+         set-SDL_GPUColorTargetInfo-resolve_layer!
+         set-SDL_GPUColorTargetInfo-cycle!
+         set-SDL_GPUColorTargetInfo-cycle_resolve_texture!
+         _SDL_GPUDepthStencilTargetInfo
+         _SDL_GPUDepthStencilTargetInfo-pointer
+         _SDL_GPUDepthStencilTargetInfo-pointer/null
+         make-SDL_GPUDepthStencilTargetInfo
+         _SDL_GPUSamplerCreateInfo
+         _SDL_GPUSamplerCreateInfo-pointer
+         make-SDL_GPUSamplerCreateInfo
+         _SDL_GPUVertexBufferDescription
+         _SDL_GPUVertexBufferDescription-pointer
+         make-SDL_GPUVertexBufferDescription
+         set-SDL_GPUVertexBufferDescription-slot!
+         set-SDL_GPUVertexBufferDescription-pitch!
+         set-SDL_GPUVertexBufferDescription-input_rate!
+         set-SDL_GPUVertexBufferDescription-instance_step_rate!
+         _SDL_GPUVertexAttribute
+         _SDL_GPUVertexAttribute-pointer
+         make-SDL_GPUVertexAttribute
+         set-SDL_GPUVertexAttribute-location!
+         set-SDL_GPUVertexAttribute-buffer_slot!
+         set-SDL_GPUVertexAttribute-format!
+         set-SDL_GPUVertexAttribute-offset!
+         _SDL_GPUVertexInputState
+         _SDL_GPUVertexInputState-pointer
+         make-SDL_GPUVertexInputState
+         _SDL_GPUStencilOpState
+         make-SDL_GPUStencilOpState
+         _SDL_GPUColorTargetBlendState
+         make-SDL_GPUColorTargetBlendState
+         _SDL_GPUColorTargetDescription
+         _SDL_GPUColorTargetDescription-pointer
+         make-SDL_GPUColorTargetDescription
+         set-SDL_GPUColorTargetDescription-format!
+         set-SDL_GPUColorTargetDescription-blend_state!
+         _SDL_GPURasterizerState
+         make-SDL_GPURasterizerState
+         _SDL_GPUMultisampleState
+         make-SDL_GPUMultisampleState
+         _SDL_GPUDepthStencilState
+         make-SDL_GPUDepthStencilState
+         _SDL_GPUGraphicsPipelineTargetInfo
+         make-SDL_GPUGraphicsPipelineTargetInfo
+         _SDL_GPUGraphicsPipelineCreateInfo
+         _SDL_GPUGraphicsPipelineCreateInfo-pointer
+         make-SDL_GPUGraphicsPipelineCreateInfo
+         _SDL_GPUShaderCreateInfo
+         _SDL_GPUShaderCreateInfo-pointer
+         make-SDL_GPUShaderCreateInfo
+         _SDL_GPUTextureCreateInfo
+         _SDL_GPUTextureCreateInfo-pointer
+         make-SDL_GPUTextureCreateInfo
+         _SDL_GPUBufferCreateInfo
+         _SDL_GPUBufferCreateInfo-pointer
+         make-SDL_GPUBufferCreateInfo
+         _SDL_GPUTransferBufferCreateInfo
+         _SDL_GPUTransferBufferCreateInfo-pointer
+         make-SDL_GPUTransferBufferCreateInfo
+         _SDL_GPUBufferBinding
+         _SDL_GPUBufferBinding-pointer
+         make-SDL_GPUBufferBinding
+         set-SDL_GPUBufferBinding-buffer!
+         set-SDL_GPUBufferBinding-offset!
+         _SDL_GPUTextureSamplerBinding
+         _SDL_GPUTextureSamplerBinding-pointer
+         make-SDL_GPUTextureSamplerBinding
+         _SDL_GPUBufferRegion
+         _SDL_GPUBufferRegion-pointer
+         make-SDL_GPUBufferRegion
+         _SDL_GPUTransferBufferLocation
+         _SDL_GPUTransferBufferLocation-pointer
+         make-SDL_GPUTransferBufferLocation
+         _SDL_GPUBufferLocation
+         _SDL_GPUBufferLocation-pointer
+         make-SDL_GPUBufferLocation
+         _SDL_GPUTextureLocation
+         _SDL_GPUTextureLocation-pointer
+         make-SDL_GPUTextureLocation
+         _SDL_GPUTextureRegion
+         _SDL_GPUTextureRegion-pointer
+         make-SDL_GPUTextureRegion
+         _SDL_GPUTextureTransferInfo
+         _SDL_GPUTextureTransferInfo-pointer
+         make-SDL_GPUTextureTransferInfo
+         _SDL_GPUBlitRegion
+         make-SDL_GPUBlitRegion
+         _SDL_GPUBlitInfo
+         _SDL_GPUBlitInfo-pointer
+         make-SDL_GPUBlitInfo
+         _SDL_GPUComputePipelineCreateInfo
+         _SDL_GPUComputePipelineCreateInfo-pointer
+         make-SDL_GPUComputePipelineCreateInfo
+         _SDL_GPUStorageBufferReadWriteBinding
+         _SDL_GPUStorageBufferReadWriteBinding-pointer
+         make-SDL_GPUStorageBufferReadWriteBinding
+         _SDL_GPUStorageTextureReadWriteBinding
+         _SDL_GPUStorageTextureReadWriteBinding-pointer
+         make-SDL_GPUStorageTextureReadWriteBinding
          ;; Surface struct
          _SDL_Surface
          _SDL_Surface-pointer
@@ -498,6 +679,17 @@
 (define-cpointer-type _SDL_Cursor-pointer)
 (define-cpointer-type _SDL_GPUDevice-pointer)
 (define-cpointer-type _SDL_GPUTexture-pointer)
+(define-cpointer-type _SDL_GPUBuffer-pointer)
+(define-cpointer-type _SDL_GPUTransferBuffer-pointer)
+(define-cpointer-type _SDL_GPUSampler-pointer)
+(define-cpointer-type _SDL_GPUShader-pointer)
+(define-cpointer-type _SDL_GPUComputePipeline-pointer)
+(define-cpointer-type _SDL_GPUGraphicsPipeline-pointer)
+(define-cpointer-type _SDL_GPUCommandBuffer-pointer)
+(define-cpointer-type _SDL_GPURenderPass-pointer)
+(define-cpointer-type _SDL_GPUComputePass-pointer)
+(define-cpointer-type _SDL_GPUCopyPass-pointer)
+(define-cpointer-type _SDL_GPUFence-pointer)
 
 ;; ============================================================================
 ;; Surface Struct
@@ -1137,6 +1329,407 @@
                     "SDL error (SDL_GetError not yet available)"))
     (error who "SDL error: ~a" msg))
   #t)
+
+;; ============================================================================
+;; GPU Enums
+;; ============================================================================
+
+;; SDL_GPUPrimitiveType - primitive topology for graphics pipeline
+(define _SDL_GPUPrimitiveType _int)
+
+;; SDL_GPULoadOp - texture load operation at beginning of render pass
+(define _SDL_GPULoadOp _int)
+
+;; SDL_GPUStoreOp - texture store operation at end of render pass
+(define _SDL_GPUStoreOp _int)
+
+;; SDL_GPUIndexElementSize - size of index buffer elements
+(define _SDL_GPUIndexElementSize _int)
+
+;; SDL_GPUTextureFormat - pixel format of a texture
+(define _SDL_GPUTextureFormat _int)
+
+;; SDL_GPUTextureUsageFlags - how texture will be used
+(define _SDL_GPUTextureUsageFlags _uint32)
+
+;; SDL_GPUTextureType - type of texture (2D, 3D, cube, etc.)
+(define _SDL_GPUTextureType _int)
+
+;; SDL_GPUSampleCount - multisampling level
+(define _SDL_GPUSampleCount _int)
+
+;; SDL_GPUBufferUsageFlags - how buffer will be used
+(define _SDL_GPUBufferUsageFlags _uint32)
+
+;; SDL_GPUTransferBufferUsage - upload or download
+(define _SDL_GPUTransferBufferUsage _int)
+
+;; SDL_GPUShaderStage - vertex or fragment
+(define _SDL_GPUShaderStage _int)
+
+;; SDL_GPUShaderFormat - shader bytecode format
+(define _SDL_GPUShaderFormat _uint32)
+
+;; SDL_GPUVertexElementFormat - vertex attribute format
+(define _SDL_GPUVertexElementFormat _int)
+
+;; SDL_GPUVertexInputRate - per-vertex or per-instance
+(define _SDL_GPUVertexInputRate _int)
+
+;; SDL_GPUFillMode - fill or line
+(define _SDL_GPUFillMode _int)
+
+;; SDL_GPUCullMode - cull front, back, or none
+(define _SDL_GPUCullMode _int)
+
+;; SDL_GPUFrontFace - winding order
+(define _SDL_GPUFrontFace _int)
+
+;; SDL_GPUCompareOp - depth/stencil comparison
+(define _SDL_GPUCompareOp _int)
+
+;; SDL_GPUStencilOp - stencil operation
+(define _SDL_GPUStencilOp _int)
+
+;; SDL_GPUBlendOp - blend operation
+(define _SDL_GPUBlendOp _int)
+
+;; SDL_GPUBlendFactor - blend factor
+(define _SDL_GPUBlendFactor _int)
+
+;; SDL_GPUColorComponentFlags - which color components to write
+(define _SDL_GPUColorComponentFlags _uint8)
+
+;; SDL_GPUFilter - texture filter mode
+(define _SDL_GPUFilter _int)
+
+;; SDL_GPUSamplerMipmapMode - mipmap filter mode
+(define _SDL_GPUSamplerMipmapMode _int)
+
+;; SDL_GPUSamplerAddressMode - texture addressing mode
+(define _SDL_GPUSamplerAddressMode _int)
+
+;; SDL_GPUPresentMode - presentation timing
+(define _SDL_GPUPresentMode _int)
+
+;; SDL_GPUSwapchainComposition - swapchain format/colorspace
+(define _SDL_GPUSwapchainComposition _int)
+
+;; ============================================================================
+;; GPU Structs
+;; ============================================================================
+
+;; SDL_GPUViewport - viewport state
+(define-cstruct _SDL_GPUViewport
+  ([x _float]
+   [y _float]
+   [w _float]
+   [h _float]
+   [min_depth _float]
+   [max_depth _float]))
+
+;; SDL_GPUColorTargetInfo - color target for render pass
+(define-cstruct _SDL_GPUColorTargetInfo
+  ([texture _SDL_GPUTexture-pointer/null]
+   [mip_level _uint32]
+   [layer_or_depth_plane _uint32]
+   [clear_color _SDL_FColor]
+   [load_op _SDL_GPULoadOp]
+   [store_op _SDL_GPUStoreOp]
+   [resolve_texture _SDL_GPUTexture-pointer/null]
+   [resolve_mip_level _uint32]
+   [resolve_layer _uint32]
+   [cycle _stdbool]
+   [cycle_resolve_texture _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]))
+
+;; SDL_GPUDepthStencilTargetInfo - depth/stencil target for render pass
+(define-cstruct _SDL_GPUDepthStencilTargetInfo
+  ([texture _SDL_GPUTexture-pointer/null]
+   [clear_depth _float]
+   [load_op _SDL_GPULoadOp]
+   [store_op _SDL_GPUStoreOp]
+   [stencil_load_op _SDL_GPULoadOp]
+   [stencil_store_op _SDL_GPUStoreOp]
+   [cycle _stdbool]
+   [clear_stencil _uint8]
+   [_padding1 _uint8]
+   [_padding2 _uint8]))
+
+;; SDL_GPUSamplerCreateInfo - sampler creation parameters
+(define-cstruct _SDL_GPUSamplerCreateInfo
+  ([min_filter _SDL_GPUFilter]
+   [mag_filter _SDL_GPUFilter]
+   [mipmap_mode _SDL_GPUSamplerMipmapMode]
+   [address_mode_u _SDL_GPUSamplerAddressMode]
+   [address_mode_v _SDL_GPUSamplerAddressMode]
+   [address_mode_w _SDL_GPUSamplerAddressMode]
+   [mip_lod_bias _float]
+   [max_anisotropy _float]
+   [compare_op _SDL_GPUCompareOp]
+   [min_lod _float]
+   [max_lod _float]
+   [enable_anisotropy _stdbool]
+   [enable_compare _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [props _uint32]))
+
+;; SDL_GPUVertexBufferDescription - vertex buffer layout
+(define-cstruct _SDL_GPUVertexBufferDescription
+  ([slot _uint32]
+   [pitch _uint32]
+   [input_rate _SDL_GPUVertexInputRate]
+   [instance_step_rate _uint32]))
+
+;; SDL_GPUVertexAttribute - vertex attribute layout
+(define-cstruct _SDL_GPUVertexAttribute
+  ([location _uint32]
+   [buffer_slot _uint32]
+   [format _SDL_GPUVertexElementFormat]
+   [offset _uint32]))
+
+;; SDL_GPUVertexInputState - vertex input state
+;; Use _pointer for the arrays to allow malloc'd memory
+(define-cstruct _SDL_GPUVertexInputState
+  ([vertex_buffer_descriptions _pointer]
+   [num_vertex_buffers _uint32]
+   [vertex_attributes _pointer]
+   [num_vertex_attributes _uint32]))
+
+;; SDL_GPUStencilOpState - stencil operation state
+(define-cstruct _SDL_GPUStencilOpState
+  ([fail_op _SDL_GPUStencilOp]
+   [pass_op _SDL_GPUStencilOp]
+   [depth_fail_op _SDL_GPUStencilOp]
+   [compare_op _SDL_GPUCompareOp]))
+
+;; SDL_GPUColorTargetBlendState - per-target blend state
+(define-cstruct _SDL_GPUColorTargetBlendState
+  ([src_color_blendfactor _SDL_GPUBlendFactor]
+   [dst_color_blendfactor _SDL_GPUBlendFactor]
+   [color_blend_op _SDL_GPUBlendOp]
+   [src_alpha_blendfactor _SDL_GPUBlendFactor]
+   [dst_alpha_blendfactor _SDL_GPUBlendFactor]
+   [alpha_blend_op _SDL_GPUBlendOp]
+   [color_write_mask _SDL_GPUColorComponentFlags]
+   [enable_blend _stdbool]
+   [enable_color_write_mask _stdbool]
+   [_padding1 _uint8]))
+
+;; SDL_GPUColorTargetDescription - color target format
+(define-cstruct _SDL_GPUColorTargetDescription
+  ([format _SDL_GPUTextureFormat]
+   [blend_state _SDL_GPUColorTargetBlendState]))
+
+;; SDL_GPURasterizerState - rasterization state
+(define-cstruct _SDL_GPURasterizerState
+  ([fill_mode _SDL_GPUFillMode]
+   [cull_mode _SDL_GPUCullMode]
+   [front_face _SDL_GPUFrontFace]
+   [depth_bias_constant_factor _float]
+   [depth_bias_clamp _float]
+   [depth_bias_slope_factor _float]
+   [enable_depth_bias _stdbool]
+   [enable_depth_clip _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]))
+
+;; SDL_GPUMultisampleState - multisampling state
+(define-cstruct _SDL_GPUMultisampleState
+  ([sample_count _SDL_GPUSampleCount]
+   [sample_mask _uint32]
+   [enable_mask _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
+
+;; SDL_GPUDepthStencilState - depth/stencil state
+(define-cstruct _SDL_GPUDepthStencilState
+  ([compare_op _SDL_GPUCompareOp]
+   [back_stencil_state _SDL_GPUStencilOpState]
+   [front_stencil_state _SDL_GPUStencilOpState]
+   [compare_mask _uint8]
+   [write_mask _uint8]
+   [enable_depth_test _stdbool]
+   [enable_depth_write _stdbool]
+   [enable_stencil_test _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
+
+;; SDL_GPUGraphicsPipelineTargetInfo - render target formats
+;; Use _pointer for arrays to allow malloc'd memory
+(define-cstruct _SDL_GPUGraphicsPipelineTargetInfo
+  ([color_target_descriptions _pointer]
+   [num_color_targets _uint32]
+   [depth_stencil_format _SDL_GPUTextureFormat]
+   [has_depth_stencil_target _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
+
+;; SDL_GPUGraphicsPipelineCreateInfo - graphics pipeline creation
+(define-cstruct _SDL_GPUGraphicsPipelineCreateInfo
+  ([vertex_shader _SDL_GPUShader-pointer]
+   [fragment_shader _SDL_GPUShader-pointer]
+   [vertex_input_state _SDL_GPUVertexInputState]
+   [primitive_type _SDL_GPUPrimitiveType]
+   [rasterizer_state _SDL_GPURasterizerState]
+   [multisample_state _SDL_GPUMultisampleState]
+   [depth_stencil_state _SDL_GPUDepthStencilState]
+   [target_info _SDL_GPUGraphicsPipelineTargetInfo]
+   [props _uint32]))
+
+;; SDL_GPUShaderCreateInfo - shader creation
+(define-cstruct _SDL_GPUShaderCreateInfo
+  ([code_size _size]
+   [code _pointer]
+   [entrypoint _string/utf-8]
+   [format _SDL_GPUShaderFormat]
+   [stage _SDL_GPUShaderStage]
+   [num_samplers _uint32]
+   [num_storage_textures _uint32]
+   [num_storage_buffers _uint32]
+   [num_uniform_buffers _uint32]
+   [props _uint32]))
+
+;; SDL_GPUTextureCreateInfo - texture creation
+(define-cstruct _SDL_GPUTextureCreateInfo
+  ([type _SDL_GPUTextureType]
+   [format _SDL_GPUTextureFormat]
+   [usage _SDL_GPUTextureUsageFlags]
+   [width _uint32]
+   [height _uint32]
+   [layer_count_or_depth _uint32]
+   [num_levels _uint32]
+   [sample_count _SDL_GPUSampleCount]
+   [props _uint32]))
+
+;; SDL_GPUBufferCreateInfo - buffer creation
+(define-cstruct _SDL_GPUBufferCreateInfo
+  ([usage _SDL_GPUBufferUsageFlags]
+   [size _uint32]
+   [props _uint32]))
+
+;; SDL_GPUTransferBufferCreateInfo - transfer buffer creation
+(define-cstruct _SDL_GPUTransferBufferCreateInfo
+  ([usage _SDL_GPUTransferBufferUsage]
+   [size _uint32]
+   [props _uint32]))
+
+;; SDL_GPUBufferBinding - buffer binding for vertex/index buffers
+(define-cstruct _SDL_GPUBufferBinding
+  ([buffer _SDL_GPUBuffer-pointer]
+   [offset _uint32]))
+
+;; SDL_GPUTextureSamplerBinding - texture+sampler binding
+(define-cstruct _SDL_GPUTextureSamplerBinding
+  ([texture _SDL_GPUTexture-pointer]
+   [sampler _SDL_GPUSampler-pointer]))
+
+;; SDL_GPUBufferRegion - region within a buffer
+(define-cstruct _SDL_GPUBufferRegion
+  ([buffer _SDL_GPUBuffer-pointer]
+   [offset _uint32]
+   [size _uint32]))
+
+;; SDL_GPUTransferBufferLocation - location in transfer buffer
+(define-cstruct _SDL_GPUTransferBufferLocation
+  ([transfer_buffer _SDL_GPUTransferBuffer-pointer]
+   [offset _uint32]))
+
+;; SDL_GPUBufferLocation - location in a buffer
+(define-cstruct _SDL_GPUBufferLocation
+  ([buffer _SDL_GPUBuffer-pointer]
+   [offset _uint32]))
+
+;; SDL_GPUTextureLocation - location in texture
+(define-cstruct _SDL_GPUTextureLocation
+  ([texture _SDL_GPUTexture-pointer]
+   [mip_level _uint32]
+   [layer _uint32]
+   [x _uint32]
+   [y _uint32]
+   [z _uint32]))
+
+;; SDL_GPUTextureRegion - region within a texture
+(define-cstruct _SDL_GPUTextureRegion
+  ([texture _SDL_GPUTexture-pointer]
+   [mip_level _uint32]
+   [layer _uint32]
+   [x _uint32]
+   [y _uint32]
+   [z _uint32]
+   [w _uint32]
+   [h _uint32]
+   [d _uint32]))
+
+;; SDL_GPUTextureTransferInfo - transfer buffer location with layout
+(define-cstruct _SDL_GPUTextureTransferInfo
+  ([transfer_buffer _SDL_GPUTransferBuffer-pointer]
+   [offset _uint32]
+   [pixels_per_row _uint32]
+   [rows_per_layer _uint32]))
+
+;; SDL_GPUBlitRegion - source or dest region for blit
+(define-cstruct _SDL_GPUBlitRegion
+  ([texture _SDL_GPUTexture-pointer]
+   [mip_level _uint32]
+   [layer_or_depth_plane _uint32]
+   [x _uint32]
+   [y _uint32]
+   [w _uint32]
+   [h _uint32]))
+
+;; SDL_GPUBlitInfo - blit operation parameters
+(define-cstruct _SDL_GPUBlitInfo
+  ([source _SDL_GPUBlitRegion]
+   [destination _SDL_GPUBlitRegion]
+   [load_op _SDL_GPULoadOp]
+   [clear_color _SDL_FColor]
+   [flip_mode _SDL_FlipMode]
+   [filter _SDL_GPUFilter]
+   [cycle _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
+
+;; SDL_GPUComputePipelineCreateInfo - compute pipeline creation
+(define-cstruct _SDL_GPUComputePipelineCreateInfo
+  ([code_size _size]
+   [code _pointer]
+   [entrypoint _string/utf-8]
+   [format _SDL_GPUShaderFormat]
+   [num_samplers _uint32]
+   [num_readonly_storage_textures _uint32]
+   [num_readonly_storage_buffers _uint32]
+   [num_readwrite_storage_textures _uint32]
+   [num_readwrite_storage_buffers _uint32]
+   [num_uniform_buffers _uint32]
+   [threadcount_x _uint32]
+   [threadcount_y _uint32]
+   [threadcount_z _uint32]
+   [props _uint32]))
+
+;; SDL_GPUStorageBufferReadWriteBinding - storage buffer binding
+(define-cstruct _SDL_GPUStorageBufferReadWriteBinding
+  ([buffer _SDL_GPUBuffer-pointer]
+   [cycle _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
+
+;; SDL_GPUStorageTextureReadWriteBinding - storage texture binding
+(define-cstruct _SDL_GPUStorageTextureReadWriteBinding
+  ([texture _SDL_GPUTexture-pointer]
+   [mip_level _uint32]
+   [layer _uint32]
+   [cycle _stdbool]
+   [_padding1 _uint8]
+   [_padding2 _uint8]
+   [_padding3 _uint8]))
 
 ;; ============================================================================
 ;; OpenGL Types

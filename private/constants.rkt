@@ -422,7 +422,191 @@
  SDL_GL_CONTEXT_DEBUG_FLAG
  SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG
  SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG
- SDL_GL_CONTEXT_RESET_ISOLATION_FLAG)
+ SDL_GL_CONTEXT_RESET_ISOLATION_FLAG
+ ;; GPU primitive types
+ SDL_GPU_PRIMITIVETYPE_TRIANGLELIST
+ SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP
+ SDL_GPU_PRIMITIVETYPE_LINELIST
+ SDL_GPU_PRIMITIVETYPE_LINESTRIP
+ SDL_GPU_PRIMITIVETYPE_POINTLIST
+ ;; GPU load operations
+ SDL_GPU_LOADOP_LOAD
+ SDL_GPU_LOADOP_CLEAR
+ SDL_GPU_LOADOP_DONT_CARE
+ ;; GPU store operations
+ SDL_GPU_STOREOP_STORE
+ SDL_GPU_STOREOP_DONT_CARE
+ SDL_GPU_STOREOP_RESOLVE
+ SDL_GPU_STOREOP_RESOLVE_AND_STORE
+ ;; GPU index element size
+ SDL_GPU_INDEXELEMENTSIZE_16BIT
+ SDL_GPU_INDEXELEMENTSIZE_32BIT
+ ;; GPU texture formats
+ SDL_GPU_TEXTUREFORMAT_INVALID
+ SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM
+ SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM
+ SDL_GPU_TEXTUREFORMAT_R8_UNORM
+ SDL_GPU_TEXTUREFORMAT_R8G8_UNORM
+ SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT
+ SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT
+ SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB
+ SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB
+ SDL_GPU_TEXTUREFORMAT_D16_UNORM
+ SDL_GPU_TEXTUREFORMAT_D24_UNORM
+ SDL_GPU_TEXTUREFORMAT_D32_FLOAT
+ SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT
+ SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT
+ ;; GPU texture usage flags
+ SDL_GPU_TEXTUREUSAGE_SAMPLER
+ SDL_GPU_TEXTUREUSAGE_COLOR_TARGET
+ SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET
+ SDL_GPU_TEXTUREUSAGE_GRAPHICS_STORAGE_READ
+ SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_READ
+ SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_WRITE
+ SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_SIMULTANEOUS_READ_WRITE
+ ;; GPU texture types
+ SDL_GPU_TEXTURETYPE_2D
+ SDL_GPU_TEXTURETYPE_2D_ARRAY
+ SDL_GPU_TEXTURETYPE_3D
+ SDL_GPU_TEXTURETYPE_CUBE
+ SDL_GPU_TEXTURETYPE_CUBE_ARRAY
+ ;; GPU sample count
+ SDL_GPU_SAMPLECOUNT_1
+ SDL_GPU_SAMPLECOUNT_2
+ SDL_GPU_SAMPLECOUNT_4
+ SDL_GPU_SAMPLECOUNT_8
+ ;; GPU buffer usage flags
+ SDL_GPU_BUFFERUSAGE_VERTEX
+ SDL_GPU_BUFFERUSAGE_INDEX
+ SDL_GPU_BUFFERUSAGE_INDIRECT
+ SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ
+ SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ
+ SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE
+ ;; GPU transfer buffer usage
+ SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD
+ SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD
+ ;; GPU shader stage
+ SDL_GPU_SHADERSTAGE_VERTEX
+ SDL_GPU_SHADERSTAGE_FRAGMENT
+ ;; GPU shader format
+ SDL_GPU_SHADERFORMAT_INVALID
+ SDL_GPU_SHADERFORMAT_PRIVATE
+ SDL_GPU_SHADERFORMAT_SPIRV
+ SDL_GPU_SHADERFORMAT_DXBC
+ SDL_GPU_SHADERFORMAT_DXIL
+ SDL_GPU_SHADERFORMAT_MSL
+ SDL_GPU_SHADERFORMAT_METALLIB
+ ;; GPU vertex element formats
+ SDL_GPU_VERTEXELEMENTFORMAT_INVALID
+ SDL_GPU_VERTEXELEMENTFORMAT_INT
+ SDL_GPU_VERTEXELEMENTFORMAT_INT2
+ SDL_GPU_VERTEXELEMENTFORMAT_INT3
+ SDL_GPU_VERTEXELEMENTFORMAT_INT4
+ SDL_GPU_VERTEXELEMENTFORMAT_UINT
+ SDL_GPU_VERTEXELEMENTFORMAT_UINT2
+ SDL_GPU_VERTEXELEMENTFORMAT_UINT3
+ SDL_GPU_VERTEXELEMENTFORMAT_UINT4
+ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT
+ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2
+ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3
+ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4
+ SDL_GPU_VERTEXELEMENTFORMAT_BYTE2
+ SDL_GPU_VERTEXELEMENTFORMAT_BYTE4
+ SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2
+ SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4
+ SDL_GPU_VERTEXELEMENTFORMAT_BYTE2_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_BYTE4_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_SHORT2
+ SDL_GPU_VERTEXELEMENTFORMAT_SHORT4
+ SDL_GPU_VERTEXELEMENTFORMAT_USHORT2
+ SDL_GPU_VERTEXELEMENTFORMAT_USHORT4
+ SDL_GPU_VERTEXELEMENTFORMAT_SHORT2_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_SHORT4_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_USHORT2_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_USHORT4_NORM
+ SDL_GPU_VERTEXELEMENTFORMAT_HALF2
+ SDL_GPU_VERTEXELEMENTFORMAT_HALF4
+ ;; GPU vertex input rate
+ SDL_GPU_VERTEXINPUTRATE_VERTEX
+ SDL_GPU_VERTEXINPUTRATE_INSTANCE
+ ;; GPU fill mode
+ SDL_GPU_FILLMODE_FILL
+ SDL_GPU_FILLMODE_LINE
+ ;; GPU cull mode
+ SDL_GPU_CULLMODE_NONE
+ SDL_GPU_CULLMODE_FRONT
+ SDL_GPU_CULLMODE_BACK
+ ;; GPU front face
+ SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE
+ SDL_GPU_FRONTFACE_CLOCKWISE
+ ;; GPU compare op
+ SDL_GPU_COMPAREOP_INVALID
+ SDL_GPU_COMPAREOP_NEVER
+ SDL_GPU_COMPAREOP_LESS
+ SDL_GPU_COMPAREOP_EQUAL
+ SDL_GPU_COMPAREOP_LESS_OR_EQUAL
+ SDL_GPU_COMPAREOP_GREATER
+ SDL_GPU_COMPAREOP_NOT_EQUAL
+ SDL_GPU_COMPAREOP_GREATER_OR_EQUAL
+ SDL_GPU_COMPAREOP_ALWAYS
+ ;; GPU stencil op
+ SDL_GPU_STENCILOP_INVALID
+ SDL_GPU_STENCILOP_KEEP
+ SDL_GPU_STENCILOP_ZERO
+ SDL_GPU_STENCILOP_REPLACE
+ SDL_GPU_STENCILOP_INCREMENT_AND_CLAMP
+ SDL_GPU_STENCILOP_DECREMENT_AND_CLAMP
+ SDL_GPU_STENCILOP_INVERT
+ SDL_GPU_STENCILOP_INCREMENT_AND_WRAP
+ SDL_GPU_STENCILOP_DECREMENT_AND_WRAP
+ ;; GPU blend op
+ SDL_GPU_BLENDOP_INVALID
+ SDL_GPU_BLENDOP_ADD
+ SDL_GPU_BLENDOP_SUBTRACT
+ SDL_GPU_BLENDOP_REVERSE_SUBTRACT
+ SDL_GPU_BLENDOP_MIN
+ SDL_GPU_BLENDOP_MAX
+ ;; GPU blend factor
+ SDL_GPU_BLENDFACTOR_INVALID
+ SDL_GPU_BLENDFACTOR_ZERO
+ SDL_GPU_BLENDFACTOR_ONE
+ SDL_GPU_BLENDFACTOR_SRC_COLOR
+ SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_COLOR
+ SDL_GPU_BLENDFACTOR_DST_COLOR
+ SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_COLOR
+ SDL_GPU_BLENDFACTOR_SRC_ALPHA
+ SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA
+ SDL_GPU_BLENDFACTOR_DST_ALPHA
+ SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_ALPHA
+ SDL_GPU_BLENDFACTOR_CONSTANT_COLOR
+ SDL_GPU_BLENDFACTOR_ONE_MINUS_CONSTANT_COLOR
+ SDL_GPU_BLENDFACTOR_SRC_ALPHA_SATURATE
+ ;; GPU color component flags
+ SDL_GPU_COLORCOMPONENT_R
+ SDL_GPU_COLORCOMPONENT_G
+ SDL_GPU_COLORCOMPONENT_B
+ SDL_GPU_COLORCOMPONENT_A
+ ;; GPU filter
+ SDL_GPU_FILTER_NEAREST
+ SDL_GPU_FILTER_LINEAR
+ ;; GPU sampler mipmap mode
+ SDL_GPU_SAMPLERMIPMAPMODE_NEAREST
+ SDL_GPU_SAMPLERMIPMAPMODE_LINEAR
+ ;; GPU sampler address mode
+ SDL_GPU_SAMPLERADDRESSMODE_REPEAT
+ SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT
+ SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE
+ ;; GPU present mode
+ SDL_GPU_PRESENTMODE_VSYNC
+ SDL_GPU_PRESENTMODE_IMMEDIATE
+ SDL_GPU_PRESENTMODE_MAILBOX
+ ;; GPU swapchain composition
+ SDL_GPU_SWAPCHAINCOMPOSITION_SDR
+ SDL_GPU_SWAPCHAINCOMPOSITION_SDR_LINEAR
+ SDL_GPU_SWAPCHAINCOMPOSITION_HDR_EXTENDED_LINEAR
+ SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084)
 
 ;; ============================================================================
 ;; Init Flags (SDL_InitFlags) - used with SDL_Init
@@ -991,4 +1175,269 @@
 (define SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG #x0002)
 (define SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG      #x0004)
 (define SDL_GL_CONTEXT_RESET_ISOLATION_FLAG    #x0008)
+
+;; ============================================================================
+;; GPU Primitive Types
+;; ============================================================================
+(define SDL_GPU_PRIMITIVETYPE_TRIANGLELIST  0)
+(define SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP 1)
+(define SDL_GPU_PRIMITIVETYPE_LINELIST      2)
+(define SDL_GPU_PRIMITIVETYPE_LINESTRIP     3)
+(define SDL_GPU_PRIMITIVETYPE_POINTLIST     4)
+
+;; ============================================================================
+;; GPU Load Operations
+;; ============================================================================
+(define SDL_GPU_LOADOP_LOAD      0)
+(define SDL_GPU_LOADOP_CLEAR     1)
+(define SDL_GPU_LOADOP_DONT_CARE 2)
+
+;; ============================================================================
+;; GPU Store Operations
+;; ============================================================================
+(define SDL_GPU_STOREOP_STORE             0)
+(define SDL_GPU_STOREOP_DONT_CARE         1)
+(define SDL_GPU_STOREOP_RESOLVE           2)
+(define SDL_GPU_STOREOP_RESOLVE_AND_STORE 3)
+
+;; ============================================================================
+;; GPU Index Element Size
+;; ============================================================================
+(define SDL_GPU_INDEXELEMENTSIZE_16BIT 0)
+(define SDL_GPU_INDEXELEMENTSIZE_32BIT 1)
+
+;; ============================================================================
+;; GPU Texture Formats (subset of most commonly used)
+;; ============================================================================
+(define SDL_GPU_TEXTUREFORMAT_INVALID               0)
+(define SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM        4)
+(define SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM       12)
+(define SDL_GPU_TEXTUREFORMAT_R8_UNORM              2)
+(define SDL_GPU_TEXTUREFORMAT_R8G8_UNORM            3)
+(define SDL_GPU_TEXTUREFORMAT_R16G16B16A16_FLOAT   29)
+(define SDL_GPU_TEXTUREFORMAT_R32G32B32A32_FLOAT   32)
+(define SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB  51)
+(define SDL_GPU_TEXTUREFORMAT_B8G8R8A8_UNORM_SRGB  52)
+(define SDL_GPU_TEXTUREFORMAT_D16_UNORM            59)
+(define SDL_GPU_TEXTUREFORMAT_D24_UNORM            60)
+(define SDL_GPU_TEXTUREFORMAT_D32_FLOAT            61)
+(define SDL_GPU_TEXTUREFORMAT_D24_UNORM_S8_UINT    62)
+(define SDL_GPU_TEXTUREFORMAT_D32_FLOAT_S8_UINT    63)
+
+;; ============================================================================
+;; GPU Texture Usage Flags
+;; ============================================================================
+(define SDL_GPU_TEXTUREUSAGE_SAMPLER                                  (arithmetic-shift 1 0))
+(define SDL_GPU_TEXTUREUSAGE_COLOR_TARGET                             (arithmetic-shift 1 1))
+(define SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET                     (arithmetic-shift 1 2))
+(define SDL_GPU_TEXTUREUSAGE_GRAPHICS_STORAGE_READ                    (arithmetic-shift 1 3))
+(define SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_READ                     (arithmetic-shift 1 4))
+(define SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_WRITE                    (arithmetic-shift 1 5))
+(define SDL_GPU_TEXTUREUSAGE_COMPUTE_STORAGE_SIMULTANEOUS_READ_WRITE  (arithmetic-shift 1 6))
+
+;; ============================================================================
+;; GPU Texture Types
+;; ============================================================================
+(define SDL_GPU_TEXTURETYPE_2D         0)
+(define SDL_GPU_TEXTURETYPE_2D_ARRAY   1)
+(define SDL_GPU_TEXTURETYPE_3D         2)
+(define SDL_GPU_TEXTURETYPE_CUBE       3)
+(define SDL_GPU_TEXTURETYPE_CUBE_ARRAY 4)
+
+;; ============================================================================
+;; GPU Sample Count
+;; ============================================================================
+(define SDL_GPU_SAMPLECOUNT_1 0)
+(define SDL_GPU_SAMPLECOUNT_2 1)
+(define SDL_GPU_SAMPLECOUNT_4 2)
+(define SDL_GPU_SAMPLECOUNT_8 3)
+
+;; ============================================================================
+;; GPU Buffer Usage Flags
+;; ============================================================================
+(define SDL_GPU_BUFFERUSAGE_VERTEX                (arithmetic-shift 1 0))
+(define SDL_GPU_BUFFERUSAGE_INDEX                 (arithmetic-shift 1 1))
+(define SDL_GPU_BUFFERUSAGE_INDIRECT              (arithmetic-shift 1 2))
+(define SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ (arithmetic-shift 1 3))
+(define SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_READ  (arithmetic-shift 1 4))
+(define SDL_GPU_BUFFERUSAGE_COMPUTE_STORAGE_WRITE (arithmetic-shift 1 5))
+
+;; ============================================================================
+;; GPU Transfer Buffer Usage
+;; ============================================================================
+(define SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD   0)
+(define SDL_GPU_TRANSFERBUFFERUSAGE_DOWNLOAD 1)
+
+;; ============================================================================
+;; GPU Shader Stage
+;; ============================================================================
+(define SDL_GPU_SHADERSTAGE_VERTEX   0)
+(define SDL_GPU_SHADERSTAGE_FRAGMENT 1)
+
+;; ============================================================================
+;; GPU Shader Format
+;; ============================================================================
+(define SDL_GPU_SHADERFORMAT_INVALID  0)
+(define SDL_GPU_SHADERFORMAT_PRIVATE  (arithmetic-shift 1 0))
+(define SDL_GPU_SHADERFORMAT_SPIRV    (arithmetic-shift 1 1))
+(define SDL_GPU_SHADERFORMAT_DXBC     (arithmetic-shift 1 2))
+(define SDL_GPU_SHADERFORMAT_DXIL     (arithmetic-shift 1 3))
+(define SDL_GPU_SHADERFORMAT_MSL      (arithmetic-shift 1 4))
+(define SDL_GPU_SHADERFORMAT_METALLIB (arithmetic-shift 1 5))
+
+;; ============================================================================
+;; GPU Vertex Element Formats
+;; ============================================================================
+(define SDL_GPU_VERTEXELEMENTFORMAT_INVALID       0)
+(define SDL_GPU_VERTEXELEMENTFORMAT_INT           1)
+(define SDL_GPU_VERTEXELEMENTFORMAT_INT2          2)
+(define SDL_GPU_VERTEXELEMENTFORMAT_INT3          3)
+(define SDL_GPU_VERTEXELEMENTFORMAT_INT4          4)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UINT          5)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UINT2         6)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UINT3         7)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UINT4         8)
+(define SDL_GPU_VERTEXELEMENTFORMAT_FLOAT         9)
+(define SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2       10)
+(define SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3       11)
+(define SDL_GPU_VERTEXELEMENTFORMAT_FLOAT4       12)
+(define SDL_GPU_VERTEXELEMENTFORMAT_BYTE2        13)
+(define SDL_GPU_VERTEXELEMENTFORMAT_BYTE4        14)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2       15)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4       16)
+(define SDL_GPU_VERTEXELEMENTFORMAT_BYTE2_NORM   17)
+(define SDL_GPU_VERTEXELEMENTFORMAT_BYTE4_NORM   18)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UBYTE2_NORM  19)
+(define SDL_GPU_VERTEXELEMENTFORMAT_UBYTE4_NORM  20)
+(define SDL_GPU_VERTEXELEMENTFORMAT_SHORT2       21)
+(define SDL_GPU_VERTEXELEMENTFORMAT_SHORT4       22)
+(define SDL_GPU_VERTEXELEMENTFORMAT_USHORT2      23)
+(define SDL_GPU_VERTEXELEMENTFORMAT_USHORT4      24)
+(define SDL_GPU_VERTEXELEMENTFORMAT_SHORT2_NORM  25)
+(define SDL_GPU_VERTEXELEMENTFORMAT_SHORT4_NORM  26)
+(define SDL_GPU_VERTEXELEMENTFORMAT_USHORT2_NORM 27)
+(define SDL_GPU_VERTEXELEMENTFORMAT_USHORT4_NORM 28)
+(define SDL_GPU_VERTEXELEMENTFORMAT_HALF2        29)
+(define SDL_GPU_VERTEXELEMENTFORMAT_HALF4        30)
+
+;; ============================================================================
+;; GPU Vertex Input Rate
+;; ============================================================================
+(define SDL_GPU_VERTEXINPUTRATE_VERTEX   0)
+(define SDL_GPU_VERTEXINPUTRATE_INSTANCE 1)
+
+;; ============================================================================
+;; GPU Fill Mode
+;; ============================================================================
+(define SDL_GPU_FILLMODE_FILL 0)
+(define SDL_GPU_FILLMODE_LINE 1)
+
+;; ============================================================================
+;; GPU Cull Mode
+;; ============================================================================
+(define SDL_GPU_CULLMODE_NONE  0)
+(define SDL_GPU_CULLMODE_FRONT 1)
+(define SDL_GPU_CULLMODE_BACK  2)
+
+;; ============================================================================
+;; GPU Front Face
+;; ============================================================================
+(define SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE 0)
+(define SDL_GPU_FRONTFACE_CLOCKWISE         1)
+
+;; ============================================================================
+;; GPU Compare Op
+;; ============================================================================
+(define SDL_GPU_COMPAREOP_INVALID          0)
+(define SDL_GPU_COMPAREOP_NEVER            1)
+(define SDL_GPU_COMPAREOP_LESS             2)
+(define SDL_GPU_COMPAREOP_EQUAL            3)
+(define SDL_GPU_COMPAREOP_LESS_OR_EQUAL    4)
+(define SDL_GPU_COMPAREOP_GREATER          5)
+(define SDL_GPU_COMPAREOP_NOT_EQUAL        6)
+(define SDL_GPU_COMPAREOP_GREATER_OR_EQUAL 7)
+(define SDL_GPU_COMPAREOP_ALWAYS           8)
+
+;; ============================================================================
+;; GPU Stencil Op
+;; ============================================================================
+(define SDL_GPU_STENCILOP_INVALID             0)
+(define SDL_GPU_STENCILOP_KEEP                1)
+(define SDL_GPU_STENCILOP_ZERO                2)
+(define SDL_GPU_STENCILOP_REPLACE             3)
+(define SDL_GPU_STENCILOP_INCREMENT_AND_CLAMP 4)
+(define SDL_GPU_STENCILOP_DECREMENT_AND_CLAMP 5)
+(define SDL_GPU_STENCILOP_INVERT              6)
+(define SDL_GPU_STENCILOP_INCREMENT_AND_WRAP  7)
+(define SDL_GPU_STENCILOP_DECREMENT_AND_WRAP  8)
+
+;; ============================================================================
+;; GPU Blend Op
+;; ============================================================================
+(define SDL_GPU_BLENDOP_INVALID          0)
+(define SDL_GPU_BLENDOP_ADD              1)
+(define SDL_GPU_BLENDOP_SUBTRACT         2)
+(define SDL_GPU_BLENDOP_REVERSE_SUBTRACT 3)
+(define SDL_GPU_BLENDOP_MIN              4)
+(define SDL_GPU_BLENDOP_MAX              5)
+
+;; ============================================================================
+;; GPU Blend Factor
+;; ============================================================================
+(define SDL_GPU_BLENDFACTOR_INVALID                  0)
+(define SDL_GPU_BLENDFACTOR_ZERO                     1)
+(define SDL_GPU_BLENDFACTOR_ONE                      2)
+(define SDL_GPU_BLENDFACTOR_SRC_COLOR                3)
+(define SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_COLOR      4)
+(define SDL_GPU_BLENDFACTOR_DST_COLOR                5)
+(define SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_COLOR      6)
+(define SDL_GPU_BLENDFACTOR_SRC_ALPHA                7)
+(define SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA      8)
+(define SDL_GPU_BLENDFACTOR_DST_ALPHA                9)
+(define SDL_GPU_BLENDFACTOR_ONE_MINUS_DST_ALPHA     10)
+(define SDL_GPU_BLENDFACTOR_CONSTANT_COLOR          11)
+(define SDL_GPU_BLENDFACTOR_ONE_MINUS_CONSTANT_COLOR 12)
+(define SDL_GPU_BLENDFACTOR_SRC_ALPHA_SATURATE      13)
+
+;; ============================================================================
+;; GPU Color Component Flags
+;; ============================================================================
+(define SDL_GPU_COLORCOMPONENT_R (arithmetic-shift 1 0))
+(define SDL_GPU_COLORCOMPONENT_G (arithmetic-shift 1 1))
+(define SDL_GPU_COLORCOMPONENT_B (arithmetic-shift 1 2))
+(define SDL_GPU_COLORCOMPONENT_A (arithmetic-shift 1 3))
+
+;; ============================================================================
+;; GPU Filter
+;; ============================================================================
+(define SDL_GPU_FILTER_NEAREST 0)
+(define SDL_GPU_FILTER_LINEAR  1)
+
+;; ============================================================================
+;; GPU Sampler Mipmap Mode
+;; ============================================================================
+(define SDL_GPU_SAMPLERMIPMAPMODE_NEAREST 0)
+(define SDL_GPU_SAMPLERMIPMAPMODE_LINEAR  1)
+
+;; ============================================================================
+;; GPU Sampler Address Mode
+;; ============================================================================
+(define SDL_GPU_SAMPLERADDRESSMODE_REPEAT          0)
+(define SDL_GPU_SAMPLERADDRESSMODE_MIRRORED_REPEAT 1)
+(define SDL_GPU_SAMPLERADDRESSMODE_CLAMP_TO_EDGE   2)
+
+;; ============================================================================
+;; GPU Present Mode
+;; ============================================================================
+(define SDL_GPU_PRESENTMODE_VSYNC     0)
+(define SDL_GPU_PRESENTMODE_IMMEDIATE 1)
+(define SDL_GPU_PRESENTMODE_MAILBOX   2)
+
+;; ============================================================================
+;; GPU Swapchain Composition
+;; ============================================================================
+(define SDL_GPU_SWAPCHAINCOMPOSITION_SDR                 0)
+(define SDL_GPU_SWAPCHAINCOMPOSITION_SDR_LINEAR          1)
+(define SDL_GPU_SWAPCHAINCOMPOSITION_HDR_EXTENDED_LINEAR 2)
+(define SDL_GPU_SWAPCHAINCOMPOSITION_HDR10_ST2084        3)
 

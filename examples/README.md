@@ -13,6 +13,7 @@ A collection of examples demonstrating the sdl3 Racket library, organized from s
 5. **input/** - Keyboard and mouse handling
 6. **animation/** - Time-based animation
 7. **advanced/** - Cameras, viewports, collision
+8. **graphics/** - OpenGL, Vulkan, and GPU API examples
 
 ## Running Examples
 
@@ -117,6 +118,20 @@ Complex topics for experienced users.
 | `camera.rkt` | World coordinates, camera follow, parallax, mini-map |
 | `wait-events.rkt` | Efficient event-driven rendering (no polling) |
 | `surface-basics.rkt` | Surface creation, pixel access, surface-to-texture conversion |
+
+### graphics/
+
+Low-level graphics APIs (OpenGL, Vulkan, SDL GPU).
+
+| Example | Concepts |
+|---------|----------|
+| `opengl-basic.rkt` | OpenGL context setup, clear color |
+| `opengl-triangle.rkt` | Spinning triangle with immediate mode |
+| `opengl-cube.rkt` | 3D cube with depth testing |
+| `vulkan-info.rkt` | Vulkan surface creation, extension enumeration |
+| `gpu-info.rkt` | GPU device info and shader formats |
+| `gpu-triangle.rkt` | GPU pipeline setup, rotating triangle |
+| `gpu-cube.rkt` | Depth-tested rotating cube |
 
 ### dialogs/
 

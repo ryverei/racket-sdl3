@@ -34,7 +34,8 @@
          "raw/image.rkt"
          "raw/ttf.rkt"
          "raw/gl.rkt"
-         "raw/vulkan.rkt")
+         "raw/vulkan.rkt"
+         "raw/gpu.rkt")
 
 (provide (all-from-out "private/lib.rkt")
          (all-from-out "private/types.rkt")
@@ -61,4 +62,5 @@
          (all-from-out "raw/image.rkt")
          (all-from-out "raw/ttf.rkt")
          (all-from-out "raw/gl.rkt")
-         (all-from-out "raw/vulkan.rkt"))
+         (all-from-out "raw/vulkan.rkt")
+         (all-from-out "raw/gpu.rkt"))

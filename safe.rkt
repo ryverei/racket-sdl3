@@ -29,7 +29,8 @@
          "safe/hints.rkt"
          "safe/properties.rkt"
          "safe/gl.rkt"
-         "safe/vulkan.rkt")
+         "safe/vulkan.rkt"
+         "safe/gpu.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
@@ -50,4 +51,5 @@
          (all-from-out "safe/hints.rkt")
          (all-from-out "safe/properties.rkt")
          (all-from-out "safe/gl.rkt")
-         (all-from-out "safe/vulkan.rkt"))
+         (all-from-out "safe/vulkan.rkt")
+         (all-from-out "safe/gpu.rkt"))

@@ -16,12 +16,17 @@
 - [x] Add `safe/vulkan.rkt` wrapper for surface creation.
 - [x] **Example:** Add `examples/graphics/vulkan-info.rkt` to demonstrate surface creation and extension enumeration.
 
-## Phase 4: The GPU Subsystem (SDL_gpu)
-- [ ] Bind `SDL_CreateGPUDevice`, `SDL_DestroyGPUDevice`.
-- [ ] Implement command buffer and pass submission.
-- [ ] Bind shader and pipeline creation functions.
-- [ ] Add `safe/gpu.rkt` wrapper for safe resource management.
-- [ ] **Example:** Add `examples/graphics/gpu-triangle.rkt` using the new SDL3 GPU API.
+## Phase 4: The GPU Subsystem (SDL_gpu) [DONE]
+- [x] Bind `SDL_CreateGPUDevice`, `SDL_DestroyGPUDevice`.
+- [x] Implement command buffer and pass submission.
+- [x] Bind shader and pipeline creation functions.
+- [x] Bind buffer, texture, and sampler management.
+- [x] Bind render pass and drawing functions.
+- [x] Bind compute pipeline and dispatch functions.
+- [x] Add `safe/gpu.rkt` wrapper for safe resource management.
+- [x] **Example:** Add `examples/graphics/gpu-info.rkt` showing device and format info.
+- [x] **Example:** Add `examples/graphics/gpu-triangle.rkt` using the new SDL3 GPU API with Metal shaders.
+- [x] **Example:** Add `examples/graphics/gpu-cube.rkt` showing a rotating 3D cube with depth testing.
 
 ## Phase 5: Camera & Video Input
 - [ ] Bind `SDL_camera.h` functions (enumeration, open/close).

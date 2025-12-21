@@ -28,14 +28,13 @@
           glBegin
           glEnd
           glColor3f
-          glVertex3f
-          GL_COLOR_BUFFER_BIT
-          GL_TRIANGLES
-          GL_PROJECTION
-          GL_MODELVIEW)])
+          glVertex3f)])
 
 (define window-width 800)
 (define window-height 600)
+
+(define (gl-const name)
+  (dynamic-require 'opengl name))
 
 (define (main)
   ;; Check if opengl is actually available before starting SDL
@@ -68,10 +67,10 @@
 
   ;; Initial GL setup
   (glViewport 0 0 window-width window-height)
-  (glMatrixMode GL_PROJECTION)
+  (glMatrixMode (gl-const 'GL_PROJECTION))
   (glLoadIdentity)
   (glOrtho -1.0 1.0 -1.0 1.0 -1.0 1.0)
-  (glMatrixMode GL_MODELVIEW)
+  (glMatrixMode (gl-const 'GL_MODELVIEW))
 
   (define start-time (current-ticks))
 
@@ -100,9 +99,9 @@
 
         ;; Draw
         (glClearColor 0.1 0.1 0.1 1.0)
-        (glClear GL_COLOR_BUFFER_BIT)
+        (glClear (gl-const 'GL_COLOR_BUFFER_BIT))
 
-        (glBegin GL_TRIANGLES)
+        (glBegin (gl-const 'GL_TRIANGLES))
         
         (glColor3f 1.0 0.0 0.0)
         (glVertex3f 0.0 0.5 0.0)

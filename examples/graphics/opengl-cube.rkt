@@ -24,16 +24,13 @@
           glEnd
           glColor3f
           glVertex3f
-          glEnable
-          GL_COLOR_BUFFER_BIT
-          GL_DEPTH_BUFFER_BIT
-          GL_DEPTH_TEST
-          GL_QUADS
-          GL_PROJECTION
-          GL_MODELVIEW)])
+          glEnable)])
 
 (define window-width 800)
 (define window-height 600)
+
+(define (gl-const name)
+  (dynamic-require 'opengl name))
 
 (define (main)
   ;; Check for opengl package
@@ -62,12 +59,12 @@
 
   ;; Setup 3D perspective
   (glViewport 0 0 window-width window-height)
-  (glMatrixMode GL_PROJECTION)
+  (glMatrixMode (gl-const 'GL_PROJECTION))
   (glLoadIdentity)
   (glFrustum -1.0 1.0 -0.75 0.75 1.5 20.0)
-  (glMatrixMode GL_MODELVIEW)
+  (glMatrixMode (gl-const 'GL_MODELVIEW))
   
-  (glEnable GL_DEPTH_TEST)
+  (glEnable (gl-const 'GL_DEPTH_TEST))
 
   (define start-time (current-ticks))
 
@@ -92,13 +89,13 @@
         (define t (/ (- now start-time) 1000.0))
         
         (glClearColor 0.2 0.2 0.2 1.0)
-        (glClear (bitwise-ior GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT))
+        (glClear (bitwise-ior (gl-const 'GL_COLOR_BUFFER_BIT) (gl-const 'GL_DEPTH_BUFFER_BIT)))
         
         (glLoadIdentity)
         (glTranslatef 0.0 0.0 -6.0)
         (glRotatef (* t 50.0) 1.0 1.0 0.0)
         
-        (glBegin GL_QUADS)
+        (glBegin (gl-const 'GL_QUADS))
         
         ;; Front face (Red)
         (glColor3f 1.0 0.0 0.0)

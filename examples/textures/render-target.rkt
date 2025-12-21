@@ -57,136 +57,131 @@
   (draw-rect! renderer 0 0 size size))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      #:window-flags 'high-pixel-density
+      ;; Create an off-screen texture that can be rendered to
+      (define target-texture
+        (create-texture renderer texture-size texture-size
+                        #:access 'target    ; Enable use as render target
+                        #:scale 'nearest))  ; Start with pixelated scaling
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height
-                          #:window-flags 'high-pixel-density))
+      ;; Enable alpha blending for the texture
+      (set-texture-blend-mode! target-texture 'blend)
 
-  ;; Create an off-screen texture that can be rendered to
-  (define target-texture
-    (create-texture renderer texture-size texture-size
-                    #:access 'target    ; Enable use as render target
-                    #:scale 'nearest))  ; Start with pixelated scaling
+      ;; Draw the initial pattern to the texture
+      (with-render-target renderer target-texture
+        (draw-pattern! renderer texture-size))
 
-  ;; Enable alpha blending for the texture
-  (set-texture-blend-mode! target-texture 'blend)
+      ;; Animation state
+      (define start-time (current-ticks))
 
-  ;; Draw the initial pattern to the texture
-  (with-render-target renderer target-texture
-    (draw-pattern! renderer texture-size))
+      (let loop ([running? #t]
+                 [current-scale 'nearest])
+        (when running?
+          ;; Handle events
+          (define-values (still-running? new-scale)
+            (for/fold ([run? #t] [scale current-scale])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested))
+                 (values #f scale)]
+                [(key-event 'down 'escape _ _ _) (values #f scale)]
 
-  ;; Animation state
-  (define start-time (current-ticks))
+                [(key-event 'down 'r _ _ _)
+                 ;; Regenerate the pattern
+                 (with-render-target renderer target-texture
+                   (draw-pattern! renderer texture-size))
+                 (values run? scale)]
 
-  (let loop ([running? #t]
-             [current-scale 'nearest])
-    (when running?
-      ;; Handle events
-      (define-values (still-running? new-scale)
-        (for/fold ([run? #t] [scale current-scale])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested))
-             (values #f scale)]
-            [(key-event 'down 'escape _ _ _) (values #f scale)]
+                [(key-event 'down key _ _ _)
+                 (cond
+                   [(eq? key '1)
+                    (texture-set-scale-mode! target-texture 'nearest)
+                    (values run? 'nearest)]
+                   [(eq? key '2)
+                    (texture-set-scale-mode! target-texture 'linear)
+                    (values run? 'linear)]
+                   [else (values run? scale)])]
+                [_ (values run? scale)])))
 
-            [(key-event 'down 'r _ _ _)
-             ;; Regenerate the pattern
-             (with-render-target renderer target-texture
-               (draw-pattern! renderer texture-size))
-             (values run? scale)]
+          (when still-running?
+            ;; Calculate animation time
+            (define elapsed (/ (- (current-ticks) start-time) 1000.0))
 
-            [(key-event 'down key _ _ _)
-             (cond
-               [(eq? key '1)
-                (texture-set-scale-mode! target-texture 'nearest)
-                (values run? 'nearest)]
-               [(eq? key '2)
-                (texture-set-scale-mode! target-texture 'linear)
-                (values run? 'linear)]
-               [else (values run? scale)])]
-            [_ (values run? scale)])))
+            ;; Clear the window
+            (set-draw-color! renderer 40 40 60)
+            (render-clear! renderer)
 
-      (when still-running?
-        ;; Calculate animation time
-        (define elapsed (/ (- (current-ticks) start-time) 1000.0))
+            ;; Render the cached texture multiple times with different transforms
+            ;; This demonstrates the performance benefit of render-to-texture:
+            ;; The pattern is drawn once, then rendered many times efficiently
 
-        ;; Clear the window
-        (set-draw-color! renderer 40 40 60)
-        (render-clear! renderer)
+            ;; 1. Original size in top-left
+            (render-texture! renderer target-texture 20 20)
 
-        ;; Render the cached texture multiple times with different transforms
-        ;; This demonstrates the performance benefit of render-to-texture:
-        ;; The pattern is drawn once, then rendered many times efficiently
+            ;; 2. Scaled up 2x
+            (render-texture! renderer target-texture 170 20
+                             #:width (* texture-size 2)
+                             #:height (* texture-size 2))
 
-        ;; 1. Original size in top-left
-        (render-texture! renderer target-texture 20 20)
+            ;; 3. Rotating version
+            (define angle (* elapsed 45))  ; 45 degrees per second
+            (render-texture! renderer target-texture 550 100
+                             #:width (* texture-size 1.5)
+                             #:height (* texture-size 1.5)
+                             #:angle angle
+                             #:center (cons (* texture-size 0.75) (* texture-size 0.75)))
 
-        ;; 2. Scaled up 2x
-        (render-texture! renderer target-texture 170 20
-                         #:width (* texture-size 2)
-                         #:height (* texture-size 2))
+            ;; 4. Multiple small copies in a row
+            (for ([i (in-range 6)])
+              (define x (+ 20 (* i 70)))
+              (define y 350)
+              (define scale (+ 0.3 (* 0.1 (sin (+ elapsed (* i 0.5))))))
+              (define w (* texture-size scale))
+              (define h (* texture-size scale))
+              (render-texture! renderer target-texture x y
+                               #:width w #:height h))
 
-        ;; 3. Rotating version
-        (define angle (* elapsed 45))  ; 45 degrees per second
-        (render-texture! renderer target-texture 550 100
-                         #:width (* texture-size 1.5)
-                         #:height (* texture-size 1.5)
-                         #:angle angle
-                         #:center (cons (* texture-size 0.75) (* texture-size 0.75)))
+            ;; 5. Stretched versions
+            (render-texture! renderer target-texture 500 350
+                             #:width (* texture-size 2)
+                             #:height (/ texture-size 2))
 
-        ;; 4. Multiple small copies in a row
-        (for ([i (in-range 6)])
-          (define x (+ 20 (* i 70)))
-          (define y 350)
-          (define scale (+ 0.3 (* 0.1 (sin (+ elapsed (* i 0.5))))))
-          (define w (* texture-size scale))
-          (define h (* texture-size scale))
-          (render-texture! renderer target-texture x y
-                           #:width w #:height h))
+            (render-texture! renderer target-texture 500 430
+                             #:width (/ texture-size 2)
+                             #:height (* texture-size 1.5))
 
-        ;; 5. Stretched versions
-        (render-texture! renderer target-texture 500 350
-                         #:width (* texture-size 2)
-                         #:height (/ texture-size 2))
+            ;; Draw UI text (simple rectangles as we don't have font in this example)
+            (set-draw-color! renderer 255 255 255 200)
 
-        (render-texture! renderer target-texture 500 430
-                         #:width (/ texture-size 2)
-                         #:height (* texture-size 1.5))
+            ;; Scale mode indicator
+            (set-draw-color! renderer
+                             (if (eq? new-scale 'nearest) 255 100)
+                             (if (eq? new-scale 'linear) 255 100)
+                             100)
+            (fill-rect! renderer 20 550 200 30)
 
-        ;; Draw UI text (simple rectangles as we don't have font in this example)
-        (set-draw-color! renderer 255 255 255 200)
+            (set-draw-color! renderer 0 0 0)
+            ;; Simple text indicator using rectangles
+            ;; "1" or "2" to indicate mode
+            (if (eq? new-scale 'nearest)
+                (fill-rect! renderer 30 555 5 20)   ; "1"
+                (begin
+                  (fill-rect! renderer 30 555 10 5)   ; "2" top
+                  (fill-rect! renderer 35 555 5 10)   ; "2" right-top
+                  (fill-rect! renderer 30 560 10 5)   ; "2" middle
+                  (fill-rect! renderer 25 560 5 10)   ; "2" left-bottom
+                  (fill-rect! renderer 25 570 15 5))) ; "2" bottom
 
-        ;; Scale mode indicator
-        (set-draw-color! renderer
-                         (if (eq? new-scale 'nearest) 255 100)
-                         (if (eq? new-scale 'linear) 255 100)
-                         100)
-        (fill-rect! renderer 20 550 200 30)
+            (render-present! renderer)
+            (delay! 16)
 
-        (set-draw-color! renderer 0 0 0)
-        ;; Simple text indicator using rectangles
-        ;; "1" or "2" to indicate mode
-        (if (eq? new-scale 'nearest)
-            (fill-rect! renderer 30 555 5 20)   ; "1"
-            (begin
-              (fill-rect! renderer 30 555 10 5)   ; "2" top
-              (fill-rect! renderer 35 555 5 10)   ; "2" right-top
-              (fill-rect! renderer 30 560 10 5)   ; "2" middle
-              (fill-rect! renderer 25 560 5 10)   ; "2" left-bottom
-              (fill-rect! renderer 25 570 15 5))) ; "2" bottom
+            (loop still-running? new-scale))))
 
-        (render-present! renderer)
-        (delay! 16)
-
-        (loop still-running? new-scale))))
-
-  ;; Clean up
-  (texture-destroy! target-texture)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Clean up
+      (texture-destroy! target-texture))))
 
 ;; Run the example when executed directly
 (module+ main

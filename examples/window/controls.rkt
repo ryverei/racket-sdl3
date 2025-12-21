@@ -40,24 +40,21 @@
 (define opacity-levels '(1.0 0.75 0.5 0.25))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer initial-title initial-width initial-height (window renderer)
+      #:window-flags 'resizable
+      ;; Scale font for high-DPI
+      (define pixel-density (window-pixel-density window))
+      (define font-size (* base-font-size pixel-density))
+      (define font (open-font font-path font-size))
 
-  (define-values (window renderer)
-    (make-window+renderer initial-title initial-width initial-height
-                          #:window-flags 'resizable))
+      ;; Store initial position for reset
+      (define-values (init-x init-y) (window-position window))
 
-  ;; Scale font for high-DPI
-  (define pixel-density (window-pixel-density window))
-  (define font-size (* base-font-size pixel-density))
-  (define font (open-font font-path font-size))
+      ;; Set minimum window size constraint
+      (set-window-minimum-size! window min-size min-size)
 
-  ;; Store initial position for reset
-  (define-values (init-x init-y) (window-position window))
-
-  ;; Set minimum window size constraint
-  (set-window-minimum-size! window min-size min-size)
-
-  (let loop ([running? #t]
+      (let loop ([running? #t]
              [opacity-idx 0]
              [bordered? #t])
     (when running?
@@ -196,13 +193,9 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running? new-opacity-idx new-bordered?))))
+        (loop still-running? new-opacity-idx new-bordered?)))
 
-  (close-font! font)
-
-  ;; Clean up (important for REPL usage)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (close-font! font)))))
 
 ;; Run the example when executed directly
 (module+ main

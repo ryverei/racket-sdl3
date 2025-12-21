@@ -177,18 +177,15 @@
     [else "Unknown"]))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Hide the system cursor initially
+      (hide-cursor!)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Current system cursor (for toggling)
+      (define current-system-cursor #f)
 
-  ;; Hide the system cursor initially
-  (hide-cursor!)
-
-  ;; Current system cursor (for toggling)
-  (define current-system-cursor #f)
-
-  (let loop ([running? #t])
+      (let loop ([running? #t])
     (when running?
       ;; Get mouse state
       (define-values (mx my buttons) (get-mouse-state))
@@ -300,17 +297,14 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
+        (loop still-running?)))
 
-  ;; Clean up
-  (when current-system-cursor
-    (destroy-cursor! current-system-cursor))
+      ;; Clean up
+      (when current-system-cursor
+        (destroy-cursor! current-system-cursor))
 
-  ;; Restore system cursor before exit
-  (show-cursor!)
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Restore system cursor before exit
+      (show-cursor!)))))
 
 ;; Run when executed directly
 (module+ main

@@ -150,18 +150,15 @@
   (fill-rect! renderer (+ sx 15) (+ sy 15) 10 10))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      (set-blend-mode! renderer 'blend)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Initial state
+      (define start-x (/ world-width 2.0))
+      (define start-y (/ world-height 2.0))
 
-  (set-blend-mode! renderer 'blend)
-
-  ;; Initial state
-  (define start-x (/ world-width 2.0))
-  (define start-y (/ world-height 2.0))
-
-  (let loop ([player-x start-x]
+      (let loop ([player-x start-x]
              [player-y start-y]
              [cam-x (- start-x (/ window-width 2.0))]
              [cam-y (- start-y (/ window-height 2.0))]
@@ -314,10 +311,7 @@
         (delay! 16)
 
         (loop new-player-x new-player-y new-cam-x new-cam-y
-              new-smooth? new-parallax? now still-running?))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+              new-smooth? new-parallax? now still-running?)))))))
 
 ;; Run when executed directly
 (module+ main

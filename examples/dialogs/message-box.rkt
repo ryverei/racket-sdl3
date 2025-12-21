@@ -21,20 +21,15 @@
 (define window-title "SDL3 Racket - Message Box Demo")
 
 (define (main)
-  ;; Initialize SDL
-  (sdl-init!)
-
-  ;; Create window and renderer
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
   ;; Instructions for the user
   (printf "Message Box Demo~n")
   (printf "Press: I=Info, W=Warning, E=Error, C=Custom Dialog~n")
   (printf "Press ESC or Q to quit~n~n")
 
-  ;; Main loop
-  (let loop ()
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Main loop
+      (let loop ()
     ;; Process events
     (define quit?
       (for/or ([ev (in-events)])
@@ -74,11 +69,8 @@
       ;; Small delay
       (delay! 16)
 
-      (loop)))
+      (loop)))))
 
-  ;; Clean up
-  (renderer-destroy! renderer)
-  (window-destroy! window)
   (printf "Done!~n"))
 
 ;; Show a simple information message box

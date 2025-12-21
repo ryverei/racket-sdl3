@@ -138,27 +138,24 @@
   (set! last-action "Random"))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      (set-blend-mode! renderer 'blend)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Create buttons
+      (define buttons
+        (list
+         (make-button 100 200 150 50 "Increment (+)" on-increment)
+         (make-button 100 270 150 50 "Decrement (-)" on-decrement)
+         (make-button 100 340 150 50 "Reset (0)" on-reset)
+         (make-button 280 200 150 50 "Double (x2)" on-double)
+         (make-button 280 270 150 50 "Random" on-random)
+         (make-button 280 340 150 50 "Disabled" void #:enabled? #f)))
 
-  (set-blend-mode! renderer 'blend)
+      ;; Track which button was pressed (for click detection)
+      (define pressed-button #f)
 
-  ;; Create buttons
-  (define buttons
-    (list
-     (make-button 100 200 150 50 "Increment (+)" on-increment)
-     (make-button 100 270 150 50 "Decrement (-)" on-decrement)
-     (make-button 100 340 150 50 "Reset (0)" on-reset)
-     (make-button 280 200 150 50 "Double (x2)" on-double)
-     (make-button 280 270 150 50 "Random" on-random)
-     (make-button 280 340 150 50 "Disabled" void #:enabled? #f)))
-
-  ;; Track which button was pressed (for click detection)
-  (define pressed-button #f)
-
-  (let loop ([running? #t])
+      (let loop ([running? #t])
     (when running?
       ;; Get mouse state
       (define-values (mx my mouse-buttons) (get-mouse-state))
@@ -274,10 +271,7 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+        (loop still-running?)))))))
 
 ;; Run when executed directly
 (module+ main

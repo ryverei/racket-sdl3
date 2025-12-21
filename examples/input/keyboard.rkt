@@ -200,11 +200,6 @@
   (render-debug-text! renderer 20 (- window-height 22) "State=continuous | Events=discrete actions"))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Keyboard Input Demo" window-width window-height))
-
   (printf "Keyboard Input Demo~n")
   (printf "===================~n")
   (printf "This demo shows two approaches to keyboard input:~n")
@@ -218,7 +213,9 @@
   (printf "~n")
   (printf "Escape: Quit~n~n")
 
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Keyboard Input Demo" window-width window-height (window renderer)
+      (let loop ([running? #t])
     (when running?
       ;; Get keyboard state once per frame (for polling-based input)
       (define kbd (get-keyboard-state))
@@ -282,13 +279,9 @@
 
         (render-present! renderer)
         (delay! 16)
-        (loop still-running?))))
+        (loop still-running?))))))
 
-  (printf "~nDone.~n")
-
-  ;; Clean up
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+  (printf "~nDone.~n"))
 
 ;; Run when executed directly
 (module+ main

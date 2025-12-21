@@ -15,53 +15,48 @@
 (define image-path "examples/assets/test.png")
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Detect format from bytes
+      (define image-bytes (file->bytes image-path))
+      (define fmt (image-format image-bytes))
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Load texture from a port
+      (define in (open-input-file image-path #:mode 'binary))
+      (define tex (load-texture renderer in))
+      (close-input-port in)
 
-  ;; Detect format from bytes
-  (define image-bytes (file->bytes image-path))
-  (define fmt (image-format image-bytes))
+      (define-values (tex-w tex-h) (texture-size tex))
+      (define tex-x (/ (- window-width tex-w) 2.0))
+      (define tex-y (/ (- window-height tex-h) 2.0))
 
-  ;; Load texture from a port
-  (define in (open-input-file image-path #:mode 'binary))
-  (define tex (load-texture renderer in))
-  (close-input-port in)
+      (let loop ([running? #t])
+        (when running?
+          (define still-running?
+            (for/fold ([run? #t])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested)) #f]
+                [(key-event 'down 'escape _ _ _) #f]
+                [_ run?])))
 
-  (define-values (tex-w tex-h) (texture-size tex))
-  (define tex-x (/ (- window-width tex-w) 2.0))
-  (define tex-y (/ (- window-height tex-h) 2.0))
+          (when still-running?
+            (set-draw-color! renderer 20 25 35)
+            (render-clear! renderer)
 
-  (let loop ([running? #t])
-    (when running?
-      (define still-running?
-        (for/fold ([run? #t])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested)) #f]
-            [(key-event 'down 'escape _ _ _) #f]
-            [_ run?])))
+            (render-texture! renderer tex tex-x tex-y
+                             #:width tex-w
+                             #:height tex-h)
+            (set-draw-color! renderer 240 240 240)
+            (render-debug-text! renderer 20 20 (format "format: ~a" (or fmt 'unknown)))
+            (render-debug-text! renderer 20 40 "Loaded from input port; press ESC to quit.")
 
-      (when still-running?
-        (set-draw-color! renderer 20 25 35)
-        (render-clear! renderer)
+            (render-present! renderer)
+            (delay! 16)
+            (loop still-running?))))
 
-        (render-texture! renderer tex tex-x tex-y
-                         #:width tex-w
-                         #:height tex-h)
-        (set-draw-color! renderer 240 240 240)
-        (render-debug-text! renderer 20 20 (format "format: ~a" (or fmt 'unknown)))
-        (render-debug-text! renderer 20 40 "Loaded from input port; press ESC to quit.")
-
-        (render-present! renderer)
-        (delay! 16)
-        (loop still-running?))))
-
-  (texture-destroy! tex)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (texture-destroy! tex))))
 
 (module+ main
   (main))

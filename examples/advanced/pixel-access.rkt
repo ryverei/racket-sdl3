@@ -70,14 +70,11 @@
           (quotient total-b sample-count)))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Create surfaces using different methods
-  (printf "Creating gradient using surface-set-pixel!...~n")
-  (define gradient-surf (create-gradient-high-level 150 100))
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create surfaces using different methods
+      (printf "Creating gradient using surface-set-pixel!...~n")
+      (define gradient-surf (create-gradient-high-level 150 100))
 
   (printf "Creating noise using call-with-surface-pixels...~n")
   (define noise-surf (create-noise-surface 150 100))
@@ -164,10 +161,11 @@
 
       (loop still-running?)))
 
-  ;; Cleanup
-  (surface-destroy! gradient-surf)
-  (surface-destroy! noise-surf)
-  (surface-destroy! circle-surf)
-  (printf "Done!~n"))
+      ;; Cleanup
+      (surface-destroy! gradient-surf)
+      (surface-destroy! noise-surf)
+      (surface-destroy! circle-surf)
+      (printf "Done!~n"))))
 
-(main)
+(module+ main
+  (main))

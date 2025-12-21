@@ -78,13 +78,10 @@
   (set-render-scale! renderer 1.0 1.0))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Render Scale Demo" window-width window-height
-                          #:window-flags 'resizable))
-
-  (let loop ([scale 1.0])
+  (with-sdl
+    (with-window+renderer "SDL3 Render Scale Demo" window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (let loop ([scale 1.0])
     ;; Get current window size
     (define-values (win-w win-h) (window-size window))
 
@@ -117,10 +114,7 @@
 
       (render-present! renderer)
       (delay! 16)
-      (loop new-scale)))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (loop new-scale))))))
 
 (module+ main
   (main))

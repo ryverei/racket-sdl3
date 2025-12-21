@@ -19,35 +19,31 @@
     (printf "  ~a: ~a (id ~a)~n" idx display-name id)))
 
 (define (main)
-  (sdl-init!)
-  (define win (make-window "SDL3 Racket - Device Enumeration" 640 360))
+  (with-sdl
+    (with-window "SDL3 Racket - Device Enumeration" 640 360 (win)
+      (printf "Has keyboard? ~a~n" (has-keyboard?))
+      (printf "Has mouse? ~a~n" (has-mouse?))
+      (print-device-list "Keyboards" (get-keyboards) get-keyboard-name-for-id)
+      (print-device-list "Mice" (get-mice) get-mouse-name-for-id)
+      (printf "Keyboard focus window: ~a~n"
+              (if (get-keyboard-focus) "present" "none"))
+      (printf "Mouse focus window: ~a~n"
+              (if (get-mouse-focus) "present" "none"))
+      (printf "Close the window or press Escape to quit.~n")
 
-  (printf "Has keyboard? ~a~n" (has-keyboard?))
-  (printf "Has mouse? ~a~n" (has-mouse?))
-  (print-device-list "Keyboards" (get-keyboards) get-keyboard-name-for-id)
-  (print-device-list "Mice" (get-mice) get-mouse-name-for-id)
-  (printf "Keyboard focus window: ~a~n"
-          (if (get-keyboard-focus) "present" "none"))
-  (printf "Mouse focus window: ~a~n"
-          (if (get-mouse-focus) "present" "none"))
-  (printf "Close the window or press Escape to quit.~n")
-
-  (let loop ()
-    (define running?
-      (for/fold ([run? #t])
-                ([e (in-events)]
-                 #:break (not run?))
-        (match e
-          [(quit-event) #f]
-          [(key-event 'down 'escape _ _ _) #f]
-          [(key-event 'down _ _ _ _) run?]
-          [_ run?])))
-    (when running?
-      (delay! 16)
-      (loop)))
-
-  (window-destroy! win)
-  (sdl-quit!))
+      (let loop ()
+        (define running?
+          (for/fold ([run? #t])
+                    ([e (in-events)]
+                     #:break (not run?))
+            (match e
+              [(quit-event) #f]
+              [(key-event 'down 'escape _ _ _) #f]
+              [(key-event 'down _ _ _ _) run?]
+              [_ run?])))
+        (when running?
+          (delay! 16)
+          (loop))))))
 
 (module+ main
   (main))

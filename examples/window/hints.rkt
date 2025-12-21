@@ -39,19 +39,15 @@
   (printf "App name hint: ~a~n" (or (get-hint 'app-name) "(not set)"))
   (printf "App ID hint: ~a~n" (or (get-hint 'app-id) "(not set)"))
 
-  ;; Initialize SDL
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      #:window-flags 'resizable
+      ;; Scale font for high-DPI
+      (define pixel-density (window-pixel-density window))
+      (define font-size (* base-font-size pixel-density))
+      (define font (open-font font-path font-size))
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height
-                          #:window-flags 'resizable))
-
-  ;; Scale font for high-DPI
-  (define pixel-density (window-pixel-density window))
-  (define font-size (* base-font-size pixel-density))
-  (define font (open-font font-path font-size))
-
-  (let loop ([running? #t]
+      (let loop ([running? #t]
              [vsync? #f]
              [screensaver-allowed? #t])
     (when running?
@@ -172,11 +168,9 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running? new-vsync? new-ss?))))
+        (loop still-running? new-vsync? new-ss?)))
 
-  (close-font! font)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (close-font! font))))
 
 ;; Run the example when executed directly
 (module+ main

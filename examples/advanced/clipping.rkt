@@ -77,13 +77,10 @@
                        "Use set-render-clip-rect! to enable, pass #f to disable"))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Clipping Demo" window-width window-height
-                          #:window-flags 'resizable))
-
-  (let loop ([frame 0])
+  (with-sdl
+    (with-window+renderer "SDL3 Clipping Demo" window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (let loop ([frame 0])
     ;; Get current window size
     (define-values (win-w win-h) (window-size window))
 
@@ -104,10 +101,7 @@
 
       (render-present! renderer)
       (delay! 16)
-      (loop (+ frame 1))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (loop (+ frame 1)))))))
 
 (module+ main
   (main))

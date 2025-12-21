@@ -15,210 +15,203 @@
 (define base-font-size 24.0)
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer "SDL3_ttf Font Properties" window-width window-height (window renderer)
+      #:window-flags 'high-pixel-density
+      ;; Scale font for high-DPI displays
+      (define pixel-density (window-pixel-density window))
+      (define scaled-font-size (* base-font-size pixel-density))
+      (define font (open-font font-path scaled-font-size))
+      (define small-font (open-font font-path (* 18.0 pixel-density)))
 
-  ;; Create window and renderer
-  (define-values (window renderer)
-    (make-window+renderer "SDL3_ttf Font Properties"
-                          window-width window-height
-                          #:window-flags 'high-pixel-density))
+      ;; Colors
+      (define white '(255 255 255 255))
+      (define yellow '(255 255 0 255))
+      (define cyan '(0 255 255 255))
+      (define green '(0 255 0 255))
+      (define gray '(128 128 128 255))
 
-  ;; Scale font for high-DPI displays
-  (define pixel-density (window-pixel-density window))
-  (define scaled-font-size (* base-font-size pixel-density))
-  (define font (open-font font-path scaled-font-size))
-  (define small-font (open-font font-path (* 18.0 pixel-density)))
+      ;; Current style state
+      (define current-styles '(normal))
 
-  ;; Colors
-  (define white '(255 255 255 255))
-  (define yellow '(255 255 0 255))
-  (define cyan '(0 255 255 255))
-  (define green '(0 255 0 255))
-  (define gray '(128 128 128 255))
+      ;; Helper to draw text and return height used
+      (define (draw-line! y text color [f font])
+        (draw-text! renderer f text 20 y color)
+        (font-height f))
 
-  ;; Current style state
-  (define current-styles '(normal))
+      ;; Helper to draw a labeled value
+      (define (draw-labeled! y label value [color white])
+        (draw-text! renderer small-font label 20 y gray)
+        (draw-text! renderer small-font value 200 y color)
+        (font-height small-font))
 
-  ;; Helper to draw text and return height used
-  (define (draw-line! y text color [f font])
-    (draw-text! renderer f text 20 y color)
-    (font-height f))
+      (let loop ([running? #t])
+        (when running?
+          ;; Process events
+          (define still-running?
+            (for/fold ([run? #t])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested))
+                 #f]
+                [(key-event 'down 'escape _ _ _) #f]
 
-  ;; Helper to draw a labeled value
-  (define (draw-labeled! y label value [color white])
-    (draw-text! renderer small-font label 20 y gray)
-    (draw-text! renderer small-font value 200 y color)
-    (font-height small-font))
+                [(key-event 'down key _ _ _)
+                 (cond
+                   [(eq? key '1)
+                    (set! current-styles
+                          (if (member 'bold current-styles)
+                              (remove 'bold current-styles)
+                              (cons 'bold current-styles)))
+                    (when (null? current-styles) (set! current-styles '(normal)))
+                    (apply set-font-style! font current-styles)
+                    run?]
+                   [(eq? key '2)
+                    (set! current-styles
+                          (if (member 'italic current-styles)
+                              (remove 'italic current-styles)
+                              (cons 'italic current-styles)))
+                    (when (null? current-styles) (set! current-styles '(normal)))
+                    (apply set-font-style! font current-styles)
+                    run?]
+                   [(eq? key '3)
+                    (set! current-styles
+                          (if (member 'underline current-styles)
+                              (remove 'underline current-styles)
+                              (cons 'underline current-styles)))
+                    (when (null? current-styles) (set! current-styles '(normal)))
+                    (apply set-font-style! font current-styles)
+                    run?]
+                   [(eq? key '4)
+                    (set! current-styles
+                          (if (member 'strikethrough current-styles)
+                              (remove 'strikethrough current-styles)
+                              (cons 'strikethrough current-styles)))
+                    (when (null? current-styles) (set! current-styles '(normal)))
+                    (apply set-font-style! font current-styles)
+                    run?]
+                   [(eq? key '5)
+                    (set! current-styles '(normal))
+                    (set-font-style! font 'normal)
+                    run?]
+                   [else run?])]
+                [_ run?])))
 
-  (let loop ([running? #t])
-    (when running?
-      ;; Process events
-      (define still-running?
-        (for/fold ([run? #t])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested))
-             #f]
-            [(key-event 'down 'escape _ _ _) #f]
+          (when still-running?
+            ;; Clear background
+            (set-draw-color! renderer 30 30 40)
+            (render-clear! renderer)
 
-            [(key-event 'down key _ _ _)
-             (cond
-               [(eq? key '1)
-                (set! current-styles
-                      (if (member 'bold current-styles)
-                          (remove 'bold current-styles)
-                          (cons 'bold current-styles)))
-                (when (null? current-styles) (set! current-styles '(normal)))
-                (apply set-font-style! font current-styles)
-                run?]
-               [(eq? key '2)
-                (set! current-styles
-                      (if (member 'italic current-styles)
-                          (remove 'italic current-styles)
-                          (cons 'italic current-styles)))
-                (when (null? current-styles) (set! current-styles '(normal)))
-                (apply set-font-style! font current-styles)
-                run?]
-               [(eq? key '3)
-                (set! current-styles
-                      (if (member 'underline current-styles)
-                          (remove 'underline current-styles)
-                          (cons 'underline current-styles)))
-                (when (null? current-styles) (set! current-styles '(normal)))
-                (apply set-font-style! font current-styles)
-                run?]
-               [(eq? key '4)
-                (set! current-styles
-                      (if (member 'strikethrough current-styles)
-                          (remove 'strikethrough current-styles)
-                          (cons 'strikethrough current-styles)))
-                (when (null? current-styles) (set! current-styles '(normal)))
-                (apply set-font-style! font current-styles)
-                run?]
-               [(eq? key '5)
-                (set! current-styles '(normal))
-                (set-font-style! font 'normal)
-                run?]
-               [else run?])]
-            [_ run?])))
+            ;; Update current styles from font (in case they changed)
+            (set! current-styles (font-style font))
 
-      (when still-running?
-        ;; Clear background
-        (set-draw-color! renderer 30 30 40)
-        (render-clear! renderer)
+            (define y 20)
 
-        ;; Update current styles from font (in case they changed)
-        (set! current-styles (font-style font))
+            ;; Title
+            (set! y (+ y (draw-line! y "Font Properties Demo" yellow)))
+            (set! y (+ y 10))
 
-        (define y 20)
+            ;; Version information
+            (define-values (ttf-major ttf-minor ttf-patch) (ttf-version))
+            (define-values (ft-major ft-minor ft-patch) (freetype-version))
+            (define-values (hb-major hb-minor hb-patch) (harfbuzz-version))
 
-        ;; Title
-        (set! y (+ y (draw-line! y "Font Properties Demo" yellow)))
-        (set! y (+ y 10))
+            (set! y (+ y (draw-labeled! y "SDL_ttf:" (~a ttf-major "." ttf-minor "." ttf-patch) cyan)))
+            (set! y (+ y (draw-labeled! y "FreeType:" (~a ft-major "." ft-minor "." ft-patch) cyan)))
+            (set! y (+ y (draw-labeled! y "HarfBuzz:"
+                                         (if hb-major
+                                             (~a hb-major "." hb-minor "." hb-patch)
+                                             "not available")
+                                         cyan)))
+            (set! y (+ y 15))
 
-        ;; Version information
-        (define-values (ttf-major ttf-minor ttf-patch) (ttf-version))
-        (define-values (ft-major ft-minor ft-patch) (freetype-version))
-        (define-values (hb-major hb-minor hb-patch) (harfbuzz-version))
+            ;; Font metadata
+            (draw-text! renderer small-font "--- Font Metadata ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
 
-        (set! y (+ y (draw-labeled! y "SDL_ttf:" (~a ttf-major "." ttf-minor "." ttf-patch) cyan)))
-        (set! y (+ y (draw-labeled! y "FreeType:" (~a ft-major "." ft-minor "." ft-patch) cyan)))
-        (set! y (+ y (draw-labeled! y "HarfBuzz:"
-                                     (if hb-major
-                                         (~a hb-major "." hb-minor "." hb-patch)
-                                         "not available")
-                                     cyan)))
-        (set! y (+ y 15))
+            (set! y (+ y (draw-labeled! y "Family:" (font-family-name font) green)))
+            (set! y (+ y (draw-labeled! y "Style name:" (font-style-name font) green)))
+            (set! y (+ y (draw-labeled! y "Fixed width?:" (~a (font-fixed-width? font)) green)))
+            (set! y (+ y (draw-labeled! y "Scalable?:" (~a (font-scalable? font)) green)))
+            (set! y (+ y (draw-labeled! y "Weight:" (~a (font-weight font)) green)))
+            (set! y (+ y 15))
 
-        ;; Font metadata
-        (draw-text! renderer small-font "--- Font Metadata ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
+            ;; Font metrics
+            (draw-text! renderer small-font "--- Font Metrics ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
 
-        (set! y (+ y (draw-labeled! y "Family:" (font-family-name font) green)))
-        (set! y (+ y (draw-labeled! y "Style name:" (font-style-name font) green)))
-        (set! y (+ y (draw-labeled! y "Fixed width?:" (~a (font-fixed-width? font)) green)))
-        (set! y (+ y (draw-labeled! y "Scalable?:" (~a (font-scalable? font)) green)))
-        (set! y (+ y (draw-labeled! y "Weight:" (~a (font-weight font)) green)))
-        (set! y (+ y 15))
+            (set! y (+ y (draw-labeled! y "Size:" (~a (font-size font) " pt") green)))
+            (set! y (+ y (draw-labeled! y "Height:" (~a (font-height font) " px") green)))
+            (set! y (+ y (draw-labeled! y "Ascent:" (~a (font-ascent font) " px") green)))
+            (set! y (+ y (draw-labeled! y "Descent:" (~a (font-descent font) " px") green)))
+            (set! y (+ y (draw-labeled! y "Line skip:" (~a (font-line-skip font) " px") green)))
+            (set! y (+ y 15))
 
-        ;; Font metrics
-        (draw-text! renderer small-font "--- Font Metrics ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
+            ;; Font settings
+            (draw-text! renderer small-font "--- Font Settings ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
 
-        (set! y (+ y (draw-labeled! y "Size:" (~a (font-size font) " pt") green)))
-        (set! y (+ y (draw-labeled! y "Height:" (~a (font-height font) " px") green)))
-        (set! y (+ y (draw-labeled! y "Ascent:" (~a (font-ascent font) " px") green)))
-        (set! y (+ y (draw-labeled! y "Descent:" (~a (font-descent font) " px") green)))
-        (set! y (+ y (draw-labeled! y "Line skip:" (~a (font-line-skip font) " px") green)))
-        (set! y (+ y 15))
+            (set! y (+ y (draw-labeled! y "Current styles:" (~a current-styles) green)))
+            (set! y (+ y (draw-labeled! y "Hinting:" (~a (font-hinting font)) green)))
+            (set! y (+ y (draw-labeled! y "Kerning?:" (~a (font-kerning? font)) green)))
+            (set! y (+ y (draw-labeled! y "Outline:" (~a (font-outline font) " px") green)))
+            (set! y (+ y (draw-labeled! y "SDF mode?:" (~a (font-sdf? font)) green)))
+            (set! y (+ y (draw-labeled! y "Wrap align:" (~a (font-wrap-alignment font)) green)))
+            (set! y (+ y (draw-labeled! y "Direction:" (~a (font-direction font)) green)))
+            (set! y (+ y 15))
 
-        ;; Font settings
-        (draw-text! renderer small-font "--- Font Settings ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
+            ;; Text measurement
+            (draw-text! renderer small-font "--- Text Measurement ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
 
-        (set! y (+ y (draw-labeled! y "Current styles:" (~a current-styles) green)))
-        (set! y (+ y (draw-labeled! y "Hinting:" (~a (font-hinting font)) green)))
-        (set! y (+ y (draw-labeled! y "Kerning?:" (~a (font-kerning? font)) green)))
-        (set! y (+ y (draw-labeled! y "Outline:" (~a (font-outline font) " px") green)))
-        (set! y (+ y (draw-labeled! y "SDF mode?:" (~a (font-sdf? font)) green)))
-        (set! y (+ y (draw-labeled! y "Wrap align:" (~a (font-wrap-alignment font)) green)))
-        (set! y (+ y (draw-labeled! y "Direction:" (~a (font-direction font)) green)))
-        (set! y (+ y 15))
+            (define sample-text "Hello, SDL3_ttf!")
+            (define-values (text-w text-h) (text-size font sample-text))
+            (set! y (+ y (draw-labeled! y "Sample text:" sample-text cyan)))
+            (set! y (+ y (draw-labeled! y "Measured size:" (~a text-w " x " text-h " px") green)))
 
-        ;; Text measurement
-        (draw-text! renderer small-font "--- Text Measurement ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
+            (define-values (fit-w fit-len) (measure-text font sample-text 100))
+            (set! y (+ y (draw-labeled! y "Fits in 100px:" (~a fit-len " chars, " fit-w " px wide") green)))
+            (set! y (+ y 15))
 
-        (define sample-text "Hello, SDL3_ttf!")
-        (define-values (text-w text-h) (text-size font sample-text))
-        (set! y (+ y (draw-labeled! y "Sample text:" sample-text cyan)))
-        (set! y (+ y (draw-labeled! y "Measured size:" (~a text-w " x " text-h " px") green)))
+            ;; Glyph information
+            (draw-text! renderer small-font "--- Glyph Info (letter 'W') ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
 
-        (define-values (fit-w fit-len) (measure-text font sample-text 100))
-        (set! y (+ y (draw-labeled! y "Fits in 100px:" (~a fit-len " chars, " fit-w " px wide") green)))
-        (set! y (+ y 15))
+            (define test-char #\W)
+            (set! y (+ y (draw-labeled! y "Has glyph?:" (~a (font-has-glyph? font test-char)) green)))
 
-        ;; Glyph information
-        (draw-text! renderer small-font "--- Glyph Info (letter 'W') ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
+            (when (font-has-glyph? font test-char)
+              (define-values (minx maxx miny maxy advance) (glyph-metrics font test-char))
+              (set! y (+ y (draw-labeled! y "Min X:" (~a minx) green)))
+              (set! y (+ y (draw-labeled! y "Max X:" (~a maxx) green)))
+              (set! y (+ y (draw-labeled! y "Min Y:" (~a miny) green)))
+              (set! y (+ y (draw-labeled! y "Max Y:" (~a maxy) green)))
+              (set! y (+ y (draw-labeled! y "Advance:" (~a advance " px") green)))
 
-        (define test-char #\W)
-        (set! y (+ y (draw-labeled! y "Has glyph?:" (~a (font-has-glyph? font test-char)) green)))
+              ;; Kerning between 'A' and 'W'
+              (define kern (glyph-kerning font #\A #\W))
+              (set! y (+ y (draw-labeled! y "Kern A->W:" (~a kern " px") green))))
 
-        (when (font-has-glyph? font test-char)
-          (define-values (minx maxx miny maxy advance) (glyph-metrics font test-char))
-          (set! y (+ y (draw-labeled! y "Min X:" (~a minx) green)))
-          (set! y (+ y (draw-labeled! y "Max X:" (~a maxx) green)))
-          (set! y (+ y (draw-labeled! y "Min Y:" (~a miny) green)))
-          (set! y (+ y (draw-labeled! y "Max Y:" (~a maxy) green)))
-          (set! y (+ y (draw-labeled! y "Advance:" (~a advance " px") green)))
+            (set! y (+ y 20))
 
-          ;; Kerning between 'A' and 'W'
-          (define kern (glyph-kerning font #\A #\W))
-          (set! y (+ y (draw-labeled! y "Kern A->W:" (~a kern " px") green))))
+            ;; Sample styled text
+            (draw-text! renderer small-font "--- Sample Styled Text ---" 20 y yellow)
+            (set! y (+ y (font-height small-font) 5))
+            (draw-text! renderer font "The quick brown fox jumps over the lazy dog." 20 y white)
+            (set! y (+ y (font-height font) 10))
 
-        (set! y (+ y 20))
+            ;; Instructions
+            (draw-text! renderer small-font "Press 1=Bold, 2=Italic, 3=Underline, 4=Strikethrough, 5=Reset, ESC=Quit"
+                        20 (- window-height 40) gray)
 
-        ;; Sample styled text
-        (draw-text! renderer small-font "--- Sample Styled Text ---" 20 y yellow)
-        (set! y (+ y (font-height small-font) 5))
-        (draw-text! renderer font "The quick brown fox jumps over the lazy dog." 20 y white)
-        (set! y (+ y (font-height font) 10))
+            (render-present! renderer)
 
-        ;; Instructions
-        (draw-text! renderer small-font "Press 1=Bold, 2=Italic, 3=Underline, 4=Strikethrough, 5=Reset, ESC=Quit"
-                    20 (- window-height 40) gray)
+            (loop still-running?))))
 
-        (render-present! renderer)
-
-        (loop still-running?))))
-
-  ;; Clean up
-  (close-font! small-font)
-  (close-font! font)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Clean up
+      (close-font! small-font)
+      (close-font! font))))
 
 ;; Run when executed directly
 (module+ main

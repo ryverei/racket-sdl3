@@ -11,39 +11,30 @@
          sdl3)
 
 (define (main)
-  ;; Initialize SDL
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer "Hello SDL3!" 800 600 (window renderer)
+      ;; Main loop
+      (let loop ()
+        ;; Check for quit events
+        (define quit?
+          (for/or ([ev (in-events)])
+            (match ev
+              [(quit-event) #t]
+              [(key-event 'down 'escape _ _ _) #t]
+              [_ #f])))
 
-  ;; Create a window and renderer
-  (define-values (window renderer)
-    (make-window+renderer "Hello SDL3!" 800 600))
+        (unless quit?
+          ;; Set background color (cornflower blue)
+          (set-draw-color! renderer 100 149 237)
 
-  ;; Main loop
-  (let loop ()
-    ;; Check for quit events
-    (define quit?
-      (for/or ([ev (in-events)])
-        (match ev
-          [(quit-event) #t]
-          [(key-event 'down 'escape _ _ _) #t]
-          [_ #f])))
+          ;; Clear the screen
+          (render-clear! renderer)
 
-    (unless quit?
-      ;; Set background color (cornflower blue)
-      (set-draw-color! renderer 100 149 237)
+          ;; Show the frame
+          (render-present! renderer)
 
-      ;; Clear the screen
-      (render-clear! renderer)
-
-      ;; Show the frame
-      (render-present! renderer)
-
-      ;; Continue the loop
-      (loop)))
-
-  ;; Clean up
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+          ;; Continue the loop
+          (loop))))))
 
 (module+ main
   (main))

@@ -92,17 +92,21 @@ This is the biggest friction point in examples.
 - [x] Image save functions (`save-png!`, `save-jpg!`, `save-bmp!`) already accept either surface struct or raw pointer
 - [x] No other public safe APIs required updates
 
-## Phase 4: Scoped Resource Helpers (Medium Priority)
+## Phase 4: Scoped Resource Helpers (Medium Priority) ✅ COMPLETE
 
-### 4.1 Core Scoped Helpers
-- [ ] Add `call-with-sdl` - initializes SDL, calls thunk, quits SDL
-- [ ] Add `call-with-window` - creates window, calls proc, destroys window
-- [ ] Add `call-with-renderer` - creates renderer, calls proc, destroys renderer
-- [ ] Add `call-with-window+renderer` - combines window and renderer creation
+### 4.1 Core Scoped Helpers ✅
+- [x] Add `call-with-sdl` - initializes SDL, calls thunk, quits SDL
+- [x] Add `call-with-window` - creates window, calls proc, destroys window
+- [x] Add `call-with-renderer` - creates renderer, calls proc, destroys renderer
+- [x] Add `call-with-window+renderer` - combines window and renderer creation
 
-### 4.2 Syntax Forms (Optional)
-- [ ] Consider `with-sdl`, `with-window`, etc. macros for prettier syntax
-- [ ] These would just wrap the `call-with-*` procedures
+### 4.2 Syntax Forms ✅
+- [x] Add `with-sdl` macro for prettier syntax
+- [x] Add `with-window` macro with binding form
+- [x] Add `with-renderer` macro with binding form
+- [x] Add `with-window+renderer` macro with binding form
+- [x] All syntax forms support keyword arguments (#:flags, #:window-flags, etc.)
+- [x] Added example: `examples/window/scoped-resources.rkt`
 
 ## Phase 5: Geometry Cleanup (Low Priority)
 

@@ -285,64 +285,59 @@
                            " | Vertices: " (* 3 (length particles)))))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      #:window-flags 'resizable
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height
-                          #:window-flags 'resizable))
+      ;; Initialize particles
+      (reset-particles!)
 
-  ;; Initialize particles
-  (reset-particles!)
+      (let loop ([running? #t]
+                 [mode MODE-PRIMITIVES]
+                 [frame 0])
+        (when running?
+          ;; Handle events
+          (define-values (still-running? new-mode)
+            (for/fold ([run? #t] [m mode])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested))
+                 (values #f m)]
 
-  (let loop ([running? #t]
-             [mode MODE-PRIMITIVES]
-             [frame 0])
-    (when running?
-      ;; Handle events
-      (define-values (still-running? new-mode)
-        (for/fold ([run? #t] [m mode])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested))
-             (values #f m)]
+                [(key-event 'down 'escape _ _ _) (values #f m)]
 
-            [(key-event 'down 'escape _ _ _) (values #f m)]
+                [(key-event 'down 'space _ _ _)
+                 (when (= m MODE-PARTICLES) (reset-particles!))
+                 (values run? m)]
 
-            [(key-event 'down 'space _ _ _)
-             (when (= m MODE-PARTICLES) (reset-particles!))
-             (values run? m)]
+                [(key-event 'down key _ _ _)
+                 (cond
+                   [(eq? key '1) (values run? MODE-PRIMITIVES)]
+                   [(eq? key '2) (values run? MODE-TRIANGLES)]
+                   [(eq? key '3) (values run? MODE-INDEXED)]
+                   [(eq? key '4) (values run? MODE-PARTICLES)]
+                   [else (values run? m)])]
 
-            [(key-event 'down key _ _ _)
-             (cond
-               [(eq? key '1) (values run? MODE-PRIMITIVES)]
-               [(eq? key '2) (values run? MODE-TRIANGLES)]
-               [(eq? key '3) (values run? MODE-INDEXED)]
-               [(eq? key '4) (values run? MODE-PARTICLES)]
-               [else (values run? m)])]
+                [_ (values run? m)])))
 
-            [_ (values run? m)])))
+          (when still-running?
+            ;; Draw based on mode
+            (case new-mode
+              [(1) (draw-primitives-demo renderer)]
+              [(2) (draw-triangles-demo renderer)]
+              [(3) (draw-indexed-demo renderer frame)]
+              [(4) (draw-particles-demo renderer)])
 
-      (when still-running?
-        ;; Draw based on mode
-        (case new-mode
-          [(1) (draw-primitives-demo renderer)]
-          [(2) (draw-triangles-demo renderer)]
-          [(3) (draw-indexed-demo renderer frame)]
-          [(4) (draw-particles-demo renderer)])
+            ;; Draw mode selector
+            (set-draw-color! renderer 150 150 150)
+            (render-debug-text! renderer 10 (- window-height 15)
+                                 "Press 1=Primitives | 2=Triangles | 3=Indexed | 4=Particles | ESC=Quit")
 
-        ;; Draw mode selector
-        (set-draw-color! renderer 150 150 150)
-        (render-debug-text! renderer 10 (- window-height 15)
-                             "Press 1=Primitives | 2=Triangles | 3=Indexed | 4=Particles | ESC=Quit")
+            (render-present! renderer)
+            (delay! 16)
 
-        (render-present! renderer)
-        (delay! 16)
-
-        (loop still-running? new-mode (+ frame 1)))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+            (loop still-running? new-mode (+ frame 1))))))))
 
 ;; Run the example when executed directly
 (module+ main

@@ -101,13 +101,10 @@
   (render-debug-text! renderer 10 40 "Notice: coordinates reset to (0,0) in each viewport"))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Viewport Demo" window-width window-height
-                          #:window-flags 'resizable))
-
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Viewport Demo" window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (let loop ([running? #t])
     (when running?
       ;; Get current window size
       (define-values (win-w win-h) (window-size window))
@@ -129,10 +126,7 @@
 
         (render-present! renderer)
         (delay! 16)
-        (loop #t))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+        (loop #t)))))))
 
 (module+ main
   (main))

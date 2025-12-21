@@ -55,14 +55,11 @@
   surf)
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Create source surfaces
-  (printf "Creating source surfaces...~n")
-  (define checker-surf (create-checkerboard-surface 100 100 10 '(255 50 50) '(50 50 255)))
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create source surfaces
+      (printf "Creating source surfaces...~n")
+      (define checker-surf (create-checkerboard-surface 100 100 10 '(255 50 50) '(50 50 255)))
   (define gradient-surf (create-gradient-surface 100 100))
   (define circle-surf (create-circle-surface 80 '(50 255 50)))
 
@@ -208,7 +205,8 @@
 
       (loop still-running?)))
 
-  ;; Cleanup (surfaces and textures cleaned up by custodian)
-  (printf "Done!~n"))
+      ;; Cleanup (surfaces and textures cleaned up by custodian)
+      (printf "Done!~n"))))
 
-(main)
+(module+ main
+  (main))

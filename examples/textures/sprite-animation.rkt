@@ -88,145 +88,140 @@
   sheet)
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create sprite sheet
+      (define sprite-sheet (create-sprite-sheet renderer))
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Enable blending for transparency
+      (set-blend-mode! renderer 'blend)
 
-  ;; Create sprite sheet
-  (define sprite-sheet (create-sprite-sheet renderer))
+      ;; Animation state
+      (let loop ([sprite-x (/ window-width 2.0)]
+                 [current-frame 0]
+                 [frame-time 0]
+                 [frame-duration default-frame-duration]
+                 [paused? #f]
+                 [reversed? #f]
+                 [last-ticks (current-ticks)]
+                 [running? #t])
+        (when running?
+          (define now (current-ticks))
+          (define dt (- now last-ticks))
 
-  ;; Enable blending for transparency
-  (set-blend-mode! renderer 'blend)
+          ;; Process events
+          (define-values (new-x new-duration new-paused? new-reversed? still-running?)
+            (for/fold ([x sprite-x]
+                       [dur frame-duration]
+                       [pause? paused?]
+                       [rev? reversed?]
+                       [run? #t])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested))
+                 (values x dur pause? rev? #f)]
 
-  ;; Animation state
-  (let loop ([sprite-x (/ window-width 2.0)]
-             [current-frame 0]
-             [frame-time 0]
-             [frame-duration default-frame-duration]
-             [paused? #f]
-             [reversed? #f]
-             [last-ticks (current-ticks)]
-             [running? #t])
-    (when running?
-      (define now (current-ticks))
-      (define dt (- now last-ticks))
+                [(key-event 'down 'escape _ _ _)
+                 (values x dur pause? rev? #f)]
 
-      ;; Process events
-      (define-values (new-x new-duration new-paused? new-reversed? still-running?)
-        (for/fold ([x sprite-x]
-                   [dur frame-duration]
-                   [pause? paused?]
-                   [rev? reversed?]
-                   [run? #t])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested))
-             (values x dur pause? rev? #f)]
+                [(key-event 'down 'left _ _ _)
+                 (values (max 50 (- x 20)) dur pause? rev? run?)]
 
-            [(key-event 'down 'escape _ _ _)
-             (values x dur pause? rev? #f)]
+                [(key-event 'down 'right _ _ _)
+                 (values (min (- window-width 50) (+ x 20)) dur pause? rev? run?)]
 
-            [(key-event 'down 'left _ _ _)
-             (values (max 50 (- x 20)) dur pause? rev? run?)]
+                [(key-event 'down 'up _ _ _)
+                 (values x (max 20 (- dur 20)) pause? rev? run?)]
 
-            [(key-event 'down 'right _ _ _)
-             (values (min (- window-width 50) (+ x 20)) dur pause? rev? run?)]
+                [(key-event 'down 'down _ _ _)
+                 (values x (min 500 (+ dur 20)) pause? rev? run?)]
 
-            [(key-event 'down 'up _ _ _)
-             (values x (max 20 (- dur 20)) pause? rev? run?)]
+                [(key-event 'down 'space _ _ _)
+                 (values x dur (not pause?) rev? run?)]
 
-            [(key-event 'down 'down _ _ _)
-             (values x (min 500 (+ dur 20)) pause? rev? run?)]
+                [(key-event 'down 'r _ _ _)
+                 (values x dur pause? (not rev?) run?)]
 
-            [(key-event 'down 'space _ _ _)
-             (values x dur (not pause?) rev? run?)]
+                [_ (values x dur pause? rev? run?)])))
 
-            [(key-event 'down 'r _ _ _)
-             (values x dur pause? (not rev?) run?)]
+          (when still-running?
+            ;; Update animation
+            (define new-frame-time
+              (if new-paused?
+                  frame-time
+                  (+ frame-time dt)))
 
-            [_ (values x dur pause? rev? run?)])))
+            ;; Advance frame if enough time has passed
+            (define frames-to-advance (quotient new-frame-time new-duration))
+            (define remaining-time (remainder new-frame-time new-duration))
 
-      (when still-running?
-        ;; Update animation
-        (define new-frame-time
-          (if new-paused?
-              frame-time
-              (+ frame-time dt)))
+            (define next-frame
+              (if new-reversed?
+                  (modulo (- current-frame frames-to-advance) frame-count)
+                  (modulo (+ current-frame frames-to-advance) frame-count)))
 
-        ;; Advance frame if enough time has passed
-        (define frames-to-advance (quotient new-frame-time new-duration))
-        (define remaining-time (remainder new-frame-time new-duration))
+            ;; Clear background
+            (set-draw-color! renderer 30 30 40)
+            (render-clear! renderer)
 
-        (define next-frame
-          (if new-reversed?
-              (modulo (- current-frame frames-to-advance) frame-count)
-              (modulo (+ current-frame frames-to-advance) frame-count)))
+            ;; Draw ground
+            (set-draw-color! renderer 60 80 60)
+            (fill-rect! renderer 0 (- window-height 80) window-width 80)
 
-        ;; Clear background
-        (set-draw-color! renderer 30 30 40)
-        (render-clear! renderer)
+            ;; Draw sprite at larger scale
+            (define scale 3.0)
+            (define sprite-w (* frame-size scale))
+            (define sprite-h (* frame-size scale))
+            (define sprite-y (- window-height 80 sprite-h))
 
-        ;; Draw ground
-        (set-draw-color! renderer 60 80 60)
-        (fill-rect! renderer 0 (- window-height 80) window-width 80)
+            (render-texture! renderer sprite-sheet
+                             (- new-x (/ sprite-w 2)) sprite-y
+                             #:width sprite-w
+                             #:height sprite-h
+                             #:src-x (* next-frame frame-size)
+                             #:src-y 0
+                             #:src-w frame-size
+                             #:src-h frame-size
+                             #:flip (if new-reversed? 'horizontal 'none))
 
-        ;; Draw sprite at larger scale
-        (define scale 3.0)
-        (define sprite-w (* frame-size scale))
-        (define sprite-h (* frame-size scale))
-        (define sprite-y (- window-height 80 sprite-h))
+            ;; Draw sprite sheet preview at bottom
+            (set-draw-color! renderer 40 40 50)
+            (fill-rect! renderer 144 16 (+ (* frame-count frame-size) 16) (+ frame-size 16))
+            (render-texture! renderer sprite-sheet 152 24)
 
-        (render-texture! renderer sprite-sheet
-                         (- new-x (/ sprite-w 2)) sprite-y
-                         #:width sprite-w
-                         #:height sprite-h
-                         #:src-x (* next-frame frame-size)
-                         #:src-y 0
-                         #:src-w frame-size
-                         #:src-h frame-size
-                         #:flip (if new-reversed? 'horizontal 'none))
+            ;; Highlight current frame in preview
+            (set-draw-color! renderer 255 255 0)
+            (draw-rect! renderer (+ 152 (* next-frame frame-size)) 24 frame-size frame-size)
 
-        ;; Draw sprite sheet preview at bottom
-        (set-draw-color! renderer 40 40 50)
-        (fill-rect! renderer 144 16 (+ (* frame-count frame-size) 16) (+ frame-size 16))
-        (render-texture! renderer sprite-sheet 152 24)
+            ;; UI info
+            (set-draw-color! renderer 255 255 255)
+            (render-debug-text! renderer 20 20 "SPRITE ANIMATION DEMO")
 
-        ;; Highlight current frame in preview
-        (set-draw-color! renderer 255 255 0)
-        (draw-rect! renderer (+ 152 (* next-frame frame-size)) 24 frame-size frame-size)
+            (set-draw-color! renderer 180 180 180)
+            (render-debug-text! renderer 20 40
+                                (~a "Frame: " next-frame "/" frame-count
+                                    "  Speed: " new-duration "ms/frame"
+                                    "  FPS: " (inexact->exact (round (/ 1000.0 new-duration)))))
 
-        ;; UI info
-        (set-draw-color! renderer 255 255 255)
-        (render-debug-text! renderer 20 20 "SPRITE ANIMATION DEMO")
+            (render-debug-text! renderer 20 55
+                                (~a "State: "
+                                    (if new-paused? "PAUSED " "PLAYING ")
+                                    (if new-reversed? "(REVERSED)" "(FORWARD)")))
 
-        (set-draw-color! renderer 180 180 180)
-        (render-debug-text! renderer 20 40
-                            (~a "Frame: " next-frame "/" frame-count
-                                "  Speed: " new-duration "ms/frame"
-                                "  FPS: " (inexact->exact (round (/ 1000.0 new-duration)))))
+            ;; Controls help
+            (set-draw-color! renderer 120 120 120)
+            (render-debug-text! renderer 20 (- window-height 30)
+                                "Left/Right: Move | Up/Down: Speed | Space: Pause | R: Reverse | ESC: Quit")
 
-        (render-debug-text! renderer 20 55
-                            (~a "State: "
-                                (if new-paused? "PAUSED " "PLAYING ")
-                                (if new-reversed? "(REVERSED)" "(FORWARD)")))
+            (render-present! renderer)
+            (delay! 16)
 
-        ;; Controls help
-        (set-draw-color! renderer 120 120 120)
-        (render-debug-text! renderer 20 (- window-height 30)
-                            "Left/Right: Move | Up/Down: Speed | Space: Pause | R: Reverse | ESC: Quit")
+            (loop new-x next-frame remaining-time new-duration
+                  new-paused? new-reversed? now still-running?))))
 
-        (render-present! renderer)
-        (delay! 16)
-
-        (loop new-x next-frame remaining-time new-duration
-              new-paused? new-reversed? now still-running?))))
-
-  ;; Clean up
-  (texture-destroy! sprite-sheet)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Clean up
+      (texture-destroy! sprite-sheet))))
 
 ;; Run when executed directly
 (module+ main

@@ -80,16 +80,13 @@
   (fill-rect! renderer 20 102 (max 0 (min 250 dy-bar)) 8))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      (define captured? #f)
+      (define cx (/ window-width 2.0))
+      (define cy (/ window-height 2.0))
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  (define captured? #f)
-  (define cx (/ window-width 2.0))
-  (define cy (/ window-height 2.0))
-
-  (let loop ([running? #t])
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define-values (still-running? do-capture? do-release?)
@@ -158,15 +155,11 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
+        (loop still-running?))
 
-  ;; Make sure to release mouse before cleanup
-  (when (relative-mouse-mode? window)
-    (set-relative-mouse-mode! window #f))
-
-  ;; Clean up
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Make sure to release mouse before cleanup
+      (when (relative-mouse-mode? window)
+        (set-relative-mouse-mode! window #f))))))
 
 ;; Run the example when executed directly
 (module+ main

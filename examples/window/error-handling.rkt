@@ -177,14 +177,11 @@
         (render-debug-text! renderer 200 420 "[No custom font loaded]"))))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      (set-blend-mode! renderer 'blend)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  (set-blend-mode! renderer 'blend)
-
-  (let loop ([running? #t])
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -281,16 +278,13 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
+        (loop still-running?))
 
-  ;; Clean up any loaded resources
-  (when current-texture
-    (texture-destroy! current-texture))
-  (when current-font
-    (font-destroy! current-font))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      ;; Clean up any loaded resources
+      (when current-texture
+        (texture-destroy! current-texture))
+      (when current-font
+        (font-destroy! current-font)))))
 
 ;; Run when executed directly
 (module+ main

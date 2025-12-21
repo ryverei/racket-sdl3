@@ -64,48 +64,45 @@
   surf)
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create surfaces
+      (printf "Creating gradient surface...~n")
+      (define gradient-surf (create-gradient-surface 200 150))
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      (printf "Creating checkerboard surface...~n")
+      (define checker-surf (create-checkerboard-surface 200 150 25))
 
-  ;; Create surfaces
-  (printf "Creating gradient surface...~n")
-  (define gradient-surf (create-gradient-surface 200 150))
+      ;; Print surface properties
+      (printf "~nGradient surface properties:~n")
+      (printf "  Width: ~a~n" (surface-width gradient-surf))
+      (printf "  Height: ~a~n" (surface-height gradient-surf))
+      (printf "  Pitch: ~a bytes/row~n" (surface-pitch gradient-surf))
+      (printf "  Format: ~a~n" (surface-format gradient-surf))
 
-  (printf "Creating checkerboard surface...~n")
-  (define checker-surf (create-checkerboard-surface 200 150 25))
+      (printf "~nCheckerboard surface properties:~n")
+      (printf "  Width: ~a~n" (surface-width checker-surf))
+      (printf "  Height: ~a~n" (surface-height checker-surf))
+      (printf "  Pitch: ~a bytes/row~n" (surface-pitch checker-surf))
+      (printf "  Format: ~a~n" (surface-format checker-surf))
 
-  ;; Print surface properties
-  (printf "~nGradient surface properties:~n")
-  (printf "  Width: ~a~n" (surface-width gradient-surf))
-  (printf "  Height: ~a~n" (surface-height gradient-surf))
-  (printf "  Pitch: ~a bytes/row~n" (surface-pitch gradient-surf))
-  (printf "  Format: ~a~n" (surface-format gradient-surf))
+      ;; Duplicate the gradient surface to test duplication
+      (printf "~nDuplicating gradient surface...~n")
+      (define gradient-copy (duplicate-surface gradient-surf))
+      (printf "Duplicate width: ~a, height: ~a~n"
+              (surface-width gradient-copy)
+              (surface-height gradient-copy))
 
-  (printf "~nCheckerboard surface properties:~n")
-  (printf "  Width: ~a~n" (surface-width checker-surf))
-  (printf "  Height: ~a~n" (surface-height checker-surf))
-  (printf "  Pitch: ~a bytes/row~n" (surface-pitch checker-surf))
-  (printf "  Format: ~a~n" (surface-format checker-surf))
+      ;; Convert surfaces to textures for rendering
+      (printf "~nConverting surfaces to textures...~n")
+      (define gradient-tex (surface->texture renderer gradient-surf))
+      (define checker-tex (surface->texture renderer checker-surf))
 
-  ;; Duplicate the gradient surface to test duplication
-  (printf "~nDuplicating gradient surface...~n")
-  (define gradient-copy (duplicate-surface gradient-surf))
-  (printf "Duplicate width: ~a, height: ~a~n"
-          (surface-width gradient-copy)
-          (surface-height gradient-copy))
+      (printf "Ready! Press ESC or close window to exit.~n")
+      (printf "Displaying: gradient (top-left), checkerboard (top-right)~n")
 
-  ;; Convert surfaces to textures for rendering
-  (printf "~nConverting surfaces to textures...~n")
-  (define gradient-tex (surface->texture renderer gradient-surf))
-  (define checker-tex (surface->texture renderer checker-surf))
-
-  (printf "Ready! Press ESC or close window to exit.~n")
-  (printf "Displaying: gradient (top-left), checkerboard (top-right)~n")
-
-  ;; Main loop
-  (let loop ([running? #t])
+      ;; Main loop
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -152,10 +149,11 @@
 
       (loop still-running?)))
 
-  ;; Cleanup (custodians handle this automatically, but explicit for clarity)
-  (surface-destroy! gradient-surf)
-  (surface-destroy! checker-surf)
-  (surface-destroy! gradient-copy)
-  (printf "Done!~n"))
+      ;; Cleanup (custodians handle this automatically, but explicit for clarity)
+      (surface-destroy! gradient-surf)
+      (surface-destroy! checker-surf)
+      (surface-destroy! gradient-copy)
+      (printf "Done!~n"))))
 
-(main)
+(module+ main
+  (main))

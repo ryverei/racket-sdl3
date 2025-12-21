@@ -35,45 +35,45 @@
    #:rect #f))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer "SDL3 Streaming Texture" window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (define tex
+        (create-texture renderer tex-width tex-height
+                        #:access 'streaming
+                        #:format (symbol->pixel-format 'rgba8888)
+                        #:scale 'nearest))
 
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Streaming Texture" window-width window-height
-                          #:window-flags 'resizable))
+      (define running? #t)
 
-  (define tex
-    (create-texture renderer tex-width tex-height
-                    #:access 'streaming
-                    #:format (symbol->pixel-format 'rgba8888)
-                    #:scale 'nearest))
+      (let loop ()
+        (when running?
+          (for ([ev (in-events)])
+            (match ev
+              [(or (quit-event) (window-event 'close-requested))
+               (set! running? #f)]
+              [(key-event 'down 'escape _ _ _)
+               (set! running? #f)]
+              [_ (void)]))
 
-  (define running? #t)
+          (define tick (current-ticks))
+          (fill-texture! tex tick)
 
-  (let loop ()
-    (when running?
-      (for ([ev (in-events)])
-        (match ev
-          [(or (quit-event) (window-event 'close-requested))
-           (set! running? #f)]
-          [(key-event 'down 'escape _ _ _)
-           (set! running? #f)]
-          [_ (void)]))
+          (define pulse (+ 0.5 (* 0.5 (sin (/ tick 250.0)))))
+          (texture-set-color-mod-float! tex pulse 1.0 (- 1.0 pulse))
+          (texture-set-alpha-mod-float! tex 1.0)
 
-      (define tick (current-ticks))
-      (fill-texture! tex tick)
+          (set-draw-color! renderer 15 15 25)
+          (render-clear! renderer)
+          (render-texture! renderer tex 0 0 #:width window-width #:height window-height)
+          (render-debug-text! renderer 20 20 "STREAMING TEXTURE (LOCK + FLOAT MOD)")
+          (render-debug-text! renderer 20 40 "Press Esc to quit.")
+          (render-present! renderer)
 
-      (define pulse (+ 0.5 (* 0.5 (sin (/ tick 250.0)))))
-      (texture-set-color-mod-float! tex pulse 1.0 (- 1.0 pulse))
-      (texture-set-alpha-mod-float! tex 1.0)
+          (delay! 16)
+          (loop)))
 
-      (set-draw-color! renderer 15 15 25)
-      (render-clear! renderer)
-      (render-texture! renderer tex 0 0 #:width window-width #:height window-height)
-      (render-debug-text! renderer 20 20 "STREAMING TEXTURE (LOCK + FLOAT MOD)")
-      (render-debug-text! renderer 20 40 "Press Esc to quit.")
-      (render-present! renderer)
+      (texture-destroy! tex))))
 
-      (delay! 16)
-      (loop))))
-
-(main)
+(module+ main
+  (main))

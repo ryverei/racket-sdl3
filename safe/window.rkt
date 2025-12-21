@@ -4,6 +4,8 @@
 
 (require ffi/unsafe
          ffi/unsafe/custodian
+         racket/stxparam
+         (for-syntax racket/base)
          "../raw.rkt"
          "../private/safe-syntax.rkt")
 
@@ -72,6 +74,18 @@
 
  ;; Convenience
  make-window+renderer
+
+ ;; Scoped resource helpers
+ call-with-sdl
+ call-with-window
+ call-with-renderer
+ call-with-window+renderer
+
+ ;; Syntax forms for scoped resources
+ with-sdl
+ with-window
+ with-renderer
+ with-window+renderer
 
  ;; Re-export app metadata property names (used as strings, not flags)
  SDL_PROP_APP_METADATA_NAME_STRING
@@ -420,3 +434,155 @@
                               #:name renderer-name
                               #:custodian cust))
   (values win rend))
+
+;; ============================================================================
+;; Scoped Resource Helpers
+;; ============================================================================
+
+;; call-with-sdl: Initialize SDL, run thunk, quit SDL
+;; flags: init flags (symbol or list of symbols, default: 'video)
+;; proc: thunk to call after initialization
+;; Returns: result of proc
+;; Example:
+;;   (call-with-sdl (lambda () (printf "SDL initialized!~n")))
+;;   (call-with-sdl #:flags '(video audio) (lambda () ...))
+(define (call-with-sdl proc #:flags [flags 'video])
+  (dynamic-wind
+    (lambda () (sdl-init! flags))
+    proc
+    (lambda () (sdl-quit!))))
+
+;; call-with-window: Create window, run proc, destroy window
+;; title, width, height: window parameters
+;; flags: window flags (symbol or list of symbols)
+;; proc: procedure taking the window as argument
+;; Returns: result of proc
+;; Example:
+;;   (call-with-window "My App" 800 600
+;;     (lambda (win) (printf "Window created!~n")))
+(define (call-with-window title width height proc
+                          #:flags [flags '()])
+  (define cust (make-custodian))
+  (dynamic-wind
+    void
+    (lambda ()
+      (parameterize ([current-custodian cust])
+        (define win (make-window title width height #:flags flags))
+        (proc win)))
+    (lambda () (custodian-shutdown-all cust))))
+
+;; call-with-renderer: Create renderer for window, run proc, destroy renderer
+;; win: the window to create renderer for
+;; proc: procedure taking the renderer as argument
+;; name: optional renderer name
+;; Returns: result of proc
+;; Example:
+;;   (call-with-renderer win
+;;     (lambda (ren) (render-clear! ren)))
+(define (call-with-renderer win proc #:name [name #f])
+  (define cust (make-custodian))
+  (dynamic-wind
+    void
+    (lambda ()
+      (parameterize ([current-custodian cust])
+        (define ren (make-renderer win #:name name))
+        (proc ren)))
+    (lambda () (custodian-shutdown-all cust))))
+
+;; call-with-window+renderer: Create window and renderer, run proc, clean up
+;; title, width, height: window parameters
+;; window-flags: window flags (symbol or list of symbols)
+;; renderer-name: optional renderer name
+;; proc: procedure taking window and renderer as arguments
+;; Returns: result of proc
+;; Example:
+;;   (call-with-window+renderer "My App" 800 600
+;;     (lambda (win ren)
+;;       (render-clear! ren)
+;;       (render-present! ren)))
+(define (call-with-window+renderer title width height proc
+                                   #:window-flags [window-flags '()]
+                                   #:renderer-name [renderer-name #f])
+  (define cust (make-custodian))
+  (dynamic-wind
+    void
+    (lambda ()
+      (parameterize ([current-custodian cust])
+        (define-values (win ren)
+          (make-window+renderer title width height
+                                #:window-flags window-flags
+                                #:renderer-name renderer-name))
+        (proc win ren)))
+    (lambda () (custodian-shutdown-all cust))))
+
+;; ============================================================================
+;; Syntax Forms for Scoped Resources
+;; ============================================================================
+
+;; with-sdl: Syntax form for call-with-sdl
+;; Example:
+;;   (with-sdl
+;;     (printf "SDL initialized!~n"))
+;;   (with-sdl #:flags '(video audio)
+;;     body ...)
+(define-syntax with-sdl
+  (syntax-rules ()
+    [(_ #:flags flags body ...)
+     (call-with-sdl (lambda () body ...) #:flags flags)]
+    [(_ body ...)
+     (call-with-sdl (lambda () body ...))]))
+
+;; with-window: Syntax form for call-with-window
+;; Example:
+;;   (with-window "Title" 800 600 win
+;;     (printf "Window: ~a~n" win))
+;;   (with-window "Title" 800 600 win #:flags 'resizable
+;;     body ...)
+(define-syntax with-window
+  (syntax-rules ()
+    [(_ title width height win-id #:flags flags body ...)
+     (call-with-window title width height
+                       (lambda (win-id) body ...)
+                       #:flags flags)]
+    [(_ title width height win-id body ...)
+     (call-with-window title width height
+                       (lambda (win-id) body ...))]))
+
+;; with-renderer: Syntax form for call-with-renderer
+;; Example:
+;;   (with-renderer win ren
+;;     (render-clear! ren))
+;;   (with-renderer win ren #:name "software"
+;;     body ...)
+(define-syntax with-renderer
+  (syntax-rules ()
+    [(_ win ren-id #:name name body ...)
+     (call-with-renderer win (lambda (ren-id) body ...) #:name name)]
+    [(_ win ren-id body ...)
+     (call-with-renderer win (lambda (ren-id) body ...))]))
+
+;; with-window+renderer: Syntax form for call-with-window+renderer
+;; Example:
+;;   (with-window+renderer "Title" 800 600 (win ren)
+;;     (render-clear! ren)
+;;     (render-present! ren))
+;;   (with-window+renderer "Title" 800 600 (win ren) #:window-flags 'resizable
+;;     body ...)
+(define-syntax with-window+renderer
+  (syntax-rules ()
+    [(_ title width height (win-id ren-id) #:window-flags wflags #:renderer-name rname body ...)
+     (call-with-window+renderer title width height
+                                (lambda (win-id ren-id) body ...)
+                                #:window-flags wflags
+                                #:renderer-name rname)]
+    [(_ title width height (win-id ren-id) #:window-flags wflags body ...)
+     (call-with-window+renderer title width height
+                                (lambda (win-id ren-id) body ...)
+                                #:window-flags wflags)]
+    [(_ title width height (win-id ren-id) #:renderer-name rname body ...)
+     (call-with-window+renderer title width height
+                                (lambda (win-id ren-id) body ...)
+                                #:renderer-name rname)]
+    [(_ title width height (win-id ren-id) body ...)
+     (call-with-window+renderer title width height
+                                (lambda (win-id ren-id) body ...))]))

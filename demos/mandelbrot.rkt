@@ -136,31 +136,28 @@
   (values cx cy))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Create surface for rendering
-  (define surf (make-surface window-width window-height #:format 'rgba32))
-
-  ;; View state
-  (define center-x default-center-x)
-  (define center-y default-center-y)
-  (define zoom default-zoom)
-  (define palette-idx 0)
-  (define show-info? #t)
-  (define needs-render? #t)
-
-  ;; Texture for display
-  (define tex #f)
-
   (printf "Mandelbrot Set Explorer~n")
   (printf "Controls: Arrows=Pan, +/-/Scroll=Zoom, Click=Center, R=Reset, C=Colors, S=Save~n")
   (flush-output)
 
-  ;; Main loop
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create surface for rendering
+      (define surf (make-surface window-width window-height #:format 'rgba32))
+
+      ;; View state
+      (define center-x default-center-x)
+      (define center-y default-center-y)
+      (define zoom default-zoom)
+      (define palette-idx 0)
+      (define show-info? #t)
+      (define needs-render? #t)
+
+      ;; Texture for display
+      (define tex #f)
+
+      ;; Main loop
+      (let loop ([running? #t])
     (when running?
       ;; Re-render if needed
       (when needs-render?
@@ -301,12 +298,12 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
+        (loop still-running?))
 
-  ;; Cleanup
-  (when tex (texture-destroy! tex))
-  (surface-destroy! surf)
-  (printf "Goodbye!~n"))
+      ;; Cleanup
+      (when tex (texture-destroy! tex))
+      (surface-destroy! surf)
+      (printf "Goodbye!~n"))))
 
 (module+ main
   (main))

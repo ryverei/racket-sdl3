@@ -51,21 +51,16 @@
      (format "UNKNOWN: type=~a" type)]))
 
 (define (main)
-  ;; Initialize SDL video subsystem
-  (sdl-init!)
-
-  ;; Create window and renderer
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Wait Events Demo" window-width window-height))
-
   (printf "Wait Events Demo~n")
   (printf "================~n")
   (printf "Using wait-event-timeout (1000ms) for CPU-efficient event handling.~n")
   (printf "Move mouse, press keys, or wait to see idle updates.~n")
   (printf "Press Escape to quit.~n~n")
 
-  ;; Main loop using blocking wait
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Wait Events Demo" window-width window-height (window renderer)
+      ;; Main loop using blocking wait
+      (let loop ([running? #t])
     (when running?
       ;; Wait for event with 1 second timeout
       ;; This blocks the process until an event arrives or timeout expires
@@ -118,12 +113,8 @@
         (render-present! renderer)
         (loop still-running?))))
 
-  (printf "~nExiting. Processed ~a events with ~a idle timeouts.~n"
-          event-count idle-count)
-
-  ;; Clean up (important for REPL usage)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+    (printf "~nExiting. Processed ~a events with ~a idle timeouts.~n"
+            event-count idle-count))))
 
 ;; Run when executed directly
 (module+ main

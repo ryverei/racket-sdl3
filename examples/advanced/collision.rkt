@@ -48,13 +48,10 @@
   (rect-intersection player-rect obs-rect))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Main loop
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Main loop
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -85,7 +82,7 @@
              (set! move-down #f) run?]
             [_ run?])))
 
-      (when still-running?
+        (when still-running?
         ;; Update player position
         (when move-left
           (set! player-x (max 0 (- player-x player-speed))))
@@ -154,11 +151,7 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
-
-  ;; Cleanup
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+        (loop still-running?)))))))
 
 ;; Run the example when executed directly
 (module+ main

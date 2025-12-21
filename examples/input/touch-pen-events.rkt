@@ -196,19 +196,16 @@
                   (+ (* radius 2) 4) (+ (* radius 2) 4)))))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height
-                          #:window-flags 'resizable))
-
   (printf "Touch & Pen Input Demo~n")
   (printf "======================~n")
   (printf "Touch screen or use a graphics tablet~n")
   (printf "C: Clear canvas~n")
   (printf "Escape: Quit~n~n")
 
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -354,12 +351,9 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running?))))
+        (loop still-running?)))))
 
-  (printf "~nDone.~n")
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+  (printf "~nDone.~n"))
 
 ;; Run when executed directly
 (module+ main

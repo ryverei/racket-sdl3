@@ -47,16 +47,13 @@
   surf)
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Create source sprite with magenta background (will be transparent)
-  (printf "Creating sprites...~n")
-  (define sprite-size 60)
-  (define magenta-bg '(255 0 255))  ; Magenta will be the transparent color
-  (define yellow-fg '(255 255 0))
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create source sprite with magenta background (will be transparent)
+      (printf "Creating sprites...~n")
+      (define sprite-size 60)
+      (define magenta-bg '(255 0 255))  ; Magenta will be the transparent color
+      (define yellow-fg '(255 255 0))
 
   (define sprite1 (create-sprite-surface sprite-size magenta-bg yellow-fg))
   (define sprite2 (create-sprite-surface sprite-size magenta-bg '(0 255 255)))
@@ -239,6 +236,7 @@
 
       (loop still-running?)))
 
-  (printf "Done!~n"))
+      (printf "Done!~n"))))
 
-(main)
+(module+ main
+  (main))

@@ -161,31 +161,28 @@
     (draw-brush! renderer x y size)))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create canvas texture
+      (define canvas (create-texture renderer canvas-width canvas-height
+                                     #:access 'target
+                                     #:scale 'nearest))
+      (set-texture-blend-mode! canvas 'blend)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      ;; Initialize canvas to white
+      (with-render-target renderer canvas
+        (set-draw-color! renderer 255 255 255)
+        (render-clear! renderer))
 
-  ;; Create canvas texture
-  (define canvas (create-texture renderer canvas-width canvas-height
-                                 #:access 'target
-                                 #:scale 'nearest))
-  (set-texture-blend-mode! canvas 'blend)
+      ;; Canvas position on screen
+      (define canvas-x (/ (- window-width canvas-width) 2))
+      (define canvas-y 50)
 
-  ;; Initialize canvas to white
-  (with-render-target renderer canvas
-    (set-draw-color! renderer 255 255 255)
-    (render-clear! renderer))
+      ;; Loaded image textures (for cleanup)
+      (define loaded-images '())
 
-  ;; Canvas position on screen
-  (define canvas-x (/ (- window-width canvas-width) 2))
-  (define canvas-y 50)
-
-  ;; Loaded image textures (for cleanup)
-  (define loaded-images '())
-
-  ;; Main loop state
-  (let loop ([running? #t]
+      ;; Main loop state
+      (let loop ([running? #t]
              [color-idx 0]
              [brush-size 8]
              [drawing? #f]
@@ -405,15 +402,13 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop still-running? new-color new-size new-drawing new-lx new-ly msg))))
+        (loop still-running? new-color new-size new-drawing new-lx new-ly msg))
 
-  ;; Clean up loaded images
-  (for ([img (in-list loaded-images)])
-    (texture-destroy! img))
+      ;; Clean up loaded images
+      (for ([img (in-list loaded-images)])
+        (texture-destroy! img))
 
-  (texture-destroy! canvas)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (texture-destroy! canvas))))
 
 ;; Helper to extract filename from path
 (define (file-name-from-path path)

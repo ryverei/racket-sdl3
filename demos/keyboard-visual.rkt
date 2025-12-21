@@ -160,11 +160,6 @@
   (draw-rect! renderer 50 420 700 60))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Keyboard Demo" window-width window-height))
-
   (printf "Keyboard Demo~n")
   (printf "=============~n")
   (printf "Press keys to see them highlighted on the virtual keyboard.~n")
@@ -172,7 +167,9 @@
   (printf "Modifier keys (Shift, Ctrl, Alt, Cmd) shown as colored boxes.~n")
   (printf "Press Escape to quit.~n~n")
 
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Keyboard Demo" window-width window-height (window renderer)
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -217,11 +214,7 @@
         (delay! 16)
         (loop still-running?))))
 
-  (printf "~nDone.~n")
-
-  ;; Clean up (important for REPL usage)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+  (printf "~nDone.~n"))
 
 ;; Run when executed directly
 (module+ main

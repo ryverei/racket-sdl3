@@ -76,64 +76,57 @@
   (~a "screenshot-" now "." ext))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      (define screenshot-count 0)
 
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
+      (let loop ([running? #t])
+        (when running?
+          (define ticks (current-ticks))
 
-  (define screenshot-count 0)
+          ;; Process events
+          (define-values (still-running? save-png? save-jpg?)
+            (for/fold ([run? #t] [png? #f] [jpg? #f])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested))
+                 (values #f #f #f)]
+                [(key-event 'down 'escape _ _ _) (values #f #f #f)]
 
-  (let loop ([running? #t])
-    (when running?
-      (define ticks (current-ticks))
+                [(key-event 'down 's _ _ _) (values run? #t jpg?)]
 
-      ;; Process events
-      (define-values (still-running? save-png? save-jpg?)
-        (for/fold ([run? #t] [png? #f] [jpg? #f])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested))
-             (values #f #f #f)]
-            [(key-event 'down 'escape _ _ _) (values #f #f #f)]
+                [(key-event 'down 'j _ _ _) (values run? png? #t)]
+                [_ (values run? png? jpg?)])))
 
-            [(key-event 'down 's _ _ _) (values run? #t jpg?)]
+          (when still-running?
+            ;; Clear and draw scene
+            (set-draw-color! renderer 0 0 0)
+            (render-clear! renderer)
+            (draw-scene! renderer ticks)
+            (render-present! renderer)
 
-            [(key-event 'down 'j _ _ _) (values run? png? #t)]
-            [_ (values run? png? jpg?)])))
+            ;; Save screenshots if requested
+            (when save-png?
+              (define filename (make-filename "png"))
+              (define surface (render-read-pixels renderer))
+              (save-png! surface filename)
+              (surface-destroy! surface)
+              (set! screenshot-count (add1 screenshot-count))
+              (printf "Saved PNG: ~a\n" filename))
 
-      (when still-running?
-        ;; Clear and draw scene
-        (set-draw-color! renderer 0 0 0)
-        (render-clear! renderer)
-        (draw-scene! renderer ticks)
-        (render-present! renderer)
+            (when save-jpg?
+              (define filename (make-filename "jpg"))
+              (define surface (render-read-pixels renderer))
+              (save-jpg! surface filename 90)
+              (surface-destroy! surface)
+              (set! screenshot-count (add1 screenshot-count))
+              (printf "Saved JPG: ~a\n" filename))
 
-        ;; Save screenshots if requested
-        (when save-png?
-          (define filename (make-filename "png"))
-          (define surface (render-read-pixels renderer))
-          (save-png! surface filename)
-          (surface-destroy! surface)
-          (set! screenshot-count (add1 screenshot-count))
-          (printf "Saved PNG: ~a\n" filename))
+            (delay! 16)
+            (loop still-running?))))
 
-        (when save-jpg?
-          (define filename (make-filename "jpg"))
-          (define surface (render-read-pixels renderer))
-          (save-jpg! surface filename 90)
-          (surface-destroy! surface)
-          (set! screenshot-count (add1 screenshot-count))
-          (printf "Saved JPG: ~a\n" filename))
-
-        (delay! 16)
-        (loop still-running?))))
-
-  (printf "Total screenshots saved: ~a\n" screenshot-count)
-
-  ;; Clean up
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (printf "Total screenshots saved: ~a\n" screenshot-count))))
 
 ;; Run the example when executed directly
 (module+ main

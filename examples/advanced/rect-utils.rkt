@@ -35,11 +35,9 @@
   (fill-rect! rend (- x 2) (- y 2) 4 4))
 
 (define (main)
-  (sdl-init!)
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Racket - Rect Utilities" window-width window-height))
-
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Racket - Rect Utilities" window-width window-height (window renderer)
+      (let loop ([running? #t])
     (when running?
       (define still-running?
         (for/fold ([run? #t])
@@ -105,10 +103,7 @@
 
         (render-present! renderer)
         (delay! 16)
-        (loop still-running?))))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+        (loop still-running?)))))))
 
 (module+ main
   (main))

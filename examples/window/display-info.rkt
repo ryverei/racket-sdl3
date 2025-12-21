@@ -21,29 +21,26 @@
 (define display-list '())
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer "SDL3 Display Info" 600 400 (window renderer)
+      #:window-flags 'resizable
+      ;; Get display list
+      (set! display-list (get-displays))
 
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Display Info" 600 400
-                          #:window-flags 'resizable))
+      ;; Print info to console
+      (printf "Found ~a display(s)~n~n" (length display-list))
+      (for ([display-id (in-list display-list)]
+            [i (in-naturals)])
+        (define mode (current-display-mode display-id))
+        (printf "Display ~a: ~a~n" i (display-name display-id))
+        (printf "  Resolution: ~ax~a @ ~aHz~n"
+                (SDL_DisplayMode-w mode)
+                (SDL_DisplayMode-h mode)
+                (~r (SDL_DisplayMode-refresh_rate mode) #:precision 1))
+        (printf "  Scale: ~ax~n~n"
+                (~r (display-content-scale display-id) #:precision 2)))
 
-  ;; Get display list
-  (set! display-list (get-displays))
-
-  ;; Print info to console
-  (printf "Found ~a display(s)~n~n" (length display-list))
-  (for ([display-id (in-list display-list)]
-        [i (in-naturals)])
-    (define mode (current-display-mode display-id))
-    (printf "Display ~a: ~a~n" i (display-name display-id))
-    (printf "  Resolution: ~ax~a @ ~aHz~n"
-            (SDL_DisplayMode-w mode)
-            (SDL_DisplayMode-h mode)
-            (~r (SDL_DisplayMode-refresh_rate mode) #:precision 1))
-    (printf "  Scale: ~ax~n~n"
-            (~r (display-content-scale display-id) #:precision 2)))
-
-  (let loop ()
+      (let loop ()
     (define quit?
       (for/or ([ev (in-events)])
         (match ev
@@ -114,10 +111,7 @@
 
       (render-present! renderer)
       (delay! 16)
-      (loop)))
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+      (loop))))))
 
 (module+ main
   (main))

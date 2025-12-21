@@ -158,12 +158,6 @@
   (render-debug-text! renderer start-x (- indicator-y 12) "L   M   R"))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height
-                          #:window-flags 'resizable))
-
   (printf "Mouse Input Demo~n")
   (printf "================~n")
   (printf "Move mouse to see cursor following~n")
@@ -172,7 +166,10 @@
   (printf "C: Toggle auto-capture~n")
   (printf "Escape: Quit~n~n")
 
-  (let loop ([trail '()] [max-trail 50] [running? #t])
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (let loop ([trail '()] [max-trail 50] [running? #t])
     (when running?
       ;; Get mouse state
       (define-values (mx my buttons) (get-mouse-state))
@@ -274,16 +271,13 @@
         (render-present! renderer)
         (delay! 16)
 
-        (loop trimmed-trail max-trail still-running?))))
+        (loop trimmed-trail max-trail still-running?)))
 
-  ;; Re-enable auto-capture before exit if we disabled it
-  (unless auto-capture?
-    (capture-mouse! #t))
+    ;; Re-enable auto-capture before exit if we disabled it
+    (unless auto-capture?
+      (capture-mouse! #t))))
 
-  (printf "~nDone.~n")
-
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+  (printf "~nDone.~n"))
 
 ;; Run when executed directly
 (module+ main

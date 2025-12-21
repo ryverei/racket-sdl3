@@ -20,50 +20,48 @@
       (string-join types ", ")))
 
 (define (main)
-  (sdl-init!)
+  (with-sdl
+    (with-window+renderer "SDL3 Clipboard Events" window-width window-height (window renderer)
+      #:window-flags 'resizable
+      (define running? #t)
+      (define last-event "Waiting for clipboard updates...")
+      (define last-text #f)
 
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Clipboard Events" window-width window-height
-                          #:window-flags 'resizable))
+      (let loop ()
+        (when running?
+          (for ([ev (in-events)])
+            (match ev
+              [(or (quit-event) (window-event 'close-requested))
+               (set! running? #f)]
+              [(key-event 'down 'escape _ _ _)
+               (set! running? #f)]
+              [(key-event 'down 'c _ _ _)
+               (define text (format "Clipboard set at ~a" (current-seconds)))
+               (set-clipboard-text! text)
+               (set! last-text text)]
+              [(clipboard-event owner? mime-types)
+               (set! last-event
+                     (format "owner?: ~a | mime types: ~a"
+                             owner?
+                             (mime-types->string mime-types)))
+               (set! last-text (clipboard-text))]
+              [_ (void)]))
 
-  (define running? #t)
-  (define last-event "Waiting for clipboard updates...")
-  (define last-text #f)
+          (set-draw-color! renderer 20 20 30)
+          (render-clear! renderer)
 
-  (let loop ()
-    (when running?
-      (for ([ev (in-events)])
-        (match ev
-          [(or (quit-event) (window-event 'close-requested))
-           (set! running? #f)]
-          [(key-event 'down 'escape _ _ _)
-           (set! running? #f)]
-          [(key-event 'down 'c _ _ _)
-           (define text (format "Clipboard set at ~a" (current-seconds)))
-           (set-clipboard-text! text)
-           (set! last-text text)]
-          [(clipboard-event owner? mime-types)
-           (set! last-event
-                 (format "owner?: ~a | mime types: ~a"
-                         owner?
-                         (mime-types->string mime-types)))
-           (set! last-text (clipboard-text))]
-          [_ (void)]))
+          (set-draw-color! renderer 200 200 220)
+          (render-debug-text! renderer 20 20 "CLIPBOARD EVENTS")
+          (render-debug-text! renderer 20 40 "Press C to set clipboard text.")
+          (render-debug-text! renderer 20 60 "Copy text in another app to trigger updates.")
+          (render-debug-text! renderer 20 80 "Press Esc to quit.")
 
-      (set-draw-color! renderer 20 20 30)
-      (render-clear! renderer)
+          (render-debug-text! renderer 20 120 last-event)
+          (render-debug-text! renderer 20 140
+                              (format "Clipboard text: ~a" (or last-text "n/a")))
 
-      (set-draw-color! renderer 200 200 220)
-      (render-debug-text! renderer 20 20 "CLIPBOARD EVENTS")
-      (render-debug-text! renderer 20 40 "Press C to set clipboard text.")
-      (render-debug-text! renderer 20 60 "Copy text in another app to trigger updates.")
-      (render-debug-text! renderer 20 80 "Press Esc to quit.")
+          (render-present! renderer)
+          (loop))))))
 
-      (render-debug-text! renderer 20 120 last-event)
-      (render-debug-text! renderer 20 140
-                          (format "Clipboard text: ~a" (or last-text "n/a")))
-
-      (render-present! renderer)
-      (loop))))
-
-(main)
+(module+ main
+  (main))

@@ -43,14 +43,11 @@
   surf)
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer window-title window-width window-height))
-
-  ;; Create a test pattern and save it as BMP
-  (printf "Creating test pattern...~n")
-  (define original-surf (create-test-pattern 150 100))
+  (with-sdl
+    (with-window+renderer window-title window-width window-height (window renderer)
+      ;; Create a test pattern and save it as BMP
+      (printf "Creating test pattern...~n")
+      (define original-surf (create-test-pattern 150 100))
 
   ;; Save to BMP
   (define bmp-path "/tmp/sdl3-test-pattern.bmp")
@@ -177,7 +174,8 @@
 
       (loop still-running?)))
 
-  ;; Cleanup (surfaces and textures cleaned up by custodian)
-  (printf "Done!~n"))
+      ;; Cleanup (surfaces and textures cleaned up by custodian)
+      (printf "Done!~n"))))
 
-(main)
+(module+ main
+  (main))

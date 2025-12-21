@@ -158,11 +158,6 @@
   (draw-rect! renderer (+ 10.0 (* 3 mod-spacing)) mod-y mod-size mod-size))
 
 (define (main)
-  (sdl-init!)
-
-  (define-values (window renderer)
-    (make-window+renderer "SDL3 Scroll Demo - Use Mouse Wheel" window-width window-height))
-
   (printf "Scroll Demo~n")
   (printf "===========~n")
   (printf "Use mouse wheel to scroll the virtual canvas.~n")
@@ -170,7 +165,9 @@
   (printf "Canvas size: ~ax~a, Window: ~ax~a~n" canvas-width canvas-height window-width window-height)
   (printf "Press Escape to quit.~n~n")
 
-  (let loop ([running? #t])
+  (with-sdl
+    (with-window+renderer "SDL3 Scroll Demo - Use Mouse Wheel" window-width window-height (window renderer)
+      (let loop ([running? #t])
     (when running?
       ;; Process events
       (define still-running?
@@ -237,15 +234,11 @@
 
         (render-present! renderer)
         (delay! 16)
-        (loop still-running?))))
+        (loop still-running?)))))
 
   (printf "~nFinal scroll position: (~a, ~a)~n"
           (inexact->exact (round scroll-x))
-          (inexact->exact (round scroll-y)))
-
-  ;; Clean up (important for REPL usage)
-  (renderer-destroy! renderer)
-  (window-destroy! window))
+          (inexact->exact (round scroll-y))))
 
 ;; Run when executed directly
 (module+ main

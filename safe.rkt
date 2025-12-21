@@ -28,7 +28,8 @@
          "safe/collision.rkt"
          "safe/hints.rkt"
          "safe/properties.rkt"
-         "safe/gl.rkt")
+         "safe/gl.rkt"
+         "safe/vulkan.rkt")
 
 (provide (all-from-out "safe/window.rkt")
          (all-from-out "safe/events.rkt")
@@ -48,4 +49,5 @@
          (all-from-out "safe/collision.rkt")
          (all-from-out "safe/hints.rkt")
          (all-from-out "safe/properties.rkt")
-         (all-from-out "safe/gl.rkt"))
+         (all-from-out "safe/gl.rkt")
+         (all-from-out "safe/vulkan.rkt"))

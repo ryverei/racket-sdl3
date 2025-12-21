@@ -238,6 +238,12 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 - [x] `SDL_GL_SwapWindow`, `SDL_GL_DestroyContext`
 - [x] `SDL_GL_ResetAttributes`
 
+#### Vulkan Support (`raw/vulkan.rkt`)
+- [x] `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_GetVkGetInstanceProcAddr`, `SDL_Vulkan_UnloadLibrary`
+- [x] `SDL_Vulkan_GetInstanceExtensions`
+- [x] `SDL_Vulkan_CreateSurface`, `SDL_Vulkan_DestroySurface`
+- [x] `SDL_Vulkan_GetPresentationSupport`
+
 ### SDL3_image (`raw/image.rkt`)
 - [x] `IMG_Version`
 - [x] `IMG_LoadTexture`, `IMG_Load`
@@ -384,9 +390,6 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 #### System Tray (`SDL_tray.h`) - *New in SDL3*
 - [ ] `SDL_CreateTray`, `SDL_SetTrayIcon`, `SDL_SetTrayTooltip`
 - [ ] Tray menus and menu entries, callbacks
-
-#### Vulkan Support
-- [ ] `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_CreateSurface`, etc.
 
 #### Haptic & Sensors (`SDL_haptic.h`, `SDL_sensor.h`)
 - [ ] Full haptic/force-feedback subsystem

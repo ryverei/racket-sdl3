@@ -11,10 +11,10 @@
 - [x] Add `safe/gl.rkt` wrapper for context creation and resource management.
 - [x] **Example:** Add `examples/graphics/opengl-basic.rkt` showing a simple GL clear and triangle.
 
-## Phase 3: Vulkan Support
-- [ ] Bind `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_CreateSurface`, `SDL_Vulkan_GetPresentationSupport`.
-- [ ] Add `safe/vulkan.rkt` wrapper for surface creation.
-- [ ] **Example:** Add `examples/graphics/vulkan-info.rkt` to demonstrate surface creation and extension enumeration.
+## Phase 3: Vulkan Support [DONE]
+- [x] Bind `SDL_Vulkan_LoadLibrary`, `SDL_Vulkan_CreateSurface`, `SDL_Vulkan_GetPresentationSupport`.
+- [x] Add `safe/vulkan.rkt` wrapper for surface creation.
+- [x] **Example:** Add `examples/graphics/vulkan-info.rkt` to demonstrate surface creation and extension enumeration.
 
 ## Phase 4: The GPU Subsystem (SDL_gpu)
 - [ ] Bind `SDL_CreateGPUDevice`, `SDL_DestroyGPUDevice`.

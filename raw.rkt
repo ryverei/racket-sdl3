@@ -33,7 +33,8 @@
          "raw/hints.rkt"
          "raw/image.rkt"
          "raw/ttf.rkt"
-         "raw/gl.rkt")
+         "raw/gl.rkt"
+         "raw/vulkan.rkt")
 
 (provide (all-from-out "private/lib.rkt")
          (all-from-out "private/types.rkt")
@@ -59,4 +60,5 @@
          (all-from-out "raw/hints.rkt")
          (all-from-out "raw/image.rkt")
          (all-from-out "raw/ttf.rkt")
-         (all-from-out "raw/gl.rkt"))
+         (all-from-out "raw/gl.rkt")
+         (all-from-out "raw/vulkan.rkt"))

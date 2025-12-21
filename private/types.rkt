@@ -16,6 +16,11 @@
          _SDL_GLContext-pointer
          _SDL_GLContext-pointer/null
          _SDL_GLAttr
+         ;; Vulkan types
+         _VkInstance
+         _VkPhysicalDevice
+         _VkSurfaceKHR
+         _VkAllocationCallbacks-pointer/null
          ;; Pointer types
          _SDL_Window-pointer
          _SDL_Window-pointer/null
@@ -1142,3 +1147,16 @@
 
 ;; SDL_GLAttr enum (for setting GL context attributes)
 (define _SDL_GLAttr _int)
+
+;; ============================================================================
+;; Vulkan Types
+;; ============================================================================
+
+;; Vulkan handles (opaque pointers for FFI purposes)
+(define _VkInstance _pointer)
+(define _VkPhysicalDevice _pointer)
+(define _VkSurfaceKHR _uint64) ; Non-dispatchable handle, usually 64-bit int
+
+;; Allocation callbacks (opaque pointer, usually NULL)
+(define _VkAllocationCallbacks-pointer/null _pointer)
+

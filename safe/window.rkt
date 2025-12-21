@@ -14,6 +14,7 @@
  sdl-quit!
  sdl-quit-subsystem!
  sdl-was-init
+ error-message
  set-app-metadata!
  set-app-metadata-property!
  get-app-metadata-property
@@ -126,6 +127,9 @@
 
 (define (sdl-was-init [flags 0])
   (SDL-WasInit flags))
+
+(define (error-message)
+  (SDL-GetError))
 
 ;; ============================================================================
 ;; App Metadata

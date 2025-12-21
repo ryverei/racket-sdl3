@@ -1,10 +1,10 @@
 # Development Plan
 
-## Phase 1: Cleanup & Simplification
-- [ ] Remove `SDL_AddTimer`, `SDL_AddTimerNS`, and `SDL_RemoveTimer` from `raw/timer.rkt`.
-- [ ] Remove `SDL_Delay` and `SDL_DelayNS` from `raw/timer.rkt` (superseded by Racket `sleep`).
-- [ ] Refactor `examples/animation/timer-callbacks.rkt` to use `racket/timer` or Racket threads to demonstrate the idiomatic way.
-- [ ] Verify `safe/timer.rkt` and all existing examples remain functional.
+## Phase 1: Cleanup & Simplification [DONE]
+- [x] Remove `SDL_AddTimer`, `SDL_AddTimerNS`, and `SDL_RemoveTimer` from `raw/timer.rkt`.
+- [x] Remove `SDL_Delay` and `SDL_DelayNS` from `raw/timer.rkt` (superseded by Racket `sleep`).
+- [x] Refactor `examples/animation/timer-callbacks.rkt` to use `racket/timer` or Racket threads to demonstrate the idiomatic way.
+- [x] Verify `safe/timer.rkt` and all existing examples remain functional.
 
 ## Phase 2: OpenGL Support
 - [ ] Bind `SDL_GL_LoadLibrary`, `SDL_GL_CreateContext`, `SDL_GL_MakeCurrent`, `SDL_GL_SwapWindow`, etc.

@@ -66,7 +66,10 @@
          SDL-UpdateJoysticks
          ;; Lock
          SDL-LockJoysticks
-         SDL-UnlockJoysticks)
+         SDL-UnlockJoysticks
+         ;; Effects
+         SDL-SendJoystickEffect
+         SDL-SendJoystickVirtualSensorData)
 
 ;; ============================================================================
 ;; Detection
@@ -415,3 +418,27 @@
 (define-sdl SDL-UnlockJoysticks
   (_fun -> _void)
   #:c-id SDL_UnlockJoysticks)
+
+;; ============================================================================
+;; Effects
+;; ============================================================================
+
+;; SDL_SendJoystickEffect: Send a joystick-specific effect packet
+;; joystick: the joystick to send the effect to
+;; data: pointer to the effect data
+;; size: size of the data in bytes
+;; Returns: true on success
+(define-sdl SDL-SendJoystickEffect
+  (_fun _SDL_Joystick-pointer _pointer _int -> _stdbool)
+  #:c-id SDL_SendJoystickEffect)
+
+;; SDL_SendJoystickVirtualSensorData: Send sensor data for a virtual joystick
+;; joystick: the virtual joystick to send sensor data to
+;; type: SDL_SensorType (accelerometer, gyro, etc.)
+;; sensor_timestamp: timestamp in nanoseconds
+;; data: pointer to float array of sensor values
+;; num_values: number of values in the array
+;; Returns: true on success
+(define-sdl SDL-SendJoystickVirtualSensorData
+  (_fun _SDL_Joystick-pointer _int _uint64 _pointer _int -> _stdbool)
+  #:c-id SDL_SendJoystickVirtualSensorData)

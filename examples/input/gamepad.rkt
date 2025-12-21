@@ -14,11 +14,13 @@
 ;; Controls:
 ;; - Escape: Exit
 ;; - Connect/disconnect gamepads to see hot-plug events
+;; - Press any button to feel haptic feedback (rumble)
 
 (require sdl3)
 
-;; Initialize SDL with joystick support (includes gamepad)
-(sdl-init! (bitwise-ior SDL_INIT_VIDEO SDL_INIT_JOYSTICK))
+;; Initialize SDL with gamepad support
+;; Note: SDL_INIT_JOYSTICK is required for gamepad detection on some platforms
+(sdl-init! (bitwise-ior SDL_INIT_VIDEO SDL_INIT_GAMEPAD SDL_INIT_JOYSTICK))
 
 (define WIDTH 800)
 (define HEIGHT 600)
@@ -178,6 +180,9 @@
 (printf "Press Escape to exit~n~n")
 
 ;; Check for already-connected gamepads
+;; Note: On macOS, opening a gamepad too early after SDL init can cause
+;; events to not fire (SDL bug #8177). A short delay helps work around this.
+(delay! 100)
 (define initial-gamepads (get-gamepads))
 (when (not (null? initial-gamepads))
   (define id (car initial-gamepads))
@@ -194,21 +199,25 @@
       [(key-event 'down (== SDLK_ESCAPE) _ _ _)
        (set! running? #f)]
 
-      ;; Gamepad connected
-      [(gamepad-device-event 'added which)
-       (printf "Gamepad connected: ~a (id: ~a)~n"
-               (get-gamepad-name-for-id which) which)
-       (unless current-gamepad
-         (set! current-gamepad (open-gamepad which))
-         (printf "Opened gamepad: ~a (type: ~a)~n"
-                 (gamepad-name current-gamepad)
-                 (gamepad-type current-gamepad)))]
+      ;; Gamepad connected (or joystick that might be a gamepad)
+      ;; Note: On some platforms (macOS), only joystick events fire, not gamepad events
+      [(or (gamepad-device-event 'added which)
+           (joy-device-event 'added which))
+       (when (is-gamepad? which)
+         (printf "Gamepad connected: ~a (id: ~a)~n"
+                 (get-gamepad-name-for-id which) which)
+         (unless current-gamepad
+           (set! current-gamepad (open-gamepad which))
+           (printf "Opened gamepad: ~a (type: ~a)~n"
+                   (gamepad-name current-gamepad)
+                   (gamepad-type current-gamepad))))]
 
       ;; Gamepad disconnected
-      [(gamepad-device-event 'removed which)
-       (printf "Gamepad disconnected (id: ~a)~n" which)
+      [(or (gamepad-device-event 'removed which)
+           (joy-device-event 'removed which))
        (when (and current-gamepad
                   (= (gamepad-id current-gamepad) which))
+         (printf "Gamepad disconnected (id: ~a)~n" which)
          (gamepad-destroy! current-gamepad)
          (set! current-gamepad #f)
          ;; Try to open another gamepad if available
@@ -217,9 +226,20 @@
            (set! current-gamepad (open-gamepad (car remaining)))
            (printf "Switched to: ~a~n" (gamepad-name current-gamepad))))]
 
-      ;; Button events (for debugging)
+      ;; Button events - rumble on press
+      ;; Note: On some platforms, only joystick button events fire (not gamepad events)
+      ;; We handle both and use the gamepad API for button name mapping
       [(gamepad-button-event type which button)
-       (printf "Button ~a: ~a~n" button type)]
+       (printf "Button ~a: ~a~n" button type)
+       (when (and current-gamepad (eq? type 'down))
+         (gamepad-rumble! current-gamepad 40000 40000 100))]
+
+      [(joy-button-event type which button-num)
+       ;; Only handle if this joystick is our current gamepad
+       (when (and current-gamepad (= (gamepad-id current-gamepad) which))
+         (printf "Button ~a: ~a~n" button-num type)
+         (when (eq? type 'down)
+           (gamepad-rumble! current-gamepad 40000 40000 100)))]
 
       [_ (void)]))
 

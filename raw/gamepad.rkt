@@ -85,7 +85,16 @@
          SDL-UpdateGamepads
          ;; Mapping
          SDL-GetGamepadMapping
-         SDL-GetGamepadMappingForID)
+         SDL-GetGamepadMappingForID
+         SDL-GetGamepadMappingForGUID
+         SDL-GetGamepadMappings
+         SDL-AddGamepadMapping
+         SDL-AddGamepadMappingsFromIO
+         SDL-AddGamepadMappingsFromFile
+         SDL-SetGamepadMapping
+         SDL-ReloadGamepadMappings
+         ;; Effects
+         SDL-SendGamepadEffect)
 
 ;; ============================================================================
 ;; Detection
@@ -502,3 +511,66 @@
 (define-sdl SDL-GetGamepadMappingForID
   (_fun _SDL_JoystickID -> _pointer)  ; returns malloc'd string
   #:c-id SDL_GetGamepadMappingForID)
+
+;; SDL_GetGamepadMappingForGUID: Get the mapping string for a GUID
+;; guid: 16-byte GUID structure (passed by value)
+;; Returns: mapping string (must be freed with SDL_free), or NULL
+(define-sdl SDL-GetGamepadMappingForGUID
+  (_fun (_array _uint8 16) -> _pointer)
+  #:c-id SDL_GetGamepadMappingForGUID)
+
+;; SDL_GetGamepadMappings: Get all current gamepad mappings
+;; Returns: (values array count) - NULL-terminated array of strings
+(define-sdl SDL-GetGamepadMappings
+  (_fun (count : (_ptr o _int)) -> (arr : _pointer)
+        -> (values arr count))
+  #:c-id SDL_GetGamepadMappings)
+
+;; SDL_AddGamepadMapping: Add a gamepad mapping string
+;; mapping: the mapping string in SDL format
+;; Returns: 1 if added, 0 if updated, -1 on error
+(define-sdl SDL-AddGamepadMapping
+  (_fun _string/utf-8 -> _int)
+  #:c-id SDL_AddGamepadMapping)
+
+;; SDL_AddGamepadMappingsFromIO: Load mappings from an IOStream
+;; src: SDL_IOStream to read from
+;; closeio: whether to close the stream when done
+;; Returns: number of mappings added, or -1 on error
+(define-sdl SDL-AddGamepadMappingsFromIO
+  (_fun _SDL_IOStream-pointer _stdbool -> _int)
+  #:c-id SDL_AddGamepadMappingsFromIO)
+
+;; SDL_AddGamepadMappingsFromFile: Load mappings from a file
+;; file: path to the mapping file
+;; Returns: number of mappings added, or -1 on error
+(define-sdl SDL-AddGamepadMappingsFromFile
+  (_fun _string/utf-8 -> _int)
+  #:c-id SDL_AddGamepadMappingsFromFile)
+
+;; SDL_SetGamepadMapping: Set the mapping for a specific joystick/gamepad
+;; instance_id: the joystick instance ID
+;; mapping: the mapping string, or NULL to clear
+;; Returns: true on success
+(define-sdl SDL-SetGamepadMapping
+  (_fun _SDL_JoystickID _string/utf-8 -> _stdbool)
+  #:c-id SDL_SetGamepadMapping)
+
+;; SDL_ReloadGamepadMappings: Reinitialize the mapping database
+;; Returns: true on success
+(define-sdl SDL-ReloadGamepadMappings
+  (_fun -> _stdbool)
+  #:c-id SDL_ReloadGamepadMappings)
+
+;; ============================================================================
+;; Effects
+;; ============================================================================
+
+;; SDL_SendGamepadEffect: Send a gamepad-specific effect packet
+;; gamepad: the gamepad to send the effect to
+;; data: pointer to the effect data
+;; size: size of the data in bytes
+;; Returns: true on success
+(define-sdl SDL-SendGamepadEffect
+  (_fun _SDL_Gamepad-pointer _pointer _int -> _stdbool)
+  #:c-id SDL_SendGamepadEffect)

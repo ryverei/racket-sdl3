@@ -374,11 +374,13 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 - [ ] `SDL_SetPrimarySelectionText`, `SDL_GetPrimarySelectionText`, `SDL_HasPrimarySelectionText`
 
 #### Joystick (Advanced)
-- [ ] `SDL_SendJoystickEffect`, `SDL_SendJoystickVirtualSensorData`
+- [x] `SDL_SendJoystickEffect`, `SDL_SendJoystickVirtualSensorData`
 
 #### Gamepad (Advanced)
-- [ ] `SDL_SendGamepadEffect`
-- [ ] `SDL_AddGamepadMapping`, `SDL_SetGamepadMapping`, `SDL_GetGamepadMappingForGUID`
+- [x] `SDL_SendGamepadEffect`
+- [x] `SDL_AddGamepadMapping`, `SDL_SetGamepadMapping`, `SDL_GetGamepadMappingForGUID`
+- [x] `SDL_GetGamepadMappings`, `SDL_AddGamepadMappingsFromIO`, `SDL_AddGamepadMappingsFromFile`
+- [x] `SDL_ReloadGamepadMappings`
 
 #### OpenGL Support
 - [ ] `SDL_GL_LoadLibrary`, `SDL_GL_GetProcAddress`, `SDL_GL_UnloadLibrary`
@@ -485,6 +487,5 @@ Modules: `safe/window.rkt`, `safe/events.rkt`, `safe/draw.rkt`, `safe/texture.rk
 
 ## Suggested Next Steps
 
-1. **Joystick + Gamepad Advanced** - send effect + mapping APIs
-2. **Touch + Pen Events** - touch/pen event structs and parsing
-3. **SDL_image Animation** - GIF/WebP animation loading and playback
+1. **Touch + Pen Events** - touch/pen event structs and parsing
+2. **SDL_image Animation** - GIF/WebP animation loading and playback

@@ -60,9 +60,9 @@ bindings, safe wrappers, constants/types, and example coverage.
     - Add device format/gain, stream open, mix/convert, format name.
     - Add `examples/audio/advanced-audio.rkt`.
 
-[ ] Phase 8: Joystick + gamepad advanced
+[x] Phase 8: Joystick + gamepad advanced
     - Add send effect + mapping APIs.
-    - Add `examples/input/gamepad-mapping.rkt`.
+    - Add `examples/input/gamepad-advanced.rkt`.
 
 [ ] Phase 9: Touch + pen events
     - Add touch/pen event structs and constants.

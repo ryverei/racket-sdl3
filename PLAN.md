@@ -113,24 +113,6 @@ This is the biggest friction point in examples.
 - [ ] Add `frect->values` similarly
 - [ ] These supplement existing accessors for convenient destructuring
 
-## Phase 6: Documentation and Examples (Final)
-
-### 6.1 Example Updates
-- [ ] Revise all `examples/basics/` to be idiomatic
-- [ ] Revise all `examples/input/` to use symbol-based keys
-- [ ] Revise all `examples/advanced/`
-- [ ] Keep `examples/graphics/` using raw access (OpenGL/Vulkan/GPU need it)
-
-### 6.2 README Updates
-- [ ] Add "Idiomatic Usage" section
-- [ ] Show before/after comparisons
-- [ ] Link to CONVENTIONS.md
-
-### 6.3 Validation
-- [ ] Run all examples with `PLTCOLLECTS="$PWD:"`
-- [ ] Verify no regressions
-- [ ] Check that new symbol-based APIs work correctly
-
 ## Non-Goals
 
 - **Backwards compatibility**: Examples are the only consumers; breaking changes are fine

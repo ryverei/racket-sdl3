@@ -147,43 +147,6 @@ This library has no external consumers beyond the examples directory. Don't worr
 4. Export from the appropriate `safe/*.rkt` module
 5. Re-export from `safe.rkt`
 
-## Common Patterns
-
-### Minimal Window Example
-
-```racket
-#lang racket
-(require sdl3)
-
-(define win (make-window "Hello" 800 600))
-(define ren (make-renderer win))
-
-(let loop ()
-  (for ([e (in-events)])
-    (match e
-      [(quit-event) (exit)]
-      [_ (void)]))
-  (set-draw-color! ren 50 50 50)
-  (render-clear! ren)
-  (render-present! ren)
-  (loop))
-```
-
-### Event Loop with Input
-
-```racket
-(for ([e (in-events)])
-  (match e
-    [(quit-event) (set! running? #f)]
-    [(key-event type _ _ sym _ _)
-     (when (and (eq? type 'down) (eq? sym 'escape))
-       (set! running? #f))]
-    [(mouse-button-event type _ x y button _ _)
-     (when (eq? type 'down)
-       (printf "Click at ~a,~a~n" x y))]
-    [_ (void)]))
-```
-
 ## SDL3 Notes
 
 - SDL3 uses C99 `bool` (not int like SDL2)

@@ -5,6 +5,7 @@
 - **Default API**: `(require sdl3)` → safe, idiomatic Racket interface
 - **Low-level API**: `(require sdl3/raw)` → C-style FFI bindings
 - Always prefer the safe API unless you need direct pointer access
+- When editing anything under `safe/`, read and follow `safe/CONVENTIONS.md`
 
 ## Build & Run
 

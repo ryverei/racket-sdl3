@@ -1,0 +1,116 @@
+name: Deploy Documentation
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Racket
+        uses: Bogdanp/setup-racket@v1.14
+        with:
+          version: 'stable'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            libxext-dev \
+            libxrandr-dev \
+            libxi-dev \
+            libxcursor-dev \
+            libxss-dev \
+            libxtst-dev \
+            libwayland-dev \
+            libxkbcommon-dev \
+            libegl1-mesa-dev \
+            libgles2-mesa-dev \
+            libdrm-dev \
+            libgbm-dev \
+            libpulse-dev \
+            libasound2-dev \
+            libpipewire-0.3-dev \
+            libdecor-0-dev \
+            libfreetype-dev \
+            libharfbuzz-dev
+
+      - name: Build SDL3 from source
+        run: |
+          git clone --depth 1 https://github.com/libsdl-org/SDL.git SDL3
+          cd SDL3
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DSDL_SHARED=ON \
+            -DSDL_STATIC=OFF
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Build SDL3_image from source
+        run: |
+          git clone --depth 1 https://github.com/libsdl-org/SDL_image.git SDL3_image
+          cd SDL3_image
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DSDL3IMAGE_SHARED=ON \
+            -DSDL3IMAGE_STATIC=OFF
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Build SDL3_ttf from source
+        run: |
+          git clone --depth 1 https://github.com/libsdl-org/SDL_ttf.git SDL3_ttf
+          cd SDL3_ttf
+          cmake -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DSDL3TTF_SHARED=ON \
+            -DSDL3TTF_STATIC=OFF
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Update library cache
+        run: sudo ldconfig
+
+      - name: Install sdl3 package
+        run: raco pkg install --auto --link --name sdl3 ${{ github.workspace }}
+
+      - name: Build documentation
+        run: raco scribble --html --dest doc scribblings/sdl3.scrbl
+
+      - name: Create index.html redirect
+        run: echo '<meta http-equiv="refresh" content="0; url=sdl3.html">' > doc/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: doc
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

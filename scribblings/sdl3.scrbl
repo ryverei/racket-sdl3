@@ -87,30 +87,91 @@ For more control, use the constructor and destructor functions directly:
 }|
 
 @; ============================================================================
-@; Include subsections
+@; Core
 @; ============================================================================
+
+@section[#:tag "core"]{Core}
+
+Initialization, windows, and basic rendering.
+
+@local-table-of-contents[]
 
 @include-section["initialization.scrbl"]
 @include-section["window.scrbl"]
+@include-section["timer.scrbl"]
+@include-section["hints.scrbl"]
+@include-section["properties.scrbl"]
+
+@; ============================================================================
+@; Graphics
+@; ============================================================================
+
+@section[#:tag "graphics"]{Graphics}
+
+Drawing, textures, images, and text rendering.
+
+@local-table-of-contents[]
+
 @include-section["drawing.scrbl"]
 @include-section["texture.scrbl"]
 @include-section["image.scrbl"]
+@include-section["ttf.scrbl"]
+@include-section["collision.scrbl"]
+
+@; ============================================================================
+@; Input
+@; ============================================================================
+
+@section[#:tag "input"]{Input}
+
+Keyboard, mouse, and game controller handling.
+
+@local-table-of-contents[]
+
 @include-section["events.scrbl"]
 @include-section["keyboard.scrbl"]
 @include-section["mouse.scrbl"]
 @include-section["gamepad.scrbl"]
 @include-section["joystick.scrbl"]
-@include-section["ttf.scrbl"]
+
+@; ============================================================================
+@; Media
+@; ============================================================================
+
+@section[#:tag "media"]{Media}
+
+Audio playback and camera capture.
+
+@local-table-of-contents[]
+
 @include-section["audio.scrbl"]
-@include-section["timer.scrbl"]
-@include-section["collision.scrbl"]
+@include-section["camera.scrbl"]
+
+@; ============================================================================
+@; System
+@; ============================================================================
+
+@section[#:tag "system"]{System}
+
+Display info, clipboard, dialogs, and system tray.
+
+@local-table-of-contents[]
+
 @include-section["display.scrbl"]
 @include-section["clipboard.scrbl"]
 @include-section["dialog.scrbl"]
-@include-section["camera.scrbl"]
 @include-section["tray.scrbl"]
-@include-section["properties.scrbl"]
-@include-section["hints.scrbl"]
+
+@; ============================================================================
+@; Advanced Graphics
+@; ============================================================================
+
+@section[#:tag "advanced-graphics"]{Advanced Graphics}
+
+OpenGL, Vulkan, and the SDL GPU API for advanced rendering.
+
+@local-table-of-contents[]
+
 @include-section["gl.scrbl"]
 @include-section["vulkan.scrbl"]
 @include-section["gpu.scrbl"]

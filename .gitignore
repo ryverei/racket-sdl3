@@ -11,3 +11,6 @@
 
 # Worktree symlink for PLTCOLLECTS override
 /sdl3
+
+# Generated documentation
+/doc/

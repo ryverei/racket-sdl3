@@ -5,5 +5,7 @@
 (define version "0.1.0")
 (define pkg-desc "SDL3 bindings for Racket")
 (define deps '("base"))
+(define build-deps '("scribble-lib" "racket-doc"))
 (define license 'MIT)
 (define compile-omit-paths '("examples"))
+(define scribblings '(("scribblings/sdl3.scrbl" (multi-page))))

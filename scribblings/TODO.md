@@ -10,42 +10,12 @@ This file tracks which modules need Scribble documentation.
 - [x] `events.scrbl` - Event polling, event structs, in-events
 - [x] `keyboard.scrbl` - Keyboard state, modifiers, text input
 - [x] `timer.scrbl` - Timing, delays, performance counter
+- [x] `mouse.scrbl` - Mouse state, cursor control
+- [x] `texture.scrbl` - Texture loading, rendering, render targets
+- [x] `ttf.scrbl` - TrueType font rendering
+- [x] `audio.scrbl` - Audio playback and streams
 
 ## Not Yet Documented
-
-### High Priority (commonly used)
-
-- [ ] `mouse.scrbl` - Mouse state, cursor control
-  - `mouse-button-pressed?`, `get-mouse-state`, `get-global-mouse-state`
-  - `get-relative-mouse-state`, `set-relative-mouse-mode!`
-  - `capture-mouse!`, `release-mouse!`
-  - `cursor-visible?`, `show-cursor!`, `hide-cursor!`
-  - `warp-mouse-in-window!`, `warp-mouse-global!`
-  - Cursor creation/destruction
-
-- [ ] `texture.scrbl` - Texture loading and manipulation
-  - `load-texture`, `create-texture`
-  - `render-texture!`, `render-texture-rotated!`
-  - `texture-size`, `texture-format`
-  - `set-texture-blend-mode!`, `get-texture-blend-mode`
-  - `set-texture-color-mod!`, `set-texture-alpha-mod!`
-  - `call-with-locked-texture`, `call-with-surface-pixels`
-  - Render targets: `set-render-target!`, `get-render-target`
-
-- [ ] `ttf.scrbl` - TrueType font rendering
-  - `open-font`, `close-font!`, `copy-font`
-  - `font-height`, `font-ascent`, `font-descent`, `font-line-skip`
-  - `font-style`, `set-font-style!`
-  - `measure-text`, `render-text`
-  - `draw-text!`, `draw-surface-text!`, `draw-renderer-text!`
-  - `make-text`, `text-engine` functions
-
-- [ ] `audio.scrbl` - Audio playback
-  - `open-audio-device`, `open-audio-device-stream`
-  - `audio-stream-put!`, `audio-stream-flush!`
-  - `pause-audio-device!`, `resume-audio-device!`
-  - `load-wav`, `play-audio!`, `mix-audio!`
-  - Audio device enumeration
 
 ### Medium Priority
 

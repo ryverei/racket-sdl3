@@ -12,10 +12,11 @@ A collection of examples demonstrating the sdl3 Racket library, organized from s
 4. **text/** - Font rendering
 5. **input/** - Keyboard and mouse handling
 6. **animation/** - Time-based animation
-7. **video/** - Camera capture and video input
-8. **advanced/** - Virtual cameras, viewports, collision
-9. **graphics/** - OpenGL, Vulkan, and GPU API examples
-10. **system/** - Tray menus and system integration
+7. **audio/** - Sound playback
+8. **video/** - Camera capture and video input
+9. **advanced/** - Surfaces, pixel access, collision detection
+10. **graphics/** - OpenGL, Vulkan, and GPU API examples
+11. **system/** - Tray menus and system integration
 
 ## Running Examples
 
@@ -47,6 +48,7 @@ Window management and system interaction.
 | `controls.rkt` | Resize, toggle fullscreen, change title |
 | `display-info.rkt` | Query monitor properties |
 | `error-handling.rkt` | Gracefully handle missing files |
+| `hints.rkt` | SDL hints and configuration |
 
 ### drawing/
 
@@ -67,6 +69,8 @@ Image loading and texture manipulation.
 | `render-target.rkt` | Render to texture, post-processing |
 | `screenshot.rkt` | Save screen contents to file |
 | `sprite-animation.rkt` | Sprite sheets, frame timing, animation control |
+| `streaming-texture.rkt` | Streaming textures with pixel-level updates |
+| `image-io.rkt` | Loading and saving images in various formats |
 
 ### text/
 
@@ -75,7 +79,8 @@ TrueType font rendering.
 | Example | Concepts |
 |---------|----------|
 | `text.rkt` | Load fonts, render text, sizing, colors |
-| `font-properties.rkt` | Font metrics, styles, text measurement, glyph info, version info |
+| `font-properties.rkt` | Font metrics, styles, text measurement, glyph info |
+| `ttf-advanced.rkt` | Advanced TTF rendering techniques |
 
 ### input/
 
@@ -90,6 +95,11 @@ User input handling.
 | `buttons.rkt` | Clickable UI buttons with hover/press states |
 | `custom-cursor.rkt` | Hide system cursor, draw custom cursors |
 | `gamepad.rkt` | Gamepad detection, buttons, axes, hot-plug events |
+| `gamepad-advanced.rkt` | Advanced gamepad features |
+| `clipboard-events.rkt` | Clipboard change notifications |
+| `drop-events.rkt` | File and text drop handling |
+| `touch-pen-events.rkt` | Touch and pen input events |
+| `device-enumeration.rkt` | Listing available input devices |
 
 ### animation/
 
@@ -98,14 +108,7 @@ Time-based animation techniques.
 | Example | Concepts |
 |---------|----------|
 | `animation.rkt` | Delta time, frame-rate independence |
-
-### video/
-
-Camera capture and video input.
-
-| Example | Concepts |
-|---------|----------|
-| `camera-preview.rkt` | Enumerate cameras, open device, live preview |
+| `timer-callbacks.rkt` | SDL timer callbacks |
 
 ### audio/
 
@@ -114,6 +117,16 @@ Sound playback.
 | Example | Concepts |
 |---------|----------|
 | `audio.rkt` | Load and play audio files |
+| `advanced-audio.rkt` | Advanced audio streaming and control |
+| `device-events.rkt` | Audio device hot-plug events |
+
+### video/
+
+Camera capture and video input.
+
+| Example | Concepts |
+|---------|----------|
+| `camera-preview.rkt` | Enumerate cameras, open device, live preview |
 
 ### advanced/
 
@@ -128,6 +141,12 @@ Complex topics for experienced users.
 | `camera.rkt` | World coordinates, camera follow, parallax, mini-map |
 | `wait-events.rkt` | Efficient event-driven rendering (no polling) |
 | `surface-basics.rkt` | Surface creation, pixel access, surface-to-texture conversion |
+| `surface-advanced.rkt` | Advanced surface manipulation |
+| `surface-blit.rkt` | Surface blitting operations |
+| `surface-io.rkt` | Loading and saving surfaces |
+| `pixel-access.rkt` | Direct pixel manipulation, color mapping |
+| `rect-utils.rkt` | Rectangle utility functions |
+| `app-metadata.rkt` | Application metadata and properties |
 
 ### graphics/
 
@@ -167,59 +186,61 @@ The `demos/` directory contains more complete applications:
 |------|-------------|
 | `mini-paint.rkt` | Simple drawing app with file save/load |
 | `keyboard-visual.rkt` | Visual keyboard showing pressed keys |
+| `mandelbrot.rkt` | Interactive Mandelbrot set explorer |
 
 ## Common Patterns
 
 ### Basic Window + Event Loop
 
 ```racket
-#lang racket
-(require sdl3)
+#lang racket/base
+(require racket/match sdl3)
 
-(define win (make-window "Title" 800 600))
-(define ren (make-renderer win))
+(with-sdl
+  (with-window+renderer "Title" 800 600 (window renderer)
+    (let loop ()
+      (define quit?
+        (for/or ([ev (in-events)])
+          (match ev
+            [(quit-event) #t]
+            [(key-event 'down 'escape _ _ _) #t]
+            [_ #f])))
 
-(let loop ()
-  (for ([e (in-events)])
-    (match e
-      [(quit-event) (exit)]
-      [_ (void)]))
-
-  (set-draw-color! ren 30 30 30)
-  (render-clear! ren)
-  ; ... draw here ...
-  (render-present! ren)
-  (loop))
+      (unless quit?
+        (set-draw-color! renderer 30 30 30)
+        (render-clear! renderer)
+        ;; ... draw here ...
+        (render-present! renderer)
+        (loop)))))
 ```
 
 ### Frame-Rate Independent Movement
 
 ```racket
-(define last-time (current-ticks))
-
-(let loop ()
+(let loop ([last-time (current-ticks)])
   (define now (current-ticks))
   (define dt (/ (- now last-time) 1000.0))
-  (set! last-time now)
 
-  ; Move 200 pixels per second regardless of frame rate
+  ;; Move 200 pixels per second regardless of frame rate
   (set! x (+ x (* 200 dt)))
-  ...)
+  ...
+  (loop now))
 ```
 
 ### Input Handling Approaches
 
 **Event-driven** (for discrete actions like menu selection):
 ```racket
-(for ([e (in-events)])
-  (match e
-    [(key-event 'down _ _ 'space _ _)
+(for ([ev (in-events)])
+  (match ev
+    [(key-event 'down 'space _ _ _)
      (fire-bullet!)]
     ...))
 ```
 
 **State polling** (for smooth continuous movement):
 ```racket
-(when (key-down? 'w) (set! y (- y (* speed dt))))
-(when (key-down? 's) (set! y (+ y (* speed dt))))
+(define kbd (get-keyboard-state))
+(when (kbd 'w) (set! y (- y (* speed dt))))
+(when (kbd 's) (set! y (+ y (* speed dt))))
 ```

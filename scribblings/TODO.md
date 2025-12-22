@@ -26,24 +26,9 @@ This file tracks which modules need Scribble documentation.
 - [x] `properties.scrbl` - SDL property bags
 - [x] `tray.scrbl` - System tray icons
 
-## Not Yet Documented
-
-### Advanced/Optional
-
-- [ ] `gl.scrbl` - OpenGL context management
-  - `create-gl-context`, `destroy-gl-context!`
-  - `gl-make-current!`, `gl-swap-window!`
-  - GL attribute getters/setters
-
-- [ ] `vulkan.scrbl` - Vulkan integration
-  - `create-vulkan-surface`, `destroy-vulkan-surface!`
-  - Vulkan instance extensions
-
-- [ ] `gpu.scrbl` - SDL GPU API (new in SDL3)
-  - Device creation, command buffers
-  - Render passes, shaders, pipelines
-  - Buffer and texture management
-  - This is a large API, may need multiple sections
+- [x] `gl.scrbl` - OpenGL context management
+- [x] `vulkan.scrbl` - Vulkan integration
+- [x] `gpu.scrbl` - SDL GPU API
 
 ## Notes
 

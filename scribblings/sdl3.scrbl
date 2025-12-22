@@ -111,3 +111,6 @@ For more control, use the constructor and destructor functions directly:
 @include-section["tray.scrbl"]
 @include-section["properties.scrbl"]
 @include-section["hints.scrbl"]
+@include-section["gl.scrbl"]
+@include-section["vulkan.scrbl"]
+@include-section["gpu.scrbl"]

@@ -2,9 +2,11 @@
 
 @(require (for-label racket/base
                      racket/contract
-                     sdl3))
+                     sdl3)
+          scribble/core
+          scribble/html-properties)
 
-@title{SDL3: Racket Bindings for SDL3}
+@title[#:style (make-style #f (list (css-addition "scribblings/sdl3.css")))]{SDL3: Racket Bindings for SDL3}
 @author{Ryan McKay-Fleming}
 
 @defmodule[sdl3]

@@ -6,7 +6,7 @@ clean:
 
 doc:
 	mkdir -p doc
-	PLTCOLLECTS="$(PWD):" /opt/homebrew/bin/raco scribble --html +m --redirect-main https://docs.racket-lang.org/ --dest doc scribblings/sdl3.scrbl
+	PLTCOLLECTS="$(PWD):" /opt/homebrew/bin/raco scribble --htmls +m --redirect-main https://docs.racket-lang.org/ --dest doc scribblings/sdl3.scrbl
 
 check-docs:
 	PLTCOLLECTS="$(PWD):" racket scripts/check-docs.rkt

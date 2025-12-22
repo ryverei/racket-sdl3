@@ -92,7 +92,7 @@ For more control, use the constructor and destructor functions directly:
 @; Core
 @; ============================================================================
 
-@section[#:tag "core"]{Core}
+@section[#:tag "core" #:style 'toc]{Core}
 
 Initialization, windows, and basic rendering.
 
@@ -108,7 +108,7 @@ Initialization, windows, and basic rendering.
 @; Graphics
 @; ============================================================================
 
-@section[#:tag "graphics"]{Graphics}
+@section[#:tag "graphics" #:style 'toc]{Graphics}
 
 Drawing, textures, images, and text rendering.
 
@@ -124,7 +124,7 @@ Drawing, textures, images, and text rendering.
 @; Input
 @; ============================================================================
 
-@section[#:tag "input"]{Input}
+@section[#:tag "input" #:style 'toc]{Input}
 
 Keyboard, mouse, and game controller handling.
 
@@ -140,7 +140,7 @@ Keyboard, mouse, and game controller handling.
 @; Media
 @; ============================================================================
 
-@section[#:tag "media"]{Media}
+@section[#:tag "media" #:style 'toc]{Media}
 
 Audio playback and camera capture.
 
@@ -153,7 +153,7 @@ Audio playback and camera capture.
 @; System
 @; ============================================================================
 
-@section[#:tag "system"]{System}
+@section[#:tag "system" #:style 'toc]{System}
 
 Display info, clipboard, dialogs, and system tray.
 
@@ -168,7 +168,7 @@ Display info, clipboard, dialogs, and system tray.
 @; Advanced Graphics
 @; ============================================================================
 
-@section[#:tag "advanced-graphics"]{Advanced Graphics}
+@section[#:tag "advanced-graphics" #:style 'toc]{Advanced Graphics}
 
 OpenGL, Vulkan, and the SDL GPU API for advanced rendering.
 

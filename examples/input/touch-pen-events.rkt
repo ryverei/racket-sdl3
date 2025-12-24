@@ -206,152 +206,152 @@
     (with-window+renderer window-title window-width window-height (window renderer)
       #:window-flags 'resizable
       (let loop ([running? #t])
-    (when running?
-      ;; Process events
-      (define still-running?
-        (for/fold ([run? #t])
-                  ([ev (in-events)]
-                   #:break (not run?))
-          (match ev
-            [(or (quit-event) (window-event 'close-requested)) #f]
+        (when running?
+          ;; Process events
+          (define still-running?
+            (for/fold ([run? #t])
+                      ([ev (in-events)]
+                       #:break (not run?))
+              (match ev
+                [(or (quit-event) (window-event 'close-requested)) #f]
 
-            [(key-event 'down 'escape _ _ _) #f]
+                [(key-event 'down 'escape _ _ _) #f]
 
-            [(key-event 'down 'c _ _ _)
-             (set! draw-points '())
-             run?]
+                [(key-event 'down 'c _ _ _)
+                 (set! draw-points '())
+                 run?]
 
-            ;; Touch finger down
-            [(touch-finger-event 'down touch-id finger-id x y dx dy pressure)
-             (define screen-x (* x window-width))
-             (define screen-y (* y window-height))
-             (define color (get-next-color))
-             (hash-set! active-fingers finger-id (list screen-x screen-y pressure color))
-             (printf "Finger DOWN: id=~a pos=(~a, ~a) pressure=~a~n"
-                     finger-id (round screen-x) (round screen-y) (~r pressure #:precision 2))
-             run?]
+                ;; Touch finger down
+                [(touch-finger-event 'down touch-id finger-id x y dx dy pressure)
+                 (define screen-x (* x window-width))
+                 (define screen-y (* y window-height))
+                 (define color (get-next-color))
+                 (hash-set! active-fingers finger-id (list screen-x screen-y pressure color))
+                 (printf "Finger DOWN: id=~a pos=(~a, ~a) pressure=~a~n"
+                         finger-id (round screen-x) (round screen-y) (~r pressure #:precision 2))
+                 run?]
 
-            ;; Touch finger up
-            [(touch-finger-event 'up touch-id finger-id x y dx dy pressure)
-             (hash-remove! active-fingers finger-id)
-             (printf "Finger UP: id=~a~n" finger-id)
-             run?]
+                ;; Touch finger up
+                [(touch-finger-event 'up touch-id finger-id x y dx dy pressure)
+                 (hash-remove! active-fingers finger-id)
+                 (printf "Finger UP: id=~a~n" finger-id)
+                 run?]
 
-            ;; Touch finger motion
-            [(touch-finger-event 'motion touch-id finger-id x y dx dy pressure)
-             (define screen-x (* x window-width))
-             (define screen-y (* y window-height))
-             (define existing (hash-ref active-fingers finger-id #f))
-             (define color (if existing (list-ref existing 3) (get-next-color)))
-             (hash-set! active-fingers finger-id (list screen-x screen-y pressure color))
-             ;; Add to draw points
-             (match-define (list r g b) color)
-             (define new-point (list screen-x screen-y pressure r g b))
-             (set! draw-points (cons new-point draw-points))
-             (when (> (length draw-points) max-points)
-               (set! draw-points (take draw-points max-points)))
-             run?]
+                ;; Touch finger motion
+                [(touch-finger-event 'motion touch-id finger-id x y dx dy pressure)
+                 (define screen-x (* x window-width))
+                 (define screen-y (* y window-height))
+                 (define existing (hash-ref active-fingers finger-id #f))
+                 (define color (if existing (list-ref existing 3) (get-next-color)))
+                 (hash-set! active-fingers finger-id (list screen-x screen-y pressure color))
+                 ;; Add to draw points
+                 (match-define (list r g b) color)
+                 (define new-point (list screen-x screen-y pressure r g b))
+                 (set! draw-points (cons new-point draw-points))
+                 (when (> (length draw-points) max-points)
+                   (set! draw-points (take draw-points max-points)))
+                 run?]
 
-            ;; Touch finger canceled
-            [(touch-finger-event 'canceled _ finger-id _ _ _ _ _)
-             (hash-remove! active-fingers finger-id)
-             (printf "Finger CANCELED: id=~a~n" finger-id)
-             run?]
+                ;; Touch finger canceled
+                [(touch-finger-event 'canceled _ finger-id _ _ _ _ _)
+                 (hash-remove! active-fingers finger-id)
+                 (printf "Finger CANCELED: id=~a~n" finger-id)
+                 run?]
 
-            ;; Pen proximity in
-            [(pen-proximity-event 'in which)
-             (set! pen-in-proximity? #t)
-             (set! pen-id which)
-             (printf "Pen PROXIMITY IN: id=~a~n" which)
-             run?]
+                ;; Pen proximity in
+                [(pen-proximity-event 'in which)
+                 (set! pen-in-proximity? #t)
+                 (set! pen-id which)
+                 (printf "Pen PROXIMITY IN: id=~a~n" which)
+                 run?]
 
-            ;; Pen proximity out
-            [(pen-proximity-event 'out which)
-             (set! pen-in-proximity? #f)
-             (printf "Pen PROXIMITY OUT: id=~a~n" which)
-             run?]
+                ;; Pen proximity out
+                [(pen-proximity-event 'out which)
+                 (set! pen-in-proximity? #f)
+                 (printf "Pen PROXIMITY OUT: id=~a~n" which)
+                 run?]
 
-            ;; Pen motion
-            [(pen-motion-event which pen-state x y)
-             (set! pen-x x)
-             (set! pen-y y)
-             (set! pen-buttons pen-state)
-             run?]
+                ;; Pen motion
+                [(pen-motion-event which pen-state x y)
+                 (set! pen-x x)
+                 (set! pen-y y)
+                 (set! pen-buttons pen-state)
+                 run?]
 
-            ;; Pen touch down (pen on surface)
-            [(pen-touch-event 'down which pen-state x y eraser?)
-             (set! pen-active? #t)
-             (set! pen-x x)
-             (set! pen-y y)
-             (set! pen-eraser? eraser?)
-             (set! pen-buttons pen-state)
-             (printf "Pen DOWN: pos=(~a, ~a) eraser=~a~n"
-                     (round x) (round y) eraser?)
-             run?]
+                ;; Pen touch down (pen on surface)
+                [(pen-touch-event 'down which pen-state x y eraser?)
+                 (set! pen-active? #t)
+                 (set! pen-x x)
+                 (set! pen-y y)
+                 (set! pen-eraser? eraser?)
+                 (set! pen-buttons pen-state)
+                 (printf "Pen DOWN: pos=(~a, ~a) eraser=~a~n"
+                         (round x) (round y) eraser?)
+                 run?]
 
-            ;; Pen touch up (pen lifted)
-            [(pen-touch-event 'up which pen-state x y eraser?)
-             (set! pen-active? #f)
-             (set! pen-x x)
-             (set! pen-y y)
-             (printf "Pen UP: pos=(~a, ~a)~n" (round x) (round y))
-             run?]
+                ;; Pen touch up (pen lifted)
+                [(pen-touch-event 'up which pen-state x y eraser?)
+                 (set! pen-active? #f)
+                 (set! pen-x x)
+                 (set! pen-y y)
+                 (printf "Pen UP: pos=(~a, ~a)~n" (round x) (round y))
+                 run?]
 
-            ;; Pen button events
-            [(pen-button-event type which pen-state x y button)
-             (set! pen-x x)
-             (set! pen-y y)
-             (set! pen-buttons pen-state)
-             (printf "Pen BUTTON ~a: button=~a pos=(~a, ~a)~n"
-                     type button (round x) (round y))
-             run?]
+                ;; Pen button events
+                [(pen-button-event type which pen-state x y button)
+                 (set! pen-x x)
+                 (set! pen-y y)
+                 (set! pen-buttons pen-state)
+                 (printf "Pen BUTTON ~a: button=~a pos=(~a, ~a)~n"
+                         type button (round x) (round y))
+                 run?]
 
-            ;; Pen axis events (pressure, tilt, rotation, etc.)
-            [(pen-axis-event which pen-state x y axis value)
-             (set! pen-x x)
-             (set! pen-y y)
-             (set! pen-buttons pen-state)
-             (case axis
-               [(pressure) (set! pen-pressure value)]
-               [(xtilt) (set! pen-xtilt value)]
-               [(ytilt) (set! pen-ytilt value)]
-               [(rotation) (set! pen-rotation value)]
-               [else (void)])
-             ;; Add to draw points when pen is active
-             (when pen-active?
-               (define r (if pen-eraser? 200 100))
-               (define g 150)
-               (define b (if pen-eraser? 100 200))
-               (define new-point (list x y pen-pressure r g b))
-               (set! draw-points (cons new-point draw-points))
-               (when (> (length draw-points) max-points)
-                 (set! draw-points (take draw-points max-points))))
-             run?]
+                ;; Pen axis events (pressure, tilt, rotation, etc.)
+                [(pen-axis-event which pen-state x y axis value)
+                 (set! pen-x x)
+                 (set! pen-y y)
+                 (set! pen-buttons pen-state)
+                 (case axis
+                   [(pressure) (set! pen-pressure value)]
+                   [(xtilt) (set! pen-xtilt value)]
+                   [(ytilt) (set! pen-ytilt value)]
+                   [(rotation) (set! pen-rotation value)]
+                   [else (void)])
+                 ;; Add to draw points when pen is active
+                 (when pen-active?
+                   (define r (if pen-eraser? 200 100))
+                   (define g 150)
+                   (define b (if pen-eraser? 100 200))
+                   (define new-point (list x y pen-pressure r g b))
+                   (set! draw-points (cons new-point draw-points))
+                   (when (> (length draw-points) max-points)
+                     (set! draw-points (take draw-points max-points))))
+                 run?]
 
-            [_ run?])))
+                [_ run?])))
 
-      (when still-running?
-        ;; Background
-        (set-draw-color! renderer 20 20 30)
-        (render-clear! renderer)
+          (when still-running?
+            ;; Background
+            (set-draw-color! renderer 20 20 30)
+            (render-clear! renderer)
 
-        ;; Draw canvas (stored points)
-        (draw-canvas! renderer)
+            ;; Draw canvas (stored points)
+            (draw-canvas! renderer)
 
-        ;; Draw active finger touches
-        (draw-fingers! renderer)
+            ;; Draw active finger touches
+            (draw-fingers! renderer)
 
-        ;; Draw pen visualization
-        (draw-pen! renderer)
+            ;; Draw pen visualization
+            (draw-pen! renderer)
 
-        ;; Draw UI
-        (draw-info! renderer)
-        (draw-instructions! renderer)
+            ;; Draw UI
+            (draw-info! renderer)
+            (draw-instructions! renderer)
 
-        (render-present! renderer)
-        (delay! 16)
+            (render-present! renderer)
+            (delay! 16)
 
-        (loop still-running?)))))
+            (loop still-running?))))))
 
   (printf "~nDone.~n"))
 

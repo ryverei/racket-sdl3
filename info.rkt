@@ -9,3 +9,4 @@
 (define license 'MIT)
 (define compile-omit-paths '("examples"))
 (define scribblings '(("scribblings/sdl3.scrbl" (multi-page))))
+(define pkg-authors '("rmckayfleming@gmail.com"))

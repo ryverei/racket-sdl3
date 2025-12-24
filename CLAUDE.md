@@ -1,193 +1,122 @@
 # CLAUDE.md
 
-## Quick Reference
+This is a Racket binding for SDL3. When working here, you'll typically be doing one of these tasks:
 
-- **Default API**: `(require sdl3)` → safe, idiomatic Racket interface
-- **Low-level API**: `(require sdl3/raw)` → C-style FFI bindings
-- Always prefer the safe API unless you need direct pointer access
-- When editing anything under `safe/`, read and follow `safe/CONVENTIONS.md`
+## Common Tasks
 
-## Build & Run
+### "I want to add a new SDL3 function"
 
-**IMPORTANT: You are working in a git worktree.** The `sdl3` package is installed pointing to the main repository, not this worktree. To test code in this worktree, you must:
+1. **Find the C signature** in `/opt/homebrew/include/SDL3/SDL_*.h`
+2. **Add types** if needed to `private/types.rkt` (pointer types, struct types)
+3. **Add constants** if needed to `private/constants.rkt` (flags, enum values)
+4. **Create the raw binding** in the appropriate `raw/*.rkt` file using `define-sdl`
+5. **Create a safe wrapper** in the matching `safe/*.rkt` file
+6. **Export from aggregators**: add to `raw.rkt` and `safe.rkt` as needed
+7. **Test**: create or update an example in `examples/`
 
-1. **Create a symlink** (one-time setup): `ln -sf . sdl3`
-2. **Use PLTCOLLECTS** to override the collection path
+**Pattern to follow**: Look at how similar functions are done. For instance, if adding a new renderer function, look at `raw/render.rkt` and `safe/draw.rkt`.
+
+### "I want to understand how X works"
+
+- **Examples are the best documentation**: Check `examples/` first. They're organized by topic (drawing, input, text, etc.)
+- **Safe API usage**: Look at `examples/basics/` for common patterns
+- **Low-level access**: Check if there's a `raw/*.rkt` file for that subsystem
+
+### "I want to fix a bug"
+
+1. **Reproduce**: Run the relevant example with `PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/.../file.rkt`
+2. **Find the code**: Safe wrappers are in `safe/`, raw bindings in `raw/`
+3. **Check types**: Many bugs are FFI type mismatches - check `private/types.rkt`
+4. **Clear cache if stuck**: `make clean` (Racket caches compiled bytecode)
+
+### "I want to add a new subsystem (e.g., gamepad, audio)"
+
+1. Create `raw/subsystem.rkt` with FFI bindings
+2. Create `safe/subsystem.rkt` with idiomatic wrappers
+3. Add exports to `raw.rkt` and `safe.rkt`
+4. Create examples in `examples/subsystem/`
+5. Follow patterns from existing subsystems (window, events, texture are good references)
+
+## Running Code
+
+**Critical**: This may be a git worktree. Always use:
 
 ```bash
-# One-time setup: create sdl3 symlink pointing to current directory
-ln -sf . sdl3
-
-# Run examples against THIS worktree's code (not the installed package)
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/window/basic.rkt
-
-# Compile against this worktree
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/raco make safe.rkt
+PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/basics/drawing.rkt
 ```
 
-The symlink is necessary because `PLTCOLLECTS` adds directories to search for collections, and the collection name is `sdl3`. The symlink `sdl3 -> .` makes the worktree findable as a collection.
+Without `PLTCOLLECTS="$PWD:"`, Racket loads the installed package instead of your local changes.
 
-Without this setup, Racket will load the main repo's code instead of the worktree's code, causing confusing "unbound identifier" errors for new functions.
+First-time setup: `ln -sf . sdl3` (creates symlink so collection resolves)
 
-Racket automatically creates `compiled/` directories for bytecode caching. Usually this just works. If you hit strange errors after modifying types or structs (e.g., "identifier not found" for something you just added), clear the cache:
+## Where Things Live
 
-```bash
-make clean
+| Looking for... | Check here |
+|----------------|------------|
+| How to use a feature | `examples/` |
+| Safe/idiomatic API | `safe/*.rkt` |
+| Raw C-style FFI | `raw/*.rkt` |
+| Type definitions | `private/types.rkt` |
+| Constants/flags | `private/constants.rkt` |
+| Key codes | `private/enums.rkt` |
+| Complete demos | `demos/` |
+
+## File Patterns
+
+**Raw bindings** (`raw/*.rkt`):
+```racket
+(define-sdl SDL-CreateWindow
+  (_fun _string _int _int _SDL_WindowFlags -> _SDL_Window-pointer/null)
+  #:c-id SDL_CreateWindow)
 ```
+- Function names: `SDL-FunctionName` (hyphenated)
+- Returns nullable pointers, doesn't check errors
 
-## Project Structure
+**Safe wrappers** (`safe/*.rkt`):
+```racket
+(define (make-window title w h #:flags [flags '()])
+  (define ptr (SDL-CreateWindow title w h (flags->window-flags flags)))
+  (unless ptr (error 'make-window "~a" (SDL-GetError)))
+  (wrap-window ptr))
+```
+- Function names: `make-thing`, `thing-property`, `do-action!`
+- Checks errors, wraps pointers in structs, registers with custodian
+
+## Key Conventions
+
+**When editing `safe/`**, read `safe/CONVENTIONS.md`. Key points:
+- Use symbols not constants: `'escape` not `SDLK_ESCAPE`
+- Use `!` suffix for side effects: `render-clear!`
+- Accept symbols for flags: `#:flags '(resizable)`
+- Return multiple values not lists: `(values x y)` not `(list x y)`
+
+**Naming**:
+- Raw: `SDL-FunctionName`, `SDL_CONSTANT_NAME`, `_SDL_Type`
+- Safe: `make-thing`, `thing-property`, `thing-action!`, `thing?`
+
+## Debugging Tips
+
+- **"unbound identifier" for something you just added**: Run `make clean`, then retry
+- **Crashes with no error**: Usually FFI type mismatch. Check pointer types match SDL3 headers
+- **Wrong behavior**: Safe wrapper might not be calling the right raw function. Add debug prints
+- **Works in installed package but not here**: You forgot `PLTCOLLECTS="$PWD:"`
+
+## SDL3 Gotchas
+
+- SDL3 uses C99 `bool` (not int like SDL2) - use `_sdl-bool` type
+- Event union is 128 bytes
+- Window flags are 64-bit, init flags are 32-bit
+- Mouse coordinates are floats, not ints
+- Many functions return `bool` for success, call `SDL-GetError` on failure
+
+## Reference Headers
 
 ```
-racket-sdl3/
-├── main.rkt          # Package entry point, re-exports safe.rkt
-├── safe.rkt          # Aggregates all safe/* modules
-├── raw.rkt           # Aggregates all raw/* modules
-├── README.md         # User documentation and tutorial
-│
-├── raw/              # Low-level FFI bindings by subsystem
-│   ├── init.rkt      # SDL-Init, SDL-Quit, errors
-│   ├── window.rkt    # Window management
-│   ├── render.rkt    # Renderer and drawing primitives
-│   ├── texture.rkt   # Texture management
-│   ├── surface.rkt   # Surface operations
-│   ├── events.rkt    # Event polling
-│   ├── keyboard.rkt  # Keyboard functions
-│   ├── mouse.rkt     # Mouse functions
-│   ├── audio.rkt     # Audio device/stream
-│   ├── display.rkt   # Display/monitor info
-│   ├── clipboard.rkt # Clipboard access
-│   ├── dialog.rkt    # File dialogs, message boxes
-│   ├── timer.rkt     # Timing functions
-│   ├── hints.rkt     # Hints/configuration
-│   ├── image.rkt     # SDL_image bindings
-│   └── ttf.rkt       # SDL_ttf bindings
-│
-├── safe/             # Idiomatic wrappers with custodian cleanup
-│   ├── window.rkt    # make-window, make-renderer
-│   ├── draw.rkt      # set-draw-color!, render-clear!, fill-rect!
-│   ├── texture.rkt   # load-texture, render-texture!
-│   ├── events.rkt    # poll-event, in-events, match-friendly structs
-│   ├── keyboard.rkt  # key-down?, key-pressed?
-│   ├── mouse.rkt     # mouse-position, mouse-button-down?
-│   ├── audio.rkt     # Audio wrappers
-│   ├── display.rkt   # display-count, display-bounds
-│   ├── clipboard.rkt # get-clipboard-text, set-clipboard-text!
-│   ├── dialog.rkt    # open-file-dialog, save-file-dialog
-│   ├── timer.rkt     # current-ticks, delay!
-│   ├── hints.rkt     # set-hint!, get-hint, set-app-name!
-│   ├── image.rkt     # load-surface, save-png!, save-jpg!
-│   ├── ttf.rkt       # open-font, draw-text!
-│   └── collision.rkt # make-rect, rects-intersect?, rect-intersection
-│
-├── private/          # Implementation details
-│   ├── lib.rkt       # Library loading, define-sdl macro
-│   ├── syntax.rkt    # Error handling helpers
-│   ├── safe-syntax.rkt # Resource wrapping macros
-│   ├── types.rkt     # C struct types and FFI type aliases
-│   ├── constants.rkt # Flags and constant values (init, window, event, etc.)
-│   └── enums.rkt     # Keycodes and scancodes
-│
-├── examples/         # Example programs organized by concept
-│   ├── window/       # Window creation and management
-│   ├── drawing/      # Shapes, blend modes, geometry
-│   ├── textures/     # Images, tinting, rotation, render targets
-│   ├── text/         # TTF font rendering
-│   ├── input/        # Keyboard and mouse handling
-│   ├── animation/    # Time-based animation
-│   ├── audio/        # Sound playback
-│   ├── advanced/     # Collision, viewports, clipping
-│   ├── dialogs/      # Message boxes
-│   └── assets/       # Images for examples
-│
-└── demos/            # Complete demo applications
-    └── mini-paint.rkt # Drawing app with file dialogs
+/opt/homebrew/include/SDL3/           # Core SDL3
+/opt/homebrew/include/SDL3_image/     # Image loading
+/opt/homebrew/include/SDL3_ttf/       # Font rendering
 ```
-
-## Architecture
-
-| Layer | Purpose | Example |
-|-------|---------|---------|
-| `safe/` | Idiomatic Racket API with automatic resource cleanup | `(make-window "Title" 800 600)` |
-| `raw/` | Direct FFI bindings, mirrors SDL3 C API | `(SDL-CreateWindow "Title" 800 600 0)` |
-| `private/` | Implementation details, not for external use | Types, macros, library loading |
-
-Safe wrappers use Racket's custodian system for automatic cleanup. When a custodian shuts down, all SDL resources registered with it are freed.
-
-## Naming Conventions
-
-### Raw Layer (C-style)
-- FFI functions use hyphenated names: `SDL-Init`, `SDL-CreateWindow`
-- C struct types use underscores: `_SDL_KeyboardEvent`
-- Struct accessors use underscores: `SDL_KeyboardEvent-key`
-- Constants match SDL3 names: `SDL_EVENT_QUIT`, `SDLK_ESCAPE`
-
-### Safe Layer (Racket-style)
-- Functions use kebab-case: `make-window`, `load-texture`
-- Mutators end with `!`: `render-clear!`, `set-draw-color!`
-- Predicates end with `?`: `window?`, `key-down?`
-- Destructors: `window-destroy!`, `texture-destroy!` (usually not needed due to custodians)
 
 ## Backwards Compatibility
 
-This library has no external consumers beyond the examples directory. Don't worry about backwards compatibility when refactoring - just make sure the examples still work.
-
-## Adding New Bindings
-
-### Adding a raw binding
-
-1. Add types to `private/types.rkt`, constants to `private/constants.rkt`, or keycodes/scancodes to `private/enums.rkt`
-2. Add function binding to appropriate `raw/*.rkt` using `define-sdl`
-3. Re-export from `raw.rkt` if needed
-
-### Adding a safe wrapper
-
-1. Create resource struct with `define-sdl-resource` if managing a pointer
-2. Wrap raw functions with error checking (raise Racket errors on failure)
-3. Register cleanup with custodian via `register-custodian-shutdown`
-4. Export from the appropriate `safe/*.rkt` module
-5. Re-export from `safe.rkt`
-
-## SDL3 Notes
-
-- SDL3 uses C99 `bool` (not int like SDL2)
-- Event union is 128 bytes (`SDL_EVENT_SIZE`)
-- Window flags are 64-bit, init flags are 32-bit
-- Coordinates in mouse events are `float`, not `int`
-
-## SDL3 Reference Headers
-
-When adding new bindings, refer to the SDL3 headers installed via Homebrew:
-
-```
-/opt/homebrew/include/SDL3/        # Core SDL3 headers
-/opt/homebrew/include/SDL3_image/  # SDL3_image headers
-/opt/homebrew/include/SDL3_ttf/    # SDL3_ttf headers
-```
-
-Key headers:
-- `SDL3/SDL_video.h` - Window functions
-- `SDL3/SDL_render.h` - Renderer and texture functions
-- `SDL3/SDL_events.h` - Event types and structs
-- `SDL3/SDL_keyboard.h` - Keyboard functions and keycodes
-- `SDL3/SDL_mouse.h` - Mouse functions
-- `SDL3/SDL_blendmode.h` - Blend mode constants
-
-## Extension Libraries
-
-| Library | Raw Access | Safe Access |
-|---------|------------|-------------|
-| SDL_image | `sdl3/raw/image` | `load-texture`, `load-surface` |
-| SDL_ttf | `sdl3/raw/ttf` | `open-font`, `draw-text!` |
-
-## Testing
-
-Run examples to verify bindings work. Remember to use `PLTCOLLECTS` in worktrees:
-
-```bash
-# In a worktree, always prefix with PLTCOLLECTS="$PWD:"
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/window/basic.rkt      # Basic window
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/input/keyboard-events.rkt  # Keyboard/mouse
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/textures/image.rkt    # Image loading
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/text/text.rkt         # TTF rendering
-PLTCOLLECTS="$PWD:" /opt/homebrew/bin/racket examples/advanced/collision.rkt    # Collision detection
-```
+None needed. Only consumers are `examples/` and `demos/`. Just make sure those still work.

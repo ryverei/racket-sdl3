@@ -186,12 +186,13 @@
     (cons 'volume-down SDL_SCANCODE_VOLUMEDOWN))))
 
 ;; Reverse mapping: scancode -> symbol
+;; For aliases (enter/return), we explicitly set the canonical symbol
 (define scancode->symbol-table
   (let ([ht (make-hasheqv)])
     (for ([(sym sc) (in-hash symbol->scancode-table)])
-      ;; Don't overwrite if already present (handles aliases like enter/return)
-      (unless (hash-has-key? ht sc)
-        (hash-set! ht sc sym)))
+      (hash-set! ht sc sym))
+    ;; Override with canonical symbols for keys with aliases
+    (hash-set! ht SDL_SCANCODE_RETURN 'return)
     ht))
 
 ;; Convert a symbol to its corresponding scancode
@@ -334,12 +335,13 @@
     (cons 'volume-down SDLK_VOLUMEDOWN))))
 
 ;; Reverse mapping: keycode -> symbol
+;; For aliases (enter/return), we explicitly set the canonical symbol
 (define keycode->symbol-table
   (let ([ht (make-hasheqv)])
     (for ([(sym kc) (in-hash symbol->keycode-table)])
-      ;; Don't overwrite if already present (handles aliases like enter/return)
-      (unless (hash-has-key? ht kc)
-        (hash-set! ht kc sym)))
+      (hash-set! ht kc sym))
+    ;; Override with canonical symbols for keys with aliases
+    (hash-set! ht SDLK_RETURN 'return)
     ht))
 
 ;; Convert a symbol to its corresponding keycode

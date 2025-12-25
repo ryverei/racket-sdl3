@@ -808,6 +808,7 @@
    [timestamp _uint64]))
 
 ;; SDL_KeyboardEvent - keyboard key press/release
+;; Note: down and repeat are C99 bool (1 byte), so use _stdbool not _bool
 (define-cstruct _SDL_KeyboardEvent
   ([type _uint32]
    [reserved _uint32]
@@ -818,8 +819,8 @@
    [key _uint32]         ; SDL_Keycode - virtual key code
    [mod _uint16]         ; SDL_Keymod - current key modifiers
    [raw _uint16]         ; platform dependent scancode
-   [down _bool]          ; true if key is pressed
-   [repeat _bool]))
+   [down _stdbool]       ; true if key is pressed
+   [repeat _stdbool]))   ; true if this is a key repeat
 
 ;; SDL_MouseMotionEvent - mouse movement
 (define-cstruct _SDL_MouseMotionEvent

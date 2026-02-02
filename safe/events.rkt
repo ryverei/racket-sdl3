@@ -14,7 +14,7 @@
  ;; Event structs (all transparent for match)
  quit-event quit-event?
 
- window-event window-event? window-event-type
+(struct-out window-event)
 (struct-out key-event)
 
 (struct-out mouse-motion-event)
@@ -173,7 +173,7 @@
 (struct quit-event sdl-event () #:transparent)
 
 ;; Window events (shown, hidden, resized, close-requested, etc.)
-(struct window-event sdl-event (type) #:transparent)
+(struct window-event sdl-event (window-id type) #:transparent)
 ;; type is a symbol: 'shown, 'hidden, 'exposed, 'moved, 'resized,
 ;;                   'focus-gained, 'focus-lost, 'close-requested
 
@@ -526,7 +526,9 @@
          (= type SDL_EVENT_WINDOW_FOCUS_GAINED)
          (= type SDL_EVENT_WINDOW_FOCUS_LOST)
          (= type SDL_EVENT_WINDOW_CLOSE_REQUESTED))
-     (window-event (window-event-type-symbol type))]
+     (window-event 
+        (SDL_WindowEvent-windowID (event->window buf))
+        (window-event-type-symbol type))]
 
     ;; Keyboard events
     [(or (= type SDL_EVENT_KEY_DOWN) (= type SDL_EVENT_KEY_UP))
@@ -844,6 +846,6 @@
 (define (should-quit? ev)
   (match ev
     [(quit-event) #t]
-    [(window-event 'close-requested) #t]
+    [(window-event _ 'close-requested) #t]
     [(key-event _ 'down 'escape _ _ _) #t]
     [_ #f]))

@@ -15,28 +15,17 @@
  quit-event quit-event?
 
  window-event window-event? window-event-type
+(struct-out key-event)
 
- key-event key-event?
- key-event-type key-event-key key-event-scancode key-event-mod key-event-repeat?
+(struct-out mouse-motion-event)
 
- mouse-motion-event mouse-motion-event?
- mouse-motion-event-x mouse-motion-event-y
- mouse-motion-event-xrel mouse-motion-event-yrel
- mouse-motion-event-state
+(struct-out mouse-button-event)
 
- mouse-button-event mouse-button-event?
- mouse-button-event-type mouse-button-event-button
- mouse-button-event-x mouse-button-event-y mouse-button-event-clicks
+ (struct-out text-input-event)
+ (struct-out mouse-wheel-event)
 
- text-input-event text-input-event? text-input-event-text
-
- mouse-wheel-event mouse-wheel-event?
- mouse-wheel-event-x mouse-wheel-event-y
- mouse-wheel-event-direction
- mouse-wheel-event-mouse-x mouse-wheel-event-mouse-y
-
- drop-event drop-event?
- drop-event-type drop-event-x drop-event-y drop-event-source drop-event-data
+ 
+ (struct-out drop-event)
 
  clipboard-event clipboard-event?
  clipboard-event-owner? clipboard-event-mime-types
@@ -71,33 +60,20 @@
  gamepad-device-event-type gamepad-device-event-which
 
  ;; Touch events
- touch-finger-event touch-finger-event?
- touch-finger-event-type touch-finger-event-touch-id touch-finger-event-finger-id
- touch-finger-event-x touch-finger-event-y
- touch-finger-event-dx touch-finger-event-dy
- touch-finger-event-pressure
+
+ (struct-out touch-finger-event)
 
  ;; Pen events
- pen-proximity-event pen-proximity-event?
- pen-proximity-event-type pen-proximity-event-which
 
- pen-motion-event pen-motion-event?
- pen-motion-event-which pen-motion-event-pen-state
- pen-motion-event-x pen-motion-event-y
+ (struct-out  pen-proximity-event)
 
- pen-touch-event pen-touch-event?
- pen-touch-event-type pen-touch-event-which pen-touch-event-pen-state
- pen-touch-event-x pen-touch-event-y
- pen-touch-event-eraser?
+ (struct-out  pen-motion-event)
 
- pen-button-event pen-button-event?
- pen-button-event-type pen-button-event-which pen-button-event-pen-state
- pen-button-event-x pen-button-event-y pen-button-event-button
+ (struct-out  pen-touch-event)
 
- pen-axis-event pen-axis-event?
- pen-axis-event-which pen-axis-event-pen-state
- pen-axis-event-x pen-axis-event-y
- pen-axis-event-axis pen-axis-event-value
+ (struct-out  pen-button-event)
+
+ (struct-out  pen-axis-event)
 
  ;; Pen state predicates
  pen-state-down?
@@ -202,7 +178,7 @@
 ;;                   'focus-gained, 'focus-lost, 'close-requested
 
 ;; Keyboard events
-(struct key-event sdl-event (type key scancode mod repeat?) #:transparent)
+(struct key-event sdl-event (window-id type key scancode mod repeat?) #:transparent)
 ;; type is 'down or 'up
 ;; key is a symbol ('escape, 'a, 'space, etc.) or the raw keycode if unknown
 ;; scancode is the physical key scancode (integer)
@@ -215,30 +191,30 @@
 ;;   [(key-event type 'space _ mod _) (when (mod-shift? mod) ...)]
 
 ;; Mouse motion
-(struct mouse-motion-event sdl-event (x y xrel yrel state) #:transparent)
+(struct mouse-motion-event sdl-event (window-id x y xrel yrel state) #:transparent)
 ;; x, y are current position (floats)
 ;; xrel, yrel are relative motion (floats)
 ;; state is button state mask (integer)
 
 ;; Mouse button press/release
-(struct mouse-button-event sdl-event (type button x y clicks) #:transparent)
+(struct mouse-button-event sdl-event (window-id type button x y clicks) #:transparent)
 ;; type is 'down or 'up
 ;; button is 'left, 'middle, 'right, 'x1, 'x2, or integer
 ;; x, y are position (floats)
 ;; clicks is click count (1 for single, 2 for double, etc.)
 
 ;; Text input (actual characters, handles shift/caps)
-(struct text-input-event sdl-event (text) #:transparent)
+(struct text-input-event sdl-event (window-id text) #:transparent)
 ;; text is a string
 
 ;; Mouse wheel/scroll
-(struct mouse-wheel-event sdl-event (x y direction mouse-x mouse-y) #:transparent)
+(struct mouse-wheel-event sdl-event (window-id x y direction mouse-x mouse-y) #:transparent)
 ;; x, y are scroll amounts (floats, positive = right/away from user)
 ;; direction is 'normal or 'flipped
 ;; mouse-x, mouse-y are cursor position (floats)
 
 ;; Drop events (drag-and-drop)
-(struct drop-event sdl-event (type x y source data) #:transparent)
+(struct drop-event sdl-event (window-id type x y source data) #:transparent)
 ;; type is 'file, 'text, 'begin, 'complete, or 'position
 ;; x, y are position (floats, may be 0 for begin/complete)
 ;; source is source app string or #f
@@ -301,7 +277,7 @@
 ;; which is the joystick instance ID
 
 ;; Touch finger events
-(struct touch-finger-event sdl-event (type touch-id finger-id x y dx dy pressure) #:transparent)
+(struct touch-finger-event sdl-event (window-id type touch-id finger-id x y dx dy pressure) #:transparent)
 ;; type is 'down, 'up, 'motion, or 'canceled
 ;; touch-id is the touch device ID
 ;; finger-id is the finger ID within the device
@@ -310,18 +286,18 @@
 ;; pressure is normalized 0...1
 
 ;; Pen proximity events
-(struct pen-proximity-event sdl-event (type which) #:transparent)
+(struct pen-proximity-event sdl-event (window-id type which) #:transparent)
 ;; type is 'in or 'out
 ;; which is the pen instance ID
 
 ;; Pen motion events
-(struct pen-motion-event sdl-event (which pen-state x y) #:transparent)
+(struct pen-motion-event sdl-event (window-id which pen-state x y) #:transparent)
 ;; which is the pen instance ID
 ;; pen-state is the pen input flags (use pen-state-down?, pen-state-button?, etc.)
 ;; x, y are position relative to window
 
 ;; Pen touch events (pen touches/lifts from surface)
-(struct pen-touch-event sdl-event (type which pen-state x y eraser?) #:transparent)
+(struct pen-touch-event sdl-event (window-id type which pen-state x y eraser?) #:transparent)
 ;; type is 'down or 'up
 ;; which is the pen instance ID
 ;; pen-state is the pen input flags
@@ -329,7 +305,7 @@
 ;; eraser? is #t if the eraser tip is used
 
 ;; Pen button events
-(struct pen-button-event sdl-event (type which pen-state x y button) #:transparent)
+(struct pen-button-event sdl-event (window-id type which pen-state x y button) #:transparent)
 ;; type is 'down or 'up
 ;; which is the pen instance ID
 ;; pen-state is the pen input flags
@@ -337,7 +313,7 @@
 ;; button is the button index (1-5)
 
 ;; Pen axis events
-(struct pen-axis-event sdl-event (which pen-state x y axis value) #:transparent)
+(struct pen-axis-event sdl-event (window-id which pen-state x y axis value) #:transparent)
 ;; which is the pen instance ID
 ;; pen-state is the pen input flags
 ;; x, y are position relative to window
@@ -558,7 +534,8 @@
      (define keycode (SDL_KeyboardEvent-key kb))
      ;; Convert keycode to symbol, fall back to integer if unknown
      (define key-sym (or (keycode->symbol keycode) keycode))
-     (key-event (if (= type SDL_EVENT_KEY_DOWN) 'down 'up)
+     (key-event (SDL_KeyboardEvent-windowID kb)
+     (if (= type SDL_EVENT_KEY_DOWN) 'down 'up)
                 key-sym
                 (SDL_KeyboardEvent-scancode kb)
                 (SDL_KeyboardEvent-mod kb)
@@ -567,7 +544,8 @@
     ;; Mouse motion
     [(= type SDL_EVENT_MOUSE_MOTION)
      (define mm (event->mouse-motion buf))
-     (mouse-motion-event (SDL_MouseMotionEvent-x mm)
+     (mouse-motion-event (SDL_MouseMotionEvent-windowID mm)
+      (SDL_MouseMotionEvent-x mm)
                          (SDL_MouseMotionEvent-y mm)
                          (SDL_MouseMotionEvent-xrel mm)
                          (SDL_MouseMotionEvent-yrel mm)
@@ -576,7 +554,8 @@
     ;; Mouse button
     [(or (= type SDL_EVENT_MOUSE_BUTTON_DOWN) (= type SDL_EVENT_MOUSE_BUTTON_UP))
      (define mb (event->mouse-button buf))
-     (mouse-button-event (if (= type SDL_EVENT_MOUSE_BUTTON_DOWN) 'down 'up)
+     (mouse-button-event (SDL_MouseButtonEvent-windowID mb)
+                         (if (= type SDL_EVENT_MOUSE_BUTTON_DOWN) 'down 'up)
                          (button-id->symbol (SDL_MouseButtonEvent-button mb))
                          (SDL_MouseButtonEvent-x mb)
                          (SDL_MouseButtonEvent-y mb)
@@ -587,13 +566,14 @@
      (define ti (event->text-input buf))
      (define text-ptr (SDL_TextInputEvent-text ti))
      (define text (cast text-ptr _pointer _string/utf-8))
-     (text-input-event text)]
+     (text-input-event (SDL_TextInputEvent-windowID ti) text)]
 
     ;; Mouse wheel
     [(= type SDL_EVENT_MOUSE_WHEEL)
      (define mw (event->mouse-wheel buf))
      (define dir (SDL_MouseWheelEvent-direction mw))
-     (mouse-wheel-event (SDL_MouseWheelEvent-x mw)
+     (mouse-wheel-event (SDL_MouseWheelEvent-windowID mw)
+      (SDL_MouseWheelEvent-x mw)
                         (SDL_MouseWheelEvent-y mw)
                         (if (= dir SDL_MOUSEWHEEL_NORMAL) 'normal 'flipped)
                         (SDL_MouseWheelEvent-mouse_x mw)
@@ -606,7 +586,8 @@
          (= type SDL_EVENT_DROP_COMPLETE)
          (= type SDL_EVENT_DROP_POSITION))
      (define drop (event->drop buf))
-     (drop-event (drop-event-type-symbol type)
+     (drop-event (SDL_DropEvent-windowID drop) 
+     (drop-event-type-symbol type)
                  (SDL_DropEvent-x drop)
                  (SDL_DropEvent-y drop)
                  (pointer->maybe-string (SDL_DropEvent-source drop))
@@ -696,7 +677,8 @@
          (= type SDL_EVENT_FINGER_MOTION)
          (= type SDL_EVENT_FINGER_CANCELED))
      (define tf (event->touch-finger buf))
-     (touch-finger-event (cond [(= type SDL_EVENT_FINGER_DOWN) 'down]
+     (touch-finger-event (SDL_TouchFingerEvent-windowID tf)
+     (cond [(= type SDL_EVENT_FINGER_DOWN) 'down]
                                [(= type SDL_EVENT_FINGER_UP) 'up]
                                [(= type SDL_EVENT_FINGER_MOTION) 'motion]
                                [else 'canceled])
@@ -712,13 +694,15 @@
     [(or (= type SDL_EVENT_PEN_PROXIMITY_IN)
          (= type SDL_EVENT_PEN_PROXIMITY_OUT))
      (define pp (event->pen-proximity buf))
-     (pen-proximity-event (if (= type SDL_EVENT_PEN_PROXIMITY_IN) 'in 'out)
+     (pen-proximity-event (SDL_PenProximityEvent-windowID pp)
+     (if (= type SDL_EVENT_PEN_PROXIMITY_IN) 'in 'out)
                           (SDL_PenProximityEvent-which pp))]
 
     ;; Pen motion events
     [(= type SDL_EVENT_PEN_MOTION)
      (define pm (event->pen-motion buf))
-     (pen-motion-event (SDL_PenMotionEvent-which pm)
+     (pen-motion-event (SDL_PenMotionEvent-windowID pm)
+     (SDL_PenMotionEvent-which pm)
                        (SDL_PenMotionEvent-pen_state pm)
                        (SDL_PenMotionEvent-x pm)
                        (SDL_PenMotionEvent-y pm))]
@@ -727,7 +711,8 @@
     [(or (= type SDL_EVENT_PEN_DOWN)
          (= type SDL_EVENT_PEN_UP))
      (define pt (event->pen-touch buf))
-     (pen-touch-event (if (= type SDL_EVENT_PEN_DOWN) 'down 'up)
+     (pen-touch-event (SDL_PenTouchEvent-windowID pt)
+      (if (= type SDL_EVENT_PEN_DOWN) 'down 'up)
                       (SDL_PenTouchEvent-which pt)
                       (SDL_PenTouchEvent-pen_state pt)
                       (SDL_PenTouchEvent-x pt)
@@ -738,7 +723,8 @@
     [(or (= type SDL_EVENT_PEN_BUTTON_DOWN)
          (= type SDL_EVENT_PEN_BUTTON_UP))
      (define pb (event->pen-button buf))
-     (pen-button-event (if (= type SDL_EVENT_PEN_BUTTON_DOWN) 'down 'up)
+     (pen-button-event (SDL_PenButtonEvent-windowID pb)
+     (if (= type SDL_EVENT_PEN_BUTTON_DOWN) 'down 'up)
                        (SDL_PenButtonEvent-which pb)
                        (SDL_PenButtonEvent-pen_state pb)
                        (SDL_PenButtonEvent-x pb)
@@ -748,7 +734,8 @@
     ;; Pen axis events
     [(= type SDL_EVENT_PEN_AXIS)
      (define pa (event->pen-axis buf))
-     (pen-axis-event (SDL_PenAxisEvent-which pa)
+     (pen-axis-event (SDL_PenAxisEvent-windowID pa)
+     (SDL_PenAxisEvent-which pa)
                      (SDL_PenAxisEvent-pen_state pa)
                      (SDL_PenAxisEvent-x pa)
                      (SDL_PenAxisEvent-y pa)
@@ -858,5 +845,5 @@
   (match ev
     [(quit-event) #t]
     [(window-event 'close-requested) #t]
-    [(key-event 'down 'escape _ _ _) #t]
+    [(key-event _ 'down 'escape _ _ _) #t]
     [_ #f]))

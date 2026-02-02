@@ -310,6 +310,9 @@
          SDL_CommonEvent-timestamp
          _SDL_KeyboardEvent
          _SDL_KeyboardEvent-pointer
+         SDL_WindowEvent-windowID
+         SDL_WindowEvent-data1
+         SDL_WindowEvent-data2
          SDL_KeyboardEvent-type
          SDL_KeyboardEvent-windowID
          SDL_KeyboardEvent-which
@@ -379,6 +382,7 @@
          SDL_CameraDeviceEvent-which
          ;; Event union helpers
          sdl-event-type
+         event->window
          event->keyboard
          event->mouse-motion
          event->mouse-button
@@ -807,6 +811,13 @@
    [reserved _uint32]
    [timestamp _uint64]))
 
+(define-cstruct _SDL_WindowEvent
+  ([type _uint32]
+   [reserved _uint32]
+   [timestamp _uint64]
+   [windowID _uint32]
+   [data1 _sint32]
+   [data2 _sint32])) 
 ;; SDL_KeyboardEvent - keyboard key press/release
 ;; Note: down and repeat are C99 bool (1 byte), so use _stdbool not _bool
 (define-cstruct _SDL_KeyboardEvent
@@ -916,6 +927,9 @@
   (ptr-ref event-ptr _uint32))
 
 ;; Helper to cast event pointer to specific struct types
+(define (event->window event-ptr)
+  (cast event-ptr _pointer _SDL_WindowEvent-pointer))
+
 (define (event->keyboard event-ptr)
   (cast event-ptr _pointer _SDL_KeyboardEvent-pointer))
 
